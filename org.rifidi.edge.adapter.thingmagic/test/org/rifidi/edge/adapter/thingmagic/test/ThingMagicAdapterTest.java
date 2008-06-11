@@ -38,7 +38,7 @@ public class ThingMagicAdapterTest {
 	@Test
 	public void testConnect(){
 		ThingMagicConnectionInfo info = new ThingMagicConnectionInfo();
-		info.setIPAddress("192.168.0.1");
+		info.setIPAddress("172.0.0.1");
 		info.setPort(8080);
 		
 		ThingMagicReaderAdapter adapter = new ThingMagicReaderAdapter(info);
