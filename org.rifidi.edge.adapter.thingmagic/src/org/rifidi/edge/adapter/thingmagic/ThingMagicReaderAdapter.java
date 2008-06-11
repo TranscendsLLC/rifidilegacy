@@ -27,7 +27,7 @@ public class ThingMagicReaderAdapter implements IReaderAdapter {
 	}
 	
 	@Override
-	public void connect() {
+	public boolean connect() {
 		try {
 			connection = new Socket(tmci.getIPAddress(), tmci.getPort());
 			out = new PrintWriter(connection.getOutputStream());
@@ -37,25 +37,31 @@ public class ThingMagicReaderAdapter implements IReaderAdapter {
 			connected = true;
 		} catch (UnknownHostException e) {
 			e.printStackTrace();
+			return false;
 		} catch (IOException e) {
 			e.printStackTrace();
+			return false;
 		}
+		return true;
 	}
 
 	@Override
-	public void disconnect() {
+	public boolean disconnect() {
 		connected=false;
 		out.flush();
 		try {
 			connection.close();
 		} catch (IOException e){
 			e.printStackTrace();
+			return false;
 		}
+		return true;
 	}
 
 	@Override
 	public List<TagRead> getNextTags() {
 		String input = null;
+		List<TagRead> tags = new ArrayList<TagRead>();
 		if(connected){
 			out.write("select id, timestamp from tag_id;/n");
 			out.flush();
@@ -63,17 +69,18 @@ public class ThingMagicReaderAdapter implements IReaderAdapter {
 				 input = readFromReader(in);
 			} catch (IOException e) {
 				e.printStackTrace();
+				return null;
 			}
 
 			if (input.equals("\n"))
-				return null;
+				return tags;
 			
 			//chew up last new line.
 			input = input.substring(0, input.lastIndexOf("\n"));
 			
 			String[] rawTags = input.split("\n");
 			
-			List<TagRead> tags = new ArrayList<TagRead>();
+			
 			
 			for (String rawTag: rawTags){
 				String[] rawTagItems = rawTag.split("|");
@@ -86,6 +93,7 @@ public class ThingMagicReaderAdapter implements IReaderAdapter {
 				tag.setLastSeenTime(System.nanoTime()); 
 				tags.add(tag);
 			}
+			return tags;
 		}
 		return null;
 	}
