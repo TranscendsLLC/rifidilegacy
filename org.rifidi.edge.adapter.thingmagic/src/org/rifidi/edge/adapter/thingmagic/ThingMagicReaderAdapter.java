@@ -13,6 +13,7 @@ import org.rifidi.common.utilities.ByteAndHexConvertingUtility;
 import org.rifidi.edge.core.readerAdapter.IReaderAdapter;
 import org.rifidi.edge.core.tag.TagRead;
 
+//TODO: Try this junit test on a /real/ thing magic reader
 public class ThingMagicReaderAdapter implements IReaderAdapter {
 	
 	boolean connected = false;
@@ -29,10 +30,15 @@ public class ThingMagicReaderAdapter implements IReaderAdapter {
 	@Override
 	public boolean connect() {
 		try {
+			System.out.println("Connecting: " + tmci.getIPAddress() + ":" + tmci.getPort());
 			connection = new Socket(tmci.getIPAddress(), tmci.getPort());
+			
 			out = new PrintWriter(connection.getOutputStream());
+			
 			in = new BufferedReader(new InputStreamReader(connection
 				.getInputStream()));
+			
+			//System.out.println(readFromReader(in));
 			
 			connected = true;
 		} catch (UnknownHostException e) {
@@ -66,8 +72,10 @@ public class ThingMagicReaderAdapter implements IReaderAdapter {
 		String input = null;
 		List<TagRead> tags = new ArrayList<TagRead>();
 		if(connected){
-			out.write("select id, timestamp from tag_id;/n");
+			
+			out.write("select id, timestamp from tag_id;\n");
 			out.flush();
+			
 			try {
 				 input = readFromReader(in);
 			} catch (IOException e) {
@@ -75,23 +83,27 @@ public class ThingMagicReaderAdapter implements IReaderAdapter {
 				e.printStackTrace();
 				return null;
 			}
-
+			
 			if (input.equals("\n"))				// TODO Auto-generated catch block
 				return tags;
 			
-			//chew up last new line.
-			input = input.substring(0, input.lastIndexOf("\n"));
+			//chew up last new lines.
+			input = input.substring(0, input.lastIndexOf("\n\n"));
+			
+			//System.out.println("Input: " + input.replace("\n", "\\n"));
 			
 			String[] rawTags = input.split("\n");
 			
 			
 			
 			for (String rawTag: rawTags){
-				String[] rawTagItems = rawTag.split("|");
+				System.out.println(rawTag);
+				
+				String[] rawTagItems = rawTag.split("\\|");
 				
 				TagRead tag = new TagRead();
 				
-				tag.setId(ByteAndHexConvertingUtility.fromHexString(rawTagItems[0]));
+				tag.setId(ByteAndHexConvertingUtility.fromHexString(rawTagItems[0].substring(2, rawTagItems[0].length())));
 				
 				//TODO: correct the time stamps.
 				tag.setLastSeenTime(System.nanoTime()); 
@@ -119,17 +131,37 @@ public class ThingMagicReaderAdapter implements IReaderAdapter {
 	@Override
 	public boolean isBlocking() {
 		// TODO Auto-generated method stub
-		return true;
+		return false;
 	}
 
 	
 	public static String readFromReader(BufferedReader inBuf) throws IOException{
 		StringBuffer buf=new StringBuffer();
 		
+		//String temp = inBuf.readLine();
+		/*while(temp != null){
+			buf.append(temp);
+			temp = inBuf.readLine();
+		}*/
+		
+		//TODO: See if this is really needed on the real thing magic reader.
+		try {
+			Thread.sleep(500);
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		while(inBuf.ready()){
 			int ch=inBuf.read();
 			buf.append((char)ch);
 		}
+		/*
+		int ch=inBuf.read();
+		while((char)ch!='\0'){
+			buf.append((char)ch);
+			ch=inBuf.read();
+		}*/
+		
 		return buf.toString();
 	}
 }

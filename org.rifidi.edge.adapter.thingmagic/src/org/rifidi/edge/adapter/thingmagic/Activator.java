@@ -47,6 +47,7 @@ public class Activator implements BundleActivator {
 			ReaderAdapterRegistryService readerAdapterRegistryService) {
 		this.readerAdapterRegistryService = readerAdapterRegistryService;
 		
+		System.out.println("Registering Reader Adapter.");
 		// register ReaderAdapter to the Services Registry
 		readerAdapterRegistryService.registerReaderAdapter(ThingMagicConnectionInfo.class,
 				new ThingMagicReaderAdapterFactory());

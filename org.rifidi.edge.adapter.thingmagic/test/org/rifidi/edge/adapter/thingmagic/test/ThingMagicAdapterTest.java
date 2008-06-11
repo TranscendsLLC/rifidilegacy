@@ -28,28 +28,36 @@ public class ThingMagicAdapterTest {
 	@Before
 	public void setUp() throws Exception {
 		ServiceRegistry.getInstance().service(this);
+		System.out.println("JUnit Test " + this.getClass().getName() + " loaded.");
 	}
 
 	@After
 	public void tearDown() throws Exception {
+		System.out.println("JUnit Test " + this.getClass().getName() + " unloaded.");
 	}
 
 	
 	@Test
 	public void testConnect(){
 		ThingMagicConnectionInfo info = new ThingMagicConnectionInfo();
-		info.setIPAddress("172.0.0.1");
+		info.setIPAddress("127.0.0.1");
 		info.setPort(8080);
 		
+
 		ThingMagicReaderAdapter adapter = new ThingMagicReaderAdapter(info);
 		
+		System.out.println("test");
+		
 		Assert.assertTrue(adapter.connect());
+		
+		System.out.println("Connected.");
 		
 		List<TagRead> tagReads = adapter.getNextTags();
 		Assert.assertNotNull(tagReads);
 		
-		//TODO print off tagReads
-		
+		for(TagRead tagRead : tagReads){
+			System.out.println(tagRead.toXML());
+		}
 		
 		Assert.assertTrue(adapter.disconnect());
 	}
