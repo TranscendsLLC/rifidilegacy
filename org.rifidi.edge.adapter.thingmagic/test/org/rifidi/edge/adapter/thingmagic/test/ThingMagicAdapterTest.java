@@ -4,6 +4,8 @@ import static org.junit.Assert.*;
 
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Test;
+import org.rifidi.edge.adapter.thingmagic.ThingMagicConnectionInfo;
 
 public class ThingMagicAdapterTest {
 
@@ -15,4 +17,16 @@ public class ThingMagicAdapterTest {
 	public void tearDown() throws Exception {
 	}
 
+	
+	@Test
+	public void testConnect(){
+		ThingMagicConnectionInfo info = new ThingMagicConnectionInfo();
+	}
+	
+	@Test
+	public void testTagRead(){
+		
+	}
+	
+	
 }

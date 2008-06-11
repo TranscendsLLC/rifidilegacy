@@ -7,7 +7,7 @@ public class ThingMagicConnectionInfo extends AbstractConnectionInfo {
 	@Override
 	public Class<? extends AbstractConnectionInfo> getReaderAdapterType() {
 		// TODO Auto-generated method stub
-		return null;
+		return ThingMagicConnectionInfo.class;
 	}
 
 }

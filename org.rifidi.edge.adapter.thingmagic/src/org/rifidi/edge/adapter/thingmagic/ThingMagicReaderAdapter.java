@@ -36,9 +36,11 @@ public class ThingMagicReaderAdapter implements IReaderAdapter {
 			
 			connected = true;
 		} catch (UnknownHostException e) {
+			//TODO print stack trace to log4j
 			e.printStackTrace();
 			return false;
 		} catch (IOException e) {
+			//TODO print stack trace to log4j
 			e.printStackTrace();
 			return false;
 		}
@@ -52,6 +54,7 @@ public class ThingMagicReaderAdapter implements IReaderAdapter {
 		try {
 			connection.close();
 		} catch (IOException e){
+			//TODO print stack trace to log4j
 			e.printStackTrace();
 			return false;
 		}
@@ -68,11 +71,12 @@ public class ThingMagicReaderAdapter implements IReaderAdapter {
 			try {
 				 input = readFromReader(in);
 			} catch (IOException e) {
+				//TODO print stack trace to log4j
 				e.printStackTrace();
 				return null;
 			}
 
-			if (input.equals("\n"))
+			if (input.equals("\n"))				// TODO Auto-generated catch block
 				return tags;
 			
 			//chew up last new line.
@@ -100,20 +104,22 @@ public class ThingMagicReaderAdapter implements IReaderAdapter {
 
 	@Override
 	public void sendCommand(byte[] command) {
-		// TODO This needs to be implemented more fully.
-		try {
-			out.write(new String(command));
-			readFromReader(in);
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+		if (!connected ){
+			// TODO This needs to be implemented more fully.
+			try {
+				out.write(new String(command));
+				readFromReader(in);
+			} catch (IOException e) {
+				//TODO print stack trace to log4j
+				e.printStackTrace();
+			}
 		}
 	}
 
 	@Override
 	public boolean isBlocking() {
 		// TODO Auto-generated method stub
-		return false;
+		return true;
 	}
 
 	
