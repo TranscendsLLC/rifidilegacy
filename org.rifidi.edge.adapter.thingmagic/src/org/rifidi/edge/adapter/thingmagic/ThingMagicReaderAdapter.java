@@ -4,6 +4,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
+import java.net.ConnectException;
 import java.net.Socket;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
@@ -30,7 +31,7 @@ public class ThingMagicReaderAdapter implements IReaderAdapter {
 	@Override
 	public boolean connect() {
 		try {
-			System.out.println("Connecting: " + tmci.getIPAddress() + ":" + tmci.getPort());
+			System.out.println("Connecting: " + tmci.getIPAddress() + ":" + tmci.getPort() + " ...");
 			connection = new Socket(tmci.getIPAddress(), tmci.getPort());
 			
 			out = new PrintWriter(connection.getOutputStream());
@@ -45,11 +46,19 @@ public class ThingMagicReaderAdapter implements IReaderAdapter {
 			//TODO print stack trace to log4j
 			e.printStackTrace();
 			return false;
+		} catch (ConnectException e){
+			System.out.println("Connection to reader refused.");
+			System.out.println("Please check if the reader is properly turned on and connected to the network.");
+			//System.out.println("Stack trace follows...");
+			//e.printStackTrace();
+			return false;
 		} catch (IOException e) {
 			//TODO print stack trace to log4j
 			e.printStackTrace();
 			return false;
 		}
+		//TODO: Replace with log4j
+		System.out.println("Successfully Connected.");
 		return true;
 	}
 
@@ -64,6 +73,8 @@ public class ThingMagicReaderAdapter implements IReaderAdapter {
 			e.printStackTrace();
 			return false;
 		}
+		//TODO: Replace with log4j
+		System.out.println("Successfully Disconnected.");
 		return true;
 	}
 
@@ -157,7 +168,7 @@ public class ThingMagicReaderAdapter implements IReaderAdapter {
 		}
 		/*
 		int ch=inBuf.read();
-		while((char)ch!='\0'){
+		while(ch != -1){
 			buf.append((char)ch);
 			ch=inBuf.read();
 		}*/

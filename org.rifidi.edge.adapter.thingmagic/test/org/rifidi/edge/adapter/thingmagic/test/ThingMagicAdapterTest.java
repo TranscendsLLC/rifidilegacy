@@ -46,19 +46,18 @@ public class ThingMagicAdapterTest {
 
 		ThingMagicReaderAdapter adapter = new ThingMagicReaderAdapter(info);
 		
-		System.out.println("test");
-		
 		Assert.assertTrue(adapter.connect());
-		
-		System.out.println("Connected.");
 		
 		List<TagRead> tagReads = adapter.getNextTags();
 		Assert.assertNotNull(tagReads);
 		
-		for(TagRead tagRead : tagReads){
-			System.out.println(tagRead.toXML());
+		if (tagReads.size() == 0){
+			System.out.println("There are no tags read.");
+		} else {
+			for(TagRead tagRead : tagReads){
+				System.out.println(tagRead.toXML());
+			}
 		}
-		
 		Assert.assertTrue(adapter.disconnect());
 	}
 	
