@@ -1,0 +1,46 @@
+<map version="0.8.1">
+<!-- To view this file, download free mind mapping software FreeMind from http://freemind.sourceforge.net -->
+<node CREATED="1233003007366" ID="Freemind_Link_182700224" MODIFIED="1233003154913" TEXT="Edge Server">
+<node CREATED="1233003155881" ID="_" MODIFIED="1233003165866" POSITION="right" TEXT="Config Service">
+<node CREATED="1233003975491" ID="Freemind_Link_574332507" MODIFIED="1233003990897" TEXT="Interface">
+<node CREATED="1233003991506" ID="Freemind_Link_751495037" MODIFIED="1233003997600" TEXT="JMX"/>
+</node>
+<node CREATED="1233003998991" ID="Freemind_Link_495634362" MODIFIED="1233004026397" TEXT="Functionality">
+<node CREATED="1233004027038" ID="Freemind_Link_1191155667" MODIFIED="1233004034569" TEXT="Store &amp; Load Preferences"/>
+<node CREATED="1233004035616" ID="Freemind_Link_1567676372" MODIFIED="1233004043272" TEXT="Inform Clients about changes"/>
+<node CREATED="1233004044553" ID="Freemind_Link_1801156613" MODIFIED="1233004057631" TEXT="Generic">
+<node CREATED="1233004058303" ID="Freemind_Link_282630111" MODIFIED="1233004077272" TEXT="e.g. should be usable by readerplugins, core, etc"/>
+</node>
+</node>
+</node>
+<node CREATED="1233003168881" ID="Freemind_Link_1093049594" MODIFIED="1233003172850" POSITION="left" TEXT="Admin Service">
+<node CREATED="1233004082069" ID="Freemind_Link_18821471" MODIFIED="1233004088928" TEXT="Functionality">
+<node CREATED="1233004089475" ID="Freemind_Link_1638701678" MODIFIED="1233004093663" TEXT="Control Threads"/>
+<node CREATED="1233004094772" ID="Freemind_Link_1926480286" MODIFIED="1233004099241" TEXT="Control OSGi Services"/>
+<node CREATED="1233004100225" ID="Freemind_Link_1696300757" MODIFIED="1233004121585" TEXT="Control Reader Session Life Cycle"/>
+<node CREATED="1233004106022" ID="Freemind_Link_311885727" MODIFIED="1233004114256" TEXT="Control Reader Session Commands"/>
+<node CREATED="1233004123788" ID="Freemind_Link_1952928145" MODIFIED="1233004127647" TEXT="Control Server"/>
+</node>
+</node>
+<node CREATED="1233003174475" ID="Freemind_Link_177899050" MODIFIED="1233003187663" POSITION="right" TEXT="Messaging (JMS, ESPER)">
+<node CREATED="1233003192225" ID="Freemind_Link_91415623" MODIFIED="1233003209069" TEXT="Client (Tobi)"/>
+</node>
+<node CREATED="1233003214772" ID="Freemind_Link_831506386" MODIFIED="1233003217678" POSITION="left" TEXT="Reader Plugins">
+<node CREATED="1233003221506" ID="Freemind_Link_352567600" MODIFIED="1233003262256" TEXT="Alien  (80%)"/>
+<node CREATED="1233003264147" ID="Freemind_Link_1874372186" MODIFIED="1233003274491" TEXT="LLRP (20%)"/>
+<node CREATED="1233003275491" ID="Freemind_Link_51310090" MODIFIED="1233003298741" TEXT="ThingMagic (15%)">
+<icon BUILTIN="button_cancel"/>
+</node>
+<node CREATED="1233003284288" ID="Freemind_Link_1181128296" MODIFIED="1233003302428" TEXT="Dummy (5%)">
+<icon BUILTIN="button_cancel"/>
+</node>
+</node>
+<node CREATED="1233003308475" ID="Freemind_Link_250990140" MODIFIED="1233003323788" POSITION="right" TEXT="Reader Session Service (70%)">
+<node CREATED="1233003326225" ID="Freemind_Link_1597088113" MODIFIED="1233003329772" TEXT="threading"/>
+<node CREATED="1233003330647" ID="Freemind_Link_854566766" MODIFIED="1233003336850" TEXT="state machine"/>
+<node CREATED="1233003371163" ID="Freemind_Link_1796048538" MODIFIED="1233003373897" TEXT="Communication">
+<node CREATED="1233003374585" ID="Freemind_Link_1626108141" MODIFIED="1233003381850" TEXT="Move to Config"/>
+</node>
+</node>
+</node>
+</map>
