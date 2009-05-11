@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.2"?>
+<plugin>
+
+   <extension
+         id="application"
+         point="org.eclipse.core.runtime.applications">
+      <application>
+         <run
+               class="org.rifidi.edge.client.Application">
+         </run>
+      </application>
+   </extension>
+   <extension
+         point="org.eclipse.ui.menus">
+      <menuContribution
+            locationURI="menu:org.eclipse.ui.main.menu?after=additions">
+         <menu
+               id="org.rifidi.edge.client.menus.file"
+               label="File">
+            <command
+                  commandId="org.eclipse.ui.file.exit"
+                  id="Exit"
+                  label="Exit"
+                  style="push">
+            </command>
+         </menu>
+         <menu
+               id="org.rifidi.edge.client.menus.window"
+               label="Window">
+            <command
+                  commandId="org.eclipse.ui.window.preferences"
+                  label="Preferences"
+                  style="push">
+            </command>
+            <command
+                  commandId="org.eclipse.ui.perspectives.showPerspective"
+                  label="Show Perspectives"
+                  style="push">
+            </command>
+            <command
+                  commandId="org.eclipse.ui.views.showView"
+                  label="Show Views"
+                  style="push">
+            </command>
+         </menu>
+         <menu
+               id="org.rifidi.edge.client.menus.help"
+               label="Help">
+            <command
+                  commandId="org.eclipse.ui.help.helpContents"
+                  label="Help"
+                  style="push">
+            </command>
+            <command
+                  commandId="org.eclipse.ui.help.aboutAction"
+                  label="About"
+                  style="push">
+            </command>
+         </menu>
+      </menuContribution>
+      <menuContribution
+            locationURI="toolbar:org.eclipse.ui.main.toolbar?after=additions">
+      </menuContribution>
+   </extension>
+   <extension
+         id="product"
+         point="org.eclipse.core.runtime.products">
+      <product
+            application="org.rifidi.edge.client.application"
+            name="Rifidi Edge Client">
+         <property
+               name="appName"
+               value="Rifidi Edge Client">
+         </property>
+         <property
+               name="preferenceCustomization"
+               value="plugin_customization.ini">
+         </property>
+      </product>
+   </extension>
+   </plugin>
