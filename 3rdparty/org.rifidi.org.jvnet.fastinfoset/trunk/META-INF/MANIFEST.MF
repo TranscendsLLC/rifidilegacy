@@ -1,0 +1,16 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Rifidi Fastinfoset Plug-in
+Bundle-SymbolicName: org.rifidi.org.jvnet.fastinfoset
+Bundle-Version: 1.2.2
+Bundle-Vendor: Pramari, LLC
+Export-Package: com.sun.xml.fastinfoset,com.sun.xml.fastinfoset.algori
+ thm,com.sun.xml.fastinfoset.alphabet,com.sun.xml.fastinfoset.dom,com.
+ sun.xml.fastinfoset.org.apache.xerces.util,com.sun.xml.fastinfoset.sa
+ x,com.sun.xml.fastinfoset.stax,com.sun.xml.fastinfoset.stax.events,co
+ m.sun.xml.fastinfoset.stax.factory,com.sun.xml.fastinfoset.stax.util,
+ com.sun.xml.fastinfoset.tools,com.sun.xml.fastinfoset.util,com.sun.xm
+ l.fastinfoset.vocab,org.jvnet.fastinfoset,org.jvnet.fastinfoset.sax,o
+ rg.jvnet.fastinfoset.sax.helpers,org.jvnet.fastinfoset.stax
+Import-Package: javax.xml.stream;version="1.0.0",javax.xml.stream.even
+ ts;version="1.0.0",javax.xml.stream.util;version="1.0.0"
