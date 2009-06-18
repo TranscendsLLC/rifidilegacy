@@ -1,4 +1,4 @@
-package org.rifidi.edge.client;
+package org.rifidi.org.apache.cxf;
 
 
 import org.eclipse.core.runtime.Plugin;
