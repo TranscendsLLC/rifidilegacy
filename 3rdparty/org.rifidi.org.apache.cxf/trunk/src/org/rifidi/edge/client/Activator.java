@@ -1,3 +1,4 @@
+package org.rifidi.edge.client;
 
 
 import org.eclipse.core.runtime.Plugin;
