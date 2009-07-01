@@ -16,7 +16,7 @@ import org.rifidi.edge.api.rmi.dto.CommandConfigurationDTO;
  * 
  * @author Kyle Neumeier - kyle@pramari.com
  */
-public interface CommandManagerService extends Remote {
+public interface CommandManagerService{
 
 	/**
 	 * This method gets the available command types on the edge server and the
