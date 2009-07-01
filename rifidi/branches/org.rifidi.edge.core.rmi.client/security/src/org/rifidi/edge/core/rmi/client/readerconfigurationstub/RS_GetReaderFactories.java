@@ -2,8 +2,8 @@ package org.rifidi.edge.core.rmi.client.readerconfigurationstub;
 
 import java.util.Set;
 
-import org.rifidi.edge.api.rmi.SensorManagerService;
 import org.rifidi.edge.api.rmi.dto.ReaderFactoryDTO;
+import org.rifidi.edge.api.rmi.services.SensorManagerService;
 import org.rifidi.rmi.proxycache.cache.AbstractRMICommandObject;
 
 /**

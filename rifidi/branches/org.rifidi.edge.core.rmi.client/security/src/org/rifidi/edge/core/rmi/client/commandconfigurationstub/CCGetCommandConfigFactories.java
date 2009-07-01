@@ -2,8 +2,8 @@ package org.rifidi.edge.core.rmi.client.commandconfigurationstub;
 
 import java.util.Set;
 
-import org.rifidi.edge.api.rmi.CommandManagerService;
 import org.rifidi.edge.api.rmi.dto.CommandConfigFactoryDTO;
+import org.rifidi.edge.api.rmi.services.CommandManagerService;
 import org.rifidi.rmi.proxycache.cache.AbstractRMICommandObject;
 
 /**

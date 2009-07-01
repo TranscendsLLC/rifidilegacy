@@ -1,6 +1,6 @@
 package org.rifidi.edge.core.rmi.client.edgeserverstub;
 
-import org.rifidi.edge.api.rmi.EdgeServerManagerService;
+import org.rifidi.edge.api.rmi.services.EdgeServerManagerService;
 import org.rifidi.rmi.proxycache.cache.AbstractRMICommandObject;
 
 /**

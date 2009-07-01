@@ -2,7 +2,7 @@ package org.rifidi.edge.core.rmi.client.readerconfigurationstub;
 
 import javax.management.MBeanInfo;
 
-import org.rifidi.edge.api.rmi.SensorManagerService;
+import org.rifidi.edge.api.rmi.services.SensorManagerService;
 import org.rifidi.rmi.proxycache.cache.AbstractRMICommandObject;
 
 /**
