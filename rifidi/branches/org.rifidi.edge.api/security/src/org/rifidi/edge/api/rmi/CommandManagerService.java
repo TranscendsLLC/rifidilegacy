@@ -1,7 +1,6 @@
 
 package org.rifidi.edge.api.rmi;
 
-import java.rmi.Remote;
 import java.util.Set;
 
 import javax.management.AttributeList;
