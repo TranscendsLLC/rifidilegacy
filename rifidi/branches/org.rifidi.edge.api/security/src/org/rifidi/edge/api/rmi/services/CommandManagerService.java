@@ -1,5 +1,5 @@
 
-package org.rifidi.edge.api.rmi;
+package org.rifidi.edge.api.rmi.services;
 
 import java.util.Set;
 
