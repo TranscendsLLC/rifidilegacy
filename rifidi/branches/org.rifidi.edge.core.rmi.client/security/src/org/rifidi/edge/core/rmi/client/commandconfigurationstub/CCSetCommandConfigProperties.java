@@ -3,7 +3,7 @@ package org.rifidi.edge.core.rmi.client.commandconfigurationstub;
 
 import javax.management.AttributeList;
 
-import org.rifidi.edge.api.rmi.CommandManagerService;
+import org.rifidi.edge.api.rmi.services.CommandManagerService;
 import org.rifidi.rmi.proxycache.cache.AbstractRMICommandObject;
 
 /**

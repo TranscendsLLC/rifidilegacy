@@ -3,8 +3,8 @@
  */
 package org.rifidi.edge.core.rmi.client.readerconfigurationstub;
 
-import org.rifidi.edge.api.rmi.SensorManagerService;
 import org.rifidi.edge.api.rmi.exceptions.CommandSubmissionException;
+import org.rifidi.edge.api.rmi.services.SensorManagerService;
 import org.rifidi.rmi.proxycache.cache.AbstractRMICommandObject;
 
 /**
