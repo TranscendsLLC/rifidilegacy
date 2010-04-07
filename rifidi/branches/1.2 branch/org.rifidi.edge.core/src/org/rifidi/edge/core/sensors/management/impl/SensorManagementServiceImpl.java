@@ -44,7 +44,7 @@ import org.rifidi.edge.core.services.esper.internal.EsperReceiver;
 import com.espertech.esper.client.EPRuntime;
 
 /**
- * Thread asfe implementation of the {@link SensorManagementService}
+ * Thread safe implementation of the {@link SensorManagementService}
  * 
  * @author Jochen Mader - jochen@pramari.com
  * 
@@ -545,7 +545,7 @@ public class SensorManagementServiceImpl implements SensorManagementService {
 			throws NoSuchSensorException {
 		sensorLock.lock();
 		try {
-			if (sensors.get(sensorName) != null) {
+			if (sensors.containsKey(sensorName)) {
 				sensors.get(sensorName).subscribe(esperReceiver);
 				esperReceiver.addSensor(sensors.get(sensorName));
 				return;

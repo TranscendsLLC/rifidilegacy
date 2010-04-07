@@ -33,11 +33,11 @@ import org.rifidi.edge.core.sensors.exceptions.InUseException;
  * 
  */
 public class CompositeSensorImpl extends SensorImpl implements CompositeSensor {
-	
+
 	/** Children of this node. */
 	private final Set<Sensor> childNodes;
-	private final static Log logger = LogFactory.getLog(CompositeSensorImpl.class);
-
+	private final static Log logger = LogFactory
+			.getLog(CompositeSensorImpl.class);
 
 	/**
 	 * @param name
@@ -48,7 +48,7 @@ public class CompositeSensorImpl extends SensorImpl implements CompositeSensor {
 			final Collection<Sensor> childNodes, final Boolean immutable) {
 		super(name, immutable);
 		this.childNodes = new CopyOnWriteArraySet<Sensor>();
-		for(Sensor childSensor : childNodes){
+		for (Sensor childSensor : childNodes) {
 			try {
 				addChild(childSensor);
 			} catch (ImmutableException e) {
@@ -87,6 +87,7 @@ public class CompositeSensorImpl extends SensorImpl implements CompositeSensor {
 			throw new InUseException(getName() + " is in use.");
 		}
 		childNodes.add(child);
+		// receive updates (e.g. tag events) from this sensor
 		child.addReceiver(this);
 	}
 
@@ -105,6 +106,7 @@ public class CompositeSensorImpl extends SensorImpl implements CompositeSensor {
 		if (isInUse()) {
 			throw new InUseException(getName() + " is in use.");
 		}
+		// stop listening for tag events
 		child.removeReceiver(this);
 		childNodes.remove(child);
 	}
@@ -123,11 +125,11 @@ public class CompositeSensorImpl extends SensorImpl implements CompositeSensor {
 		if (isInUse()) {
 			throw new InUseException(getName() + " is in use.");
 		}
-		for(Sensor childSensor : children){
+		for (Sensor childSensor : children) {
+			//stop listening for tag events
 			childSensor.removeReceiver(this);
 			childNodes.remove(childSensor);
 		}
 	}
-
 
 }
