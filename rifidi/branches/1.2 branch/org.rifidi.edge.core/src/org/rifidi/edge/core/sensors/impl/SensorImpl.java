@@ -39,7 +39,9 @@ public class SensorImpl implements Sensor {
 	 * all events which are not Tag Read Events.
 	 */
 	protected final Map<Object, LinkedBlockingQueue<Object>> eventSubscriberToQueueMap = new ConcurrentHashMap<Object, LinkedBlockingQueue<Object>>();
+	/** The name of this sensor */
 	private String sensorName;
+	/** True if immutable */
 	private final Boolean isImmutable;
 
 	public SensorImpl(String sensorName, Boolean isImmutable) {
@@ -121,7 +123,9 @@ public class SensorImpl implements Sensor {
 		Set<TagReadEvent> tagReads = new HashSet<TagReadEvent>();
 		for (ReadCycle cycle : rcs) {
 			for (TagReadEvent event : cycle.getTags()) {
-				tagReads.add(event);
+				TagReadEvent tre = new TagReadEvent(getName(), event.getTag(),
+						event.getAntennaID(), event.getTimestamp());
+				tagReads.add(tre);
 			}
 		}
 		ReadCycle cycle = new ReadCycle(tagReads, getName(), time);
@@ -237,8 +241,8 @@ public class SensorImpl implements Sensor {
 		}
 
 	}
-	
-	public void destroy(){
+
+	public void destroy() {
 		receivers.clear();
 	}
 
