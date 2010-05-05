@@ -1,10 +1,10 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: rxtx Plugin
-Bundle-SymbolicName: org.rifidi.org.rxtx
+Bundle-SymbolicName: org.rifidi.gnu.io
 Bundle-Version: 2.1.7
 Bundle-ClassPath: RXTXcomm.jar
-Bundle-Vendor: rxtx.org
+Bundle-Vendor: Pramari, LLC
 Export-Package: gnu.io;version="2.1.7"
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-NativeCode: 
