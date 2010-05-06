@@ -34,4 +34,4 @@ Bundle-NativeCode:
  
  nativelib/Windows/i368-mingw32/rxtxParallel.dll;
  nativelib/Windows/i368-mingw32/rxtxSerial.dll;
- osname=Win32; processor=x86
+ osname=Win32; osname=windows 7; processor=x86
