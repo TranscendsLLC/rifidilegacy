@@ -1,9 +1,8 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
-Bundle-Name: Test
-Bundle-SymbolicName: org.rifidi.edge.core.test.fragment
+Bundle-Name: Test1
+Bundle-SymbolicName: org.rifidi.edge.core.test
 Bundle-Version: 1.0.0.qualifier
-Fragment-Host: org.rifidi.edge.core;bundle-version="5.4.0"
+Fragment-Host: org.rifidi.edge.core
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
-Require-Bundle: com.springsource.org.junit;bundle-version="4.8.1"
-Export-Package: org.rifidi.edge.core.test.mock;uses:="org.rifidi.edge.core.app.api.service.tagmonitor"
+Import-Package: org.junit;version="4.8.1"
