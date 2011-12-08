@@ -1,6 +1,0 @@
-// ========== LABTRACK PERMISSIONS =====================================
-
-grant codeBase "file:${catalina.base}/webapps/LabtrackDemo/-" {
-    permission java.util.PropertyPermission "*", "read,write";
-    permission java.lang.RuntimePermission "accessClassInPackage.org.apache.tomcat.util.http";
-};
