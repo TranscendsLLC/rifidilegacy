@@ -1,0 +1,40 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Rifidi Edge LLRP Adapter
+Bundle-SymbolicName: org.rifidi.edge.adapter.llrp
+Bundle-Version: 2.2.0
+Bundle-ActivationPolicy: lazy
+Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Import-Package: javax.xml.bind,
+ javax.xml.bind.annotation,
+ org.apache.commons.codec,
+ org.apache.commons.codec.binary,
+ org.apache.commons.lang;version="2.3.0",
+ org.apache.commons.logging;version="1.1.1",
+ org.apache.log4j,
+ org.apache.mina.common;version="1.1.7",
+ org.eclipse.paho.client.mqttv3,
+ org.eclipse.paho.client.mqttv3.persist,
+ org.jdom,
+ org.llrp.ltk.exceptions,
+ org.llrp.ltk.generated,
+ org.llrp.ltk.generated.enumerations,
+ org.llrp.ltk.generated.interfaces,
+ org.llrp.ltk.generated.messages,
+ org.llrp.ltk.generated.parameters,
+ org.llrp.ltk.net,
+ org.llrp.ltk.types,
+ org.llrp.ltk.util,
+ org.osgi.framework;version="1.5.0",
+ org.springframework.core;version="3.0.5.RELEASE"
+Require-Bundle: org.rifidi.edge.api;bundle-version="1.1.1",
+ org.rifidi.edge;bundle-version="5.4.0"
+Spring-Context: *;create-asynchronously:=true
+Eclipse-BuddyPolicy: global
+Bundle-Vendor: Pramari, LLC
+Export-Package: org.rifidi.edge.adapter.llrp,
+ org.rifidi.edge.adapter.llrp.commandobject,
+ org.rifidi.edge.adapter.llrp.commands,
+ org.rifidi.edge.adapter.llrp.commands.internal,
+ org.rifidi.edge.adapter.llrp.gpio
+
