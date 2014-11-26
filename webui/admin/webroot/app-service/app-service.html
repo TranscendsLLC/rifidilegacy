@@ -1,0 +1,130 @@
+<link rel="import" href="../components/polymer/polymer.html">
+<link rel="import" href="../components/core-ajax/core-ajax.html">
+<!-- 
+  `<post-service>` provides an API for a fake service -- 
+  _unquote_, the read-only social networking service!
+
+  Provides a very simple API: `posts` returns the list of posts.
+  `setFavorite` pretends to persist a user's favorite choice.
+
+  @element post-service
+  @demo 
+  @homepage http://www.polymer-project.org/docs/start/tutorial.html
+-->
+
+<!--
+  An array of post objects, with the following format:
+
+  <table border="0">
+    <tr>
+      <td><code>uid</code></td>
+      <td>Number</td>
+      <td>Unique ID for this post.</td>
+    </tr>
+     <tr>
+      <td><code>username</code></td>
+      <td>String</td>
+      <td>Poster's username.</td>
+    </tr>
+    <tr>
+      <td><code>avatar</code></td>
+      <td>String</td>
+      <td>URL for the user's avatar.</td>
+    </tr>  
+    <tr>
+      <td><code>text</code></td>
+      <td>String</td>
+      <td>Post text.</td>
+    </tr>  
+    <tr>
+      <td><code>favorite</code></td>
+      <td>Boolean</td>
+      <td>True if the current user favorited this post.</td>
+    </tr>
+  </table>
+  
+  @attribute apps 
+  @type Array
+  @default []
+-->
+<polymer-element name="app-service" attributes="apps">
+  <template>
+    <style>
+    :host {
+      display: none;
+    }
+    </style>
+    <core-ajax id="ajax"
+        auto
+        method="GET"
+        url="http://localhost:8111/apps"
+      on-core-response="{{manageCoreResponse}}"
+	  on-core-error="{{manageCoreError}}"
+	  on-core-complete="{{manageCoreComplete}}"
+      handleAs="xml">
+    </core-ajax>
+  </template>
+  <script>
+  Polymer('app-service', {
+    created: function() {
+	  console.log('created function!!');
+      this.apps = [];
+    },
+    manageCoreResponse: function() {
+	
+		console.log('core response called');
+		console.log('response: ' + this.$.ajax.response);
+      // Make a copy of the loaded data
+      //this.apps = this.$.ajax.response.slice(0);
+
+    },
+	manageCoreError: function() {
+	
+		console.log('core error called');
+        console.log('response: ' + this.$.ajax.response);
+
+    },
+	manageCoreComplete: function() {
+	
+		console.log('core complete called');
+        console.log('response: ' + this.$.ajax.response);
+		resp = this.$.ajax.response;
+		//console.log('resp.getElementsByTagName("response")[0]): ' + resp.getElementsByTagName("response")[0].childNodes[0]);
+		//this.apps = this.$.ajax.response.slice(0);
+                //response = resp.getElementsByTagName("response");
+                
+                //test = resp.getElementsByTagName("id")[0].childNodes[0];
+                //appsT = resp.getElementsByTagName("apps")[0];
+                appVector = resp.getElementsByTagName("app");
+                
+                tLocalId = appVector[1].getElementsByTagName("id")[0].childNodes[0];
+                tLocalNumber = appVector[1].getElementsByTagName("number")[0].childNodes[0];
+                tLocalStatus = appVector[1].getElementsByTagName("status")[0].childNodes[0];
+                
+                for(index = 0; index < appVector.length; index++){
+                    localId = appVector[index].getElementsByTagName("id")[0].childNodes[0];
+                    localNumber = appVector[index].getElementsByTagName("number")[0].childNodes[0];
+                    localStatus = appVector[index].getElementsByTagName("status")[0].childNodes[0];
+                    console.log('localStatus: ' + localStatus);
+                    this.apps[this.apps.length] = {id:localId.textContent, number:localNumber.textContent, status:tLocalStatus.textContent};
+                }
+                
+                
+    },
+    /** 
+     * Update the service with the current favorite value.
+     * (Two-way data binding updates the favorite value 
+     * stored locally.) If this was a real service, this
+     * method would do something useful.
+     * 
+     * @method setFavorite
+     * @param uid {Number} Unique ID for post.
+     * @param isFavorite {Boolean} True if the user marked this post as a favorite.
+     */
+    setFavorite: function(uid, isFavorite) {
+      // no service backend, just log the change
+      console.log('Favorite changed: ' + uid + ", now: " + isFavorite);
+    }
+  });
+  </script>
+</polymer-element>
