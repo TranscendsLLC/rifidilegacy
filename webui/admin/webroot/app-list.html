@@ -1,0 +1,39 @@
+<link rel="import" href="../components/polymer/polymer.html">
+<link rel="import" href="../app-service/app-service.html">
+<link rel="import" href="../app-elem.html">
+
+<polymer-element name="app-list">
+  <template>
+    <style>
+    :host {
+      display: block;
+      width: 100%;
+    }
+    app-elem {
+      margin-bottom: 30px;
+    }
+    </style>
+
+    <app-service id="service" apps="{{apps}}"></app-service>
+    
+    <div layout vertical center>
+      <template repeat="{{app in apps}}">
+        <app-elem
+          
+          <h2>ID: {{app.id}}</h2>
+          <h3>NUMBER: {{app.number}}</h3>
+          <p>STATUS: {{app.status}}</p>
+        </app-elem>
+      </template>
+    </div>
+  </template>
+
+  <script>
+  Polymer({
+    handleFavorite: function(event, detail, sender) {
+      var app = sender.templateInstance.model.app;
+      this.$.service.setFavorite(app.uid, app.favorite);
+    }
+  });
+  </script>
+</polymer-element>
