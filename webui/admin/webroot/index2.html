@@ -1,0 +1,91 @@
+<!doctype html>
+<html>
+
+<head>
+    
+    <!-- 1. Load webcomponents.js for polyfill support. -->
+    <script src="../components/webcomponentsjs/webcomponents.js"></script>
+
+	<link rel="import" href="../components/google-map/google-map.html">
+
+
+  <title>Rifidi Polymer example 2</title>
+
+  <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1.0, user-scalable=yes">
+
+  <!--<script src="../components/platform/platform.js">  </script>-->
+
+  <link rel="import" href="../components/font-roboto/roboto.html">
+  <link rel="import" href="../components/core-header-panel/core-header-panel.html">
+  <link rel="import" href="../components/core-toolbar/core-toolbar.html">
+  <link rel="import" href="../components/paper-tabs/paper-tabs.html">
+  <link rel="import" href="../app-list.html">
+
+  <style>
+  html,body {
+    height: 100%;
+    margin: 0;
+    
+    font-family: 'Roboto', Arial, sans-serif;
+  }
+  
+  
+  google-map {
+  display: block;
+  height: 100%;
+ }
+
+  core-header-panel {
+    height: 100%;
+    overflow: auto;
+    -webkit-overflow-scrolling: touch; 
+  }
+  core-toolbar {
+    background: #03a9f4;
+    color: white;
+  }
+  #tabs {
+    width: 100%;
+    margin: 0;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+	text-transform: uppercase;
+  }
+  .container {
+    width: 80%;
+    margin: 50px auto;
+  }
+  @media (min-width: 481px) {
+    #tabs {
+      
+    }
+    .container {
+      width: 400px;
+    }
+  }
+  </style>
+
+</head>
+
+<body unresolved>
+
+	
+
+
+  
+
+  <google-map latitude="37.779" longitude="-122.3892" zoom="13">
+  <google-map-marker
+      latitude="37.779"
+      longitude="-122.3892"
+      title="Go Giants!"
+      draggable="true"></google-map-marker>
+
+  </google-map>
+  
+    
+</body>
+
+</html>

@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<servers>
+
+	<server>
+		<displayName>Rifidi11A</displayName>
+		<restProtocol>http</restProtocol>
+		<ipAddress>192.168.88.104</ipAddress>
+		<restPort>8111</restPort>
+	</server>
+	<server>
+		<displayName>Rifidi22</displayName>
+		<restProtocol>http</restProtocol>
+		<ipAddress>localhost</ipAddress>
+		<restPort>8111</restPort>
+	</server>
+	<server>
+		<displayName>Rifidi33</displayName>
+		<restProtocol>http</restProtocol>
+		<ipAddress>192.168.88.105</ipAddress>
+		<restPort>8111</restPort>
+	</server>
+	<server>
+		<displayName>Rifidi44</displayName>
+		<restProtocol>http</restProtocol>
+		<ipAddress>192.168.88.106</ipAddress>
+		<restPort>8111</restPort>
+	</server>
+	<server>
+		<displayName>Rifidi55</displayName>
+		<restProtocol>http</restProtocol>
+		<ipAddress>192.168.88.107</ipAddress>
+		<restPort>8111</restPort>
+	</server>
+	
+</servers>

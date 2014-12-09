@@ -1,0 +1,77 @@
+<link rel="import" href="../components/polymer/polymer.html">
+<link rel="import" href="../servers-service/servers-service.html">
+<link rel="import" href="../sensors-service/sensors-service.html">
+<link rel="import" href="../components/core-menu/core-menu.html">
+  <link rel="import" href="../components/core-item/core-item.html">
+  <link rel="import" href="../components/core-menu/core-submenu.html">
+
+<polymer-element name="rifidi-menu">
+  <template>
+    <style>
+    :host {
+      display: block;
+      width: 100%;
+    }
+    
+	#core_menu {
+        font-size: 12px;
+      }
+	  
+	  core-submenu::shadow #submenu {
+	    margin-left: 10px;
+	 }
+    </style>
+
+    <servers-service id="serversService" servers="{{servers}}"></servers-service>
+	<!--<sensors-service id="sensorsService{{server.displayName}}" sensors="{{sensors}}" ></sensors-service>-->
+	<!--<sensors-service id="sensorsService{{server.displayName}}" sensors="{{sensors}}" ipAddress = "localhost" restProtocol="http" restPort="8111"></sensors-service>-->
+	
+	<core-menu valueattr="label" id="core_menu" theme="core-light-theme">
+		
+			<core-submenu active  id="core_submenu" label="Servers">
+			
+				<template repeat="{{server in servers}}">
+				
+					<sensors-service id="sensorsService{{server.displayName}}" sensors="{{sensorsVar}}" ipAddress = {{server.ipAddress}} restProtocol={{server.restProtocol}} restPort="{{server.restPort}}"></sensors-service>
+					<!--<sensors-service id="sensorsService{{server.displayName}}" sensors="{{sensors}}" ipAddress = {{server.ipAddress}} restProtocol="http" restPort="8111"></sensors-service>-->
+			
+					<core-submenu id="core_submenu_servers" label="{{server.displayName}}">
+						
+						<core-submenu id="core_submenu_sensors"  label="Sensor Management">
+						
+							<template repeat="{{sensor in sensorsVar}}">
+						
+								<core-submenu id="core_submenu_sensor1"  label="{{sensor.serviceID}}">
+							
+									<core-submenu  id="core_submenu_sessions1_1" label="Session1">
+										<core-item id="core_item_command1" label="Command 1" horizontal center layout></core-item>
+									</core-submenu>
+									
+								</core-submenu>
+							
+							</template>
+							
+						</core-submenu>
+						
+						<core-submenu id="core_submenu_apps"  label="App Management">
+							<core-submenu  id="core_submenu_sessions" label="Session1">
+								<core-item id="core_item_command1" label="Command 1" horizontal center layout></core-item>
+							</core-submenu>
+						</core-submenu>
+						
+					</core-submenu>
+					
+				</template>
+				
+			 </core-submenu>
+			
+        </core-menu>
+	
+  </template>
+
+  <script>
+  Polymer({
+    
+  });
+  </script>
+</polymer-element>

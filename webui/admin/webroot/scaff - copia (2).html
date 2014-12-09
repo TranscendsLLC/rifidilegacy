@@ -1,0 +1,203 @@
+<!doctype html>
+<html>
+
+<head>
+    
+    <!-- 1. Load webcomponents.js for polyfill support. -->
+    <script src="../components/webcomponentsjs/webcomponents.js"></script>
+
+	<link rel="import" href="../components/google-map/google-map.html">
+	
+	<link rel="import" href="../components/core-scaffold/core-scaffold.html">
+
+
+  <title>Rifidi Scaffold</title>
+
+  <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1.0, user-scalable=yes">
+
+  <!--<script src="../components/platform/platform.js">  </script>-->
+
+  <link rel="import" href="../components/font-roboto/roboto.html">
+  <link rel="import" href="../components/core-header-panel/core-header-panel.html">
+  <link rel="import" href="../components/core-menu/core-menu.html">
+  <link rel="import" href="../components/core-item/core-item.html">
+  <link rel="import" href="../components/core-menu/core-submenu.html">
+  <link rel="import" href="../components/core-toolbar/core-toolbar.html">
+  <link rel="import" href="../components/paper-tabs/paper-tabs.html">
+  <link rel="import" href="../app-list.html">
+
+  <style>
+  html,body {
+    height: 100%;
+    margin: 0;
+    
+    font-family: 'Roboto', Arial, sans-serif;
+  }
+  
+  
+  #core_scaffold {
+        position: absolute;
+        top: 0px;
+        right: 0px;
+        bottom: 0px;
+        left: 0px;
+        width: 100%;
+        height: 100%;
+      }
+      #core_header_panel {
+        background-color: rgb(255, 255, 255);
+	
+      }
+      #core_toolbar {
+        color: rgb(255, 255, 255);
+        background-color: rgb(79, 125, 201);
+      }
+      #core_menu {
+        font-size: 12px;
+      }
+	  
+	  core-submenu::shadow #submenu {
+	    margin-left: 10px;
+	 }
+	
+	  
+	  #google_map {
+        width: 100%;
+        height: 80%;
+        display: block;
+        left: 0px;
+        top: 0px;
+        position: absolute;
+      }
+  </style>
+
+</head>
+
+<body unresolved>
+
+
+  <!--<core-scaffold id="core_scaffold" mode="waterfall-tall">-->
+  <core-scaffold id="core_scaffold" >
+  
+  <div tool flex >Rifidi Application</div>
+  
+  <!--
+  <div tool horizontal layout flex center-justified class="middle">Title-middle</div>
+  <div tool horizontal layout flex end-justified class="bottom">Title-bottom</div>
+  -->
+
+    <core-header-panel mode="seamed" id="core_header_panel" navigation flex>
+        <core-toolbar id="core_toolbar"></core-toolbar>
+		
+        <core-menu valueattr="label" id="core_menu" theme="core-light-theme">
+		
+			<core-submenu active  id="core_submenu" label="Servers">
+			
+				<core-submenu id="core_submenu_servers" label="Rifidi1">
+					
+					<core-submenu id="core_submenu_sensors"  label="Sensor Management">
+					
+						<core-submenu id="core_submenu_sensor1"  label="Sensor 1">
+					
+							<core-submenu  id="core_submenu_sessions1_1" label="Session1">
+								<core-item id="core_item_command1" label="Command 1" horizontal center layout></core-item>
+							</core-submenu>
+							
+						</core-submenu>
+						
+						<core-submenu id="core_submenu_sensor2"  label="Sensor 2">
+					
+							<core-submenu  id="core_submenu_sessions2_1" label="Session1">
+								<core-item id="core_item_command2_1_1" label="Command 1" horizontal center layout></core-item>
+							</core-submenu>
+							
+						</core-submenu>
+						
+						<core-submenu id="core_submenu_sensor3"  label="Sensor 3">
+					
+							<core-submenu  id="core_submenu_sessions3_1" label="Session1">
+								<core-item id="core_item_command3_1_1" label="Command 1" horizontal center layout></core-item>
+							</core-submenu>
+							
+						</core-submenu>
+						
+					</core-submenu>
+					
+					<core-submenu id="core_submenu_apps"  label="App Management">
+						<core-submenu  id="core_submenu_sessions" label="Session1">
+							<core-item id="core_item_command1" label="Command 1" horizontal center layout></core-item>
+						</core-submenu>
+					</core-submenu>
+					
+					
+				</core-submenu>
+				
+				
+				<core-submenu id="core_submenu_servers2" label="Rifidi2">
+					
+					<core-submenu id="core_submenu_sensors"  label="Sensor Management">
+					
+						<core-submenu id="core_submenu_sensor1"  label="Sensor 1">
+					
+							<core-submenu  id="core_submenu_sessions1_1" label="Session1">
+								<core-item id="core_item_command1" label="Command 1" horizontal center layout></core-item>
+							</core-submenu>
+							
+						</core-submenu>
+						
+						<core-submenu id="core_submenu_sensor2"  label="Sensor 2">
+					
+							<core-submenu  id="core_submenu_sessions2_1" label="Session1">
+								<core-item id="core_item_command2_1_1" label="Command 1" horizontal center layout></core-item>
+							</core-submenu>
+							
+						</core-submenu>
+						
+						<core-submenu id="core_submenu_sensor3"  label="Sensor 3">
+					
+							<core-submenu  id="core_submenu_sessions3_1" label="Session1">
+								<core-item id="core_item_command3_1_1" label="Command 1" horizontal center layout></core-item>
+							</core-submenu>
+							
+						</core-submenu>
+						
+					</core-submenu>
+					
+					<core-submenu id="core_submenu_apps"  label="App Management">
+						<core-submenu  id="core_submenu_sessions" label="Session1">
+							<core-item id="core_item_command1" label="Command 1" horizontal center layout></core-item>
+						</core-submenu>
+					</core-submenu>
+					
+					
+				</core-submenu>
+				
+				
+			 </core-submenu>
+			  
+			
+        </core-menu>
+    </core-header-panel>
+    <div fit>
+		<google-map id="google_map" latitude="37.77493" longitude="-122.41942"  >
+			<google-map-marker latitude="37.779" longitude="-122.3892"
+			  draggable="true" title="Sensor1"></google-map-marker>
+			  
+		  <google-map-marker title="Sensor2" latitude="37.777" longitude="-122.38911"></google-map-marker>
+		</google-map>
+
+
+	</div>
+	
+  </core-scaffold>
+  
+  <script>
+	//var cmdTypesItem = document.querySelector('core_item_command_types');
+	//cmdTypesItem.addEventListener('core-select', function() {
+    //console.log("Selected: " + cmdTypesItem.selected);
+  //});
+  </script>
+    
+</body>
+
+</html>
