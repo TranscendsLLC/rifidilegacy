@@ -1,0 +1,121 @@
+<link rel="import" href="../components/polymer/polymer.html">
+<link rel="import" href="../components/core-ajax/core-ajax.html">
+<!-- 
+  `<post-service>` provides an API for a fake service -- 
+  _unquote_, the read-only social networking service!
+
+  Provides a very simple API: `posts` returns the list of posts.
+  `setFavorite` pretends to persist a user's favorite choice.
+
+  @element post-service
+  @demo 
+  @homepage http://www.polymer-project.org/docs/start/tutorial.html
+-->
+
+<!--
+  An array of post objects, with the following format:
+
+  <table border="0">
+    <tr>
+      <td><code>uid</code></td>
+      <td>Number</td>
+      <td>Unique ID for this post.</td>
+    </tr>
+     <tr>
+      <td><code>username</code></td>
+      <td>String</td>
+      <td>Poster's username.</td>
+    </tr>
+    <tr>
+      <td><code>avatar</code></td>
+      <td>String</td>
+      <td>URL for the user's avatar.</td>
+    </tr>  
+    <tr>
+      <td><code>text</code></td>
+      <td>String</td>
+      <td>Post text.</td>
+    </tr>  
+    <tr>
+      <td><code>favorite</code></td>
+      <td>Boolean</td>
+      <td>True if the current user favorited this post.</td>
+    </tr>
+  </table>
+  
+  @attribute apps 
+  @type Array
+  @default []
+-->
+<polymer-element name="servers-service" attributes="servers">
+  <template>
+    <style>
+    :host {
+      display: none;
+    }
+    </style>
+    <core-ajax id="ajax"
+        auto
+        method="GET"
+        url="../api/servers.xml"
+      on-core-response="{{manageCoreResponse}}"
+	  on-core-error="{{manageCoreError}}"
+	  on-core-complete="{{manageCoreComplete}}"
+      handleAs="xml">
+    </core-ajax>
+  </template>
+  <script>
+  Polymer('servers-service', {
+    created: function() {
+	  //console.log('created function!!');
+      this.servers = [];
+    },
+    manageCoreResponse: function() {
+	
+		//console.log('core response called');
+		//console.log('response: ' + this.$.ajax.response);
+      // Make a copy of the loaded data
+      //this.servers = this.$.ajax.response.slice(0);
+
+    },
+	manageCoreError: function() {
+	
+		//console.log('core error called');
+        //console.log('response: ' + this.$.ajax.response);
+
+    },
+	manageCoreComplete: function() {
+	
+		//console.log('core complete called');
+        //console.log('response: ' + this.$.ajax.response);
+		resp = this.$.ajax.response;
+		
+                serverVector = resp.getElementsByTagName("server");
+                
+                for(index = 0; index < serverVector.length; index++){
+                    localDisplayName = serverVector[index].getElementsByTagName("displayName")[0].childNodes[0];
+                    localIpAddress = serverVector[index].getElementsByTagName("ipAddress")[0].childNodes[0];
+					localRestProtocol = serverVector[index].getElementsByTagName("restProtocol")[0].childNodes[0];
+                    localRestPort = serverVector[index].getElementsByTagName("restPort")[0].childNodes[0];
+                    this.servers[this.servers.length] = {displayName:localDisplayName.textContent, ipAddress:localIpAddress.textContent, restProtocol: localRestProtocol.textContent, restPort:localRestPort.textContent};
+                }
+                
+                
+    },
+    /** 
+     * Update the service with the current favorite value.
+     * (Two-way data binding updates the favorite value 
+     * stored locally.) If this was a real service, this
+     * method would do something useful.
+     * 
+     * @method setFavorite
+     * @param uid {Number} Unique ID for post.
+     * @param isFavorite {Boolean} True if the user marked this post as a favorite.
+     */
+    setFavorite: function(uid, isFavorite) {
+      // no service backend, just log the change
+      console.log('Favorite changed: ' + uid + ", now: " + isFavorite);
+    }
+  });
+  </script>
+</polymer-element>
