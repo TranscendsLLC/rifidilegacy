@@ -37,7 +37,27 @@
     <![endif]-->
 	
 	<script src="js/angular-1.2.27.js"></script>
+	<script src="js/angular-resource-1.2.27.js"></script>
+	<!--
+	<script src="js/ui-map.js"></script>
+	<script src="https://maps.googleapis.com/maps/api/js?v=3.exp&sensor=false&callback=onGoogleReady"></script>
+	-->
+
+	
 	<script src="js/controllers.js"></script>
+	
+	<!--
+	<script src="js/event.js"></script>
+	-->
+
+	<!--
+	<script src="js/services.js"></script>
+	<script src="js/app.js"></script>
+	-->
+	
+	
+		
+
 
 
 </head>
@@ -372,6 +392,15 @@
 						<!-- start rifidi menu -->
 						
 						<li ng-controller="ServerListCtrl">
+						
+						<script>
+						
+							function onGoogleReady() {
+							  //angular.bootstrap(document.getElementById("map"), ['app.ui-map']);
+							}
+							
+						</script>
+
                             <a href="#"><i class="fa fa-sitemap fa-fw"></i>Servers<span class="fa arrow"></span></a>
                             <ul class="nav nav-second-level">
                                 <li ng-repeat="server in servers">
@@ -400,6 +429,11 @@
                                 </li>
                             </ul>
                             <!-- /.nav-second-level -->
+							
+							<!--
+							<div ui-map="myMap" ui-options="mapOptions" class="map-canvas"></div>
+							-->
+
                         </li>
 						
 						<!-- end rifidi menu -->
