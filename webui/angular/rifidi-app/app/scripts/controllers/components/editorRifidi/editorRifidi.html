@@ -1,0 +1,176 @@
+<div class="panel panel-default">
+    <div class="panel-heading">
+        <span class="glyphicon glyphicon-list-alt" aria-hidden="true"></span> Elements Menu
+    </div>
+    <div class="panel-body">
+       <div
+              data-angular-treeview="true"
+              data-tree-id="elementTree"
+              data-tree-model="elementList"
+              data-node-id="elementId"
+              data-node-label="elementName"
+              data-node-children="children" >
+      </div>
+    </div>
+</div>
+<div class="panel panel-default">
+    <div class="panel-heading">
+        <span class="glyphicon glyphicon-wrench" aria-hidden="true"></span> {{elementSelected.elementName}} Properties
+    </div>
+    <div class="panel-body">
+
+        <div ng-switch="propertyType">
+            <div ng-switch-when="servers">
+                <div class="serversProperties">
+                    <button type="button" class="btn btn-default" aria-label="Left Align" data-ng-click="mode = 'server'">
+                        <span class="glyphicon glyphicon-plus" aria-hidden="true">Add Server</span>
+                    </button>
+                    <div class="input_panel" data-ng-show="mode == 'server'">
+                        <h4>New Server</h4>
+                        <form role="form">
+
+                        <div class="form-group row" >
+                            <div class="col-lg-6">
+                                <label class="control-label" for="ipAddress">Display Name</label>
+                            </div>
+                            <div class="col-lg-6">
+                                <input id="displayNameCreate" name="displayName" type="text" placeholder="Server 1" data-ng-model="temporaryNode.elementName" class="input-xlarge"/>
+                            </div>
+
+                        </div>
+                        <div class="form-group row">
+                            <div class="col-lg-6">
+                                <label class="control-label" for="ipAddress">IP Address</label>
+                            </div>
+                            <div class="col-lg-6">
+                                <input id="ipAddressCreate" name="ipAddress" type="text" placeholder="127.0.0.1" data-ng-model="temporaryNode.ipAddress" class="input-xlarge">
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <div class="col-lg-6">
+                                <label class="control-label" for="ipAddress">Rest Protocol</label>
+                            </div>
+                            <div class="col-lg-6">
+                                <input id="restProtocolCreate" name="restProtocol" type="text" placeholder="http" data-ng-model="temporaryNode.restProtocol" class="input-xlarge">
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <div class="col-lg-6">
+                                <label class="control-label" for="ipAddress">Rest Port</label>
+                            </div>
+                            <div class="col-lg-6">
+                                <input id="restPortCreate" name="restPort" type="text" placeholder="8111" data-ng-model="temporaryNode.restPort" class="input-xlarge">
+                            </div>
+                        </div>
+                        </form>
+                        <input type="button" value="Create Server" class="done_button" data-ng-click="addServerDone()">
+                    </div>
+                </div>
+            </div>
+            <div ng-switch-when="server">
+
+                    <tabset>
+                        <tab heading="Properties">
+                            <br/>
+                            <form role="form">
+
+                                <div class="form-group row" >
+                                    <div class="col-lg-6">
+                                        <label class="control-label" for="ipAddress">Display Name</label>
+                                    </div>
+                                    <div class="col-lg-6">
+                                        <input id="displayName" name="displayName" type="text" placeholder="Server 1" class="input-xlarge" value="{{elementSelected.displayName}}" data-ng-model="elementTree.currentNode.elementName"/>
+                                   </div>
+
+                                </div>
+                                <div class="form-group row">
+                                    <div class="col-lg-6">
+                                        <label class="control-label" for="ipAddress">IP Address</label>
+                                    </div>
+                                    <div class="col-lg-6">
+                                        <input id="ipAddress" name="ipAddress" type="text" placeholder="127.0.0.1" class="input-xlarge" value="{{elementSelected.ipAddress}}" data-ng-model="elementTree.currentNode.ipAddress">
+                                    </div>
+                                </div>
+                                <div class="form-group row">
+                                    <div class="col-lg-6">
+                                        <label class="control-label" for="ipAddress">Rest Protocol</label>
+                                    </div>
+                                    <div class="col-lg-6">
+                                        <input id="restProtocol" name="restProtocol" type="text" placeholder="http" class="input-xlarge" value="{{elementSelected.restProtocol}}" data-ng-model="elementTree.currentNode.restProtocol">
+                                    </div>
+                                </div>
+                                <div class="form-group row">
+                                    <div class="col-lg-6">
+                                        <label class="control-label" for="ipAddress">Rest Port</label>
+                                    </div>
+                                    <div class="col-lg-6">
+                                        <input id="restPort" name="restPort" type="text" placeholder="8111" class="input-xlarge" value="{{elementSelected.restPort}}" data-ng-model="elementTree.currentNode.restPort">
+                                    </div>
+                                </div>
+                                <input type="button" value="Save" class="done_button" data-ng-click="done()">
+                                <input type="button" value="Delete" class="done_button" data-ng-click="deleteServer()">
+                            </form>
+                        </tab>
+                        <tab heading="Administration">
+                            <br/>
+                            <button type="button" class="btn btn-default" aria-label="Left Align">
+                                <span class="glyphicon glyphicon-edit" aria-hidden="true">Edit Server</span>
+                            </button>
+                            <br/><br/>
+                            <button type="button" class="btn btn-default" aria-label="Left Align">
+                                <span class="glyphicon glyphicon-trash" aria-hidden="true">Delete Server</span>
+                            </button>
+                        </tab>
+                    </tabset>
+            </div>
+            <div ng-switch-when="sensorManagement">
+                <button type="button" class="btn btn-default" aria-label="Left Align">
+                    <span class="glyphicon glyphicon-plus" aria-hidden="true">Add Sensor</span>
+                </button>
+            </div>
+            <div ng-switch-when="sensor">
+                <tabset>
+                    <tab heading="Connection"></tab>
+                    <tab heading="General"></tab>
+                    <tab heading="GPIO"></tab>
+                    <tab heading="Miscellanous"></tab>
+                    <tab heading="Administration">
+                        <br/>
+                        <button type="button" class="btn btn-default" aria-label="Left Align">
+                            <span class="glyphicon glyphicon-edit" aria-hidden="true">Edit Sensor</span>
+                        </button>
+                        <br/><br/>
+                        <button type="button" class="btn btn-default" aria-label="Left Align">
+                            <span class="glyphicon glyphicon-trash" aria-hidden="true">Delete Sensor</span>
+                        </button>
+                    </tab>
+                </tabset>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<!--
+  <div class="row" ng-repeat="server in servers">
+
+    <div class="col-md-4"><span>{{server.displayName}}</span></div>
+
+    <div class="col-md-4"><strong>{{element.ipAddress}}</strong></div>
+
+    <div class="col-md-4"><strong>{{element.restProtocol}}</strong></div>
+    <br/>
+  </div>-->
+
+<!--<tab ng-repeat="tab in tabs" heading="{{tab.title}}" active="tab.active" disabled="tab.disabled">
+                            <h3>{{tab.title}}</h3>
+                            Esto es un contenido de tab:
+                            {{tab.content}}
+                        </tab>
+                        <tab select="alertMe()">
+                            <tab-heading>
+                                <i class="glyphicon glyphicon-bell"></i> Alert!
+                            </tab-heading>
+                            I've got an HTML heading, and a select callback. Pretty cool!
+
+                        </tab>-->

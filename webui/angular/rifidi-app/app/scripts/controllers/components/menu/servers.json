@@ -1,0 +1,27 @@
+[
+  {
+    "displayName": "Server1",
+    "restProtocol" : "http",
+    "ipAddress" : "127.0.0.1",
+    "restPort" : "8111"
+  },
+  {
+    "displayName": "Server2",
+    "restProtocol" : "http",
+    "ipAddress" : "192.168.88.104",
+    "restPort" : "8111"
+  },
+
+  {
+    "displayName": "Server4",
+    "restProtocol" : "http",
+    "ipAddress" : "192.168.88.104",
+    "restPort" : "8111"
+  },
+  {
+    "displayName": "Server5",
+    "restProtocol" : "http",
+    "ipAddress" : "192.168.88.104",
+    "restPort" : "8111"
+  }
+]
