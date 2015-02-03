@@ -77,18 +77,21 @@ angular.module('rifidiApp')
                 server.elementName = server.displayName;
                 server.elementId = "server";
                 server.children = [];
+                server.host = server.restProtocol + "://" + server.ipAddress + ":" + server.restPort;
+
+                partialElementList[0].children.push(server);
 
                 //for each server, add the sensor management element
 
                 //sensor management element:
-                var sensorManagementElement = { "elementName" : "Sensor Management", "elementId" : "sensorManagement", "collapsed":true, "children" : [] };
+                var sensorManagementElement = { "host" : server.ipAddress + ":" + server.restPort, "elementName" : "Sensor Management", "elementId" : "sensorManagement", "collapsed":true, "children" : [] };
                 server.children.push(sensorManagementElement);
 
                 //for each server, connect and query the list of sensors and place them under sensor management element
                 $http.get(server.restProtocol + "://" + server.ipAddress + ":" + server.restPort + '/readers')
                     .success(function(data, status, headers, config) {
-                        console.log("funciono lectura sensores server.ipAddress: " + server.ipAddress);
-                        console.log("data: " + data);
+
+                        var sensorsResponseHost = headers('host');
 
                         var xmlSensors;
                         if (window.DOMParser)
@@ -110,18 +113,29 @@ angular.module('rifidiApp')
                             var serviceID = sensorXmlVector[index].getElementsByTagName("serviceID")[0].childNodes[0];
                             var factoryID = sensorXmlVector[index].getElementsByTagName("factoryID")[0].childNodes[0];
 
-                            console.log("serviceID: " + serviceID.nodeValue);
-                            console.log("factoryID: " + factoryID.nodeValue);
+                            //console.log("serviceID: " + serviceID.nodeValue);
+                            //console.log("factoryID: " + factoryID.nodeValue);
 
                             var sensorElement = { "elementName" : serviceID.nodeValue, "elementId" : serviceID.nodeValue, "collapsed":true, "children" : [] };
 
-                            sensorManagementElement.children.push(sensorElement);
+                            //for this responseHost search which sensorManagementElement is associated with, and associate the sensorElement
+                            //console.log("headers('host') from readers service: " + headers('host'));
+
+                            partialElementList[0].children.forEach(function(server) {
+                                if (server.host == sensorsResponseHost){
+
+                                    //add this sensor to the server
+                                    server.children[0].children.push(sensorElement);
+                                }
+                            });
 
                             //retrieve the sessions associated with this sensor element
-                            $http.get(server.restProtocol + "://" + server.ipAddress + ":" + server.restPort + '/readerstatus/' + serviceID.nodeValue)
+                            $http.get(sensorsResponseHost + '/readerstatus/' + serviceID.nodeValue)
                                 .success(function(data, status, headers, config) {
 
-                                    console.log("data: " + data);
+                                    var sessionsResponseHost = headers('host');
+
+                                    //console.log("data for readerstatus from host: " + sessionsResponseHost + ": " + data);
 
                                     var xmlSessions;
                                     if (window.DOMParser)
@@ -137,24 +151,109 @@ angular.module('rifidiApp')
                                     }
 
                                     //get the xml response and extract the values to construct the local session object
+
+                                    var responseServiceId = xmlSessions.getElementsByTagName("sensor")[0].getElementsByTagName("serviceID")[0].childNodes[0].nodeValue;
+                                    //console.log("responseServiceId: ");
+                                    //console.log(responseServiceId);
+
                                     var sessionXmlVector = xmlSessions.getElementsByTagName("session");
 
                                     for(var index = 0; index < sessionXmlVector.length; index++) {
                                         var sessionID = sessionXmlVector[index].getElementsByTagName("ID")[0].childNodes[0];
                                         var sessionStatus = sessionXmlVector[index].getElementsByTagName("status")[0].childNodes[0];
 
-                                        console.log("sessionID: " + sessionID.nodeValue);
-                                        console.log("sessionStatus: " + sessionStatus.nodeValue);
+                                        //console.log("sessionID: " + sessionID.nodeValue);
+                                        //console.log("sessionStatus: " + sessionStatus.nodeValue);
 
                                         var sessionElement = {
-                                            "elementName": index+"session " + sessionID.nodeValue,
-                                            "elementId": index+"session " + sessionID.nodeValue,
+                                            "elementName": "session " + sessionID.nodeValue,
+                                            "elementId": "session " + sessionID.nodeValue,
                                             "collapsed": true,
                                             "status": sessionStatus.nodeValue,
                                             "children": []
                                         };
 
-                                        sensorElement.children.push(sessionElement);
+                                        //extract the executing commands form this session and append as childern element
+                                        var executingCommandsXmlVector = xmlSessions.getElementsByTagName("executingcommand");
+
+                                        for(var index = 0; index < executingCommandsXmlVector.length; index++) {
+                                            var commandID = executingCommandsXmlVector[index].getElementsByTagName("commandID")[0].childNodes[0];
+                                            var commandInterval = executingCommandsXmlVector[index].getElementsByTagName("interval")[0].childNodes[0];
+
+                                            var commandElement = {
+                                                "elementName": commandID.nodeValue,
+                                                "elementId": commandID.nodeValue,
+                                                "collapsed": true,
+                                                "interval": commandInterval.nodeValue,
+                                                "children": []
+                                            };
+
+                                            sessionElement.children.push(commandElement);
+
+                                        }
+
+
+
+
+                                        //for this responseHost search which sensorElement is associated with, and associate the sensorElement
+                                        //console.log("headers('host') from sessions service: " + headers('host'));
+
+                                        partialElementList[0].children.forEach(function(server) {
+
+
+
+
+                                            if (server.host == sessionsResponseHost){
+
+                                                //console.log("server.host == sessionsResponseHost:");
+                                                //console.log(server.host);
+
+                                                //console.log("XX server.host:");
+                                                //console.log(server.host);
+
+                                                //console.log("sessionsResponseHost:");
+                                                //console.log(sessionsResponseHost);
+
+                                                //responseServiceId is the service id that this response belongs to
+
+                                                //search for this server, which sensor is going to hold the session
+
+                                                server.children[0].children.forEach(function(sensor) {
+
+                                                        //console.log("iter sensor:");
+                                                        //console.log(sensor);
+                                                    console.log("sensor.elementId");
+                                                    console.log(sensor.elementId);
+                                                    console.log("responseServiceId");
+                                                    console.log(responseServiceId);
+                                                    console.log("-------------------------------------");
+
+
+
+                                                        if (sensor.elementId == responseServiceId){
+/*
+                                                            console.log("ZZ server.host:");
+                                                            console.log(server.host);
+
+                                                            console.log("sensor.elementId:");
+                                                            console.log(sensor.elementId);
+
+                                                            console.log("responseServiceId:");
+                                                            console.log(responseServiceId);
+*/
+                                                            sensor.children.push(sessionElement);
+                                                        }
+
+                                                });
+
+
+                                                //add this session to the session list of this sensor
+                                                //sensorElement.children.push(sessionElement);
+                                                //server.children[0].children.push(sensorElement);
+                                            }
+                                        });
+
+
                                     }
 
 
@@ -185,7 +284,7 @@ angular.module('rifidiApp')
                 server.children.push(appManagementElement);
 
 
-                partialElementList[0].children.push(server);
+
 
 
             });
@@ -265,7 +364,7 @@ angular.module('rifidiApp')
 
 
 
-
+/*
                 for(var i=0; i<data.length; i++){
                     var obj = data[i];
                     console.log( "obj: " + obj );
@@ -283,10 +382,15 @@ angular.module('rifidiApp')
 
 
                 }
+                */
+
+                  /*
 
                 data.forEach( function( item ) {
                     console.log( "ite: " + item );
                 });
+
+                */
             // this callback will be called asynchronously
             // when the response is available
           }).
