@@ -22,13 +22,13 @@
   {
     "displayName": "Server4",
     "restProtocol" : "http",
-    "ipAddress" : "192.168.88.104",
+    "ipAddress" : "192.168.88.107",
     "restPort" : "8111"
   },
   {
     "displayName": "Server5",
     "restProtocol" : "http",
-    "ipAddress" : "192.168.88.104",
+    "ipAddress" : "192.168.88.109",
     "restPort" : "8111"
   }
 ]
