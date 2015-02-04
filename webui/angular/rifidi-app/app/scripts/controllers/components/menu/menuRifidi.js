@@ -78,8 +78,86 @@ angular.module('rifidiApp')
                 server.elementId = "server";
                 server.children = [];
                 server.host = server.restProtocol + "://" + server.ipAddress + ":" + server.restPort;
+                server.status = 'CONNECTING';
 
                 partialElementList[0].children.push(server);
+
+                //for each server make an asynchronous call to test whether ping operation returns success
+                $http.get(server.restProtocol + "://" + server.ipAddress + ":" + server.restPort + '/ping')
+                    .success(function(data, status, headers, config) {
+
+                        var pingResponseHost = headers('host');
+
+                        var xmlPingTimestamp;
+                        if (window.DOMParser)
+                        {
+                            var parser = new DOMParser();
+                            xmlPingTimestamp = parser.parseFromString(data,"text/xml");
+                        }
+                        else // Internet Explorer
+                        {
+                            xmlPingTimestamp = new ActiveXObject("Microsoft.XMLDOM");
+                            xmlPingTimestamp.async=false;
+                            xmlPingTimestamp.loadXML(data);
+                        }
+
+                        //get the xml response and extract the ping timestamp value
+                        var timestampXmlVector = xmlPingTimestamp.getElementsByTagName("timestamp");
+
+                        var serverTimestamp = timestampXmlVector[0].childNodes[0].nodeValue;
+
+                        if (serverTimestamp){
+                            console.log("server ping, ip: " + pingResponseHost + ", timestamp: " + serverTimestamp);
+
+                            //change server connecting status to connected
+
+                            partialElementList[0].children.forEach(function(server) {
+                                if (server.host == pingResponseHost){
+
+                                    //change server status
+                                    server.status = 'CONNECTED';
+                                }
+                            });
+
+                        }
+
+                    })
+                    .error(function(data, status, headers, config) {
+                        console.log("error haciendo ping server.ipAddress: " + server.ipAddress);
+
+                        // called asynchronously if an error occurs
+                        // or server returns response with an error status.
+
+                        //var pingResponseHost = headers('host');
+                        //console.log("headers in error calling ping:");
+                        //console.log(headers());
+
+                        //console.log("data in error calling ping:");
+                        //console.log(data);
+
+                        //console.log("status in error calling ping:");
+                        //console.log(status);
+
+                        console.log("config.url in error calling ping:");
+                        console.log(config.url);
+
+                        partialElementList[0].children.forEach(function(server) {
+
+                            //console.log("error calling ping operation, inside loop, server.host: "+ server.host + ", pingResponseHost: " + pingResponseHost);
+/*
+                            if (server.host == pingResponseHost){
+
+                                console.log("going to change status to unable to connect for server: " + server.host);
+                                //change server status
+                                server.status = 'UNABLE TO CONNECT';
+                            }
+                            */
+                        });
+
+                    });
+
+
+
 
                 //for each server, add the sensor management element
 
