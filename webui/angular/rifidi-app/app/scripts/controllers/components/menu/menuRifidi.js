@@ -300,11 +300,13 @@ angular.module('rifidiApp')
 
                                                         //console.log("iter sensor:");
                                                         //console.log(sensor);
+                                                    /*
                                                     console.log("sensor.elementId");
                                                     console.log(sensor.elementId);
                                                     console.log("responseServiceId");
                                                     console.log(responseServiceId);
                                                     console.log("-------------------------------------");
+                                                    */
 
 
 
@@ -357,10 +359,505 @@ angular.module('rifidiApp')
                         // or server returns response with an error status.
                     });
 
+                //for each server, add the command management element
+                //command management element:
+                var commandManagementElement = { "host" : server.ipAddress + ":" + server.restPort, "elementName" : "Command Management", "elementId" : "commandManagement", "collapsed":true, "children" : [] };
+                server.children.push(commandManagementElement);
+
+
+
+                //for each server, connect and query the list of command types and place them under command management element
+                $http.get(server.restProtocol + "://" + server.ipAddress + ":" + server.restPort + '/commandtypes')
+                    .success(function(data, status, headers, config) {
+
+                        var commandTypesResponseHost = headers('host');
+
+                        var xmlCommandTypes;
+                        if (window.DOMParser)
+                        {
+                            var parser = new DOMParser();
+                            xmlCommandTypes = parser.parseFromString(data,"text/xml");
+                        }
+                        else // Internet Explorer
+                        {
+                            xmlCommandTypes = new ActiveXObject("Microsoft.XMLDOM");
+                            xmlCommandTypes.async=false;
+                            xmlCommandTypes.loadXML(data);
+                        }
+
+                        //get the xml response and extract the values to construct the local command type object
+                        var commandTypeXmlVector = xmlCommandTypes.getElementsByTagName("command");
+
+                        //define an empty reader factory structure to hold the current command type
+                        var readerFactory = {
+                            "elementName": "",
+                            "elementId": "",
+                            "collapsed": true,
+                            "readerFactoryID": "",
+                            "children": []
+                        };
+
+                        for(var index = 0; index < commandTypeXmlVector.length; index++) {
+
+                            var factoryID = commandTypeXmlVector[index].getElementsByTagName("factoryID")[0].childNodes[0];
+                            var description = commandTypeXmlVector[index].getElementsByTagName("description")[0].childNodes[0];
+                            var readerFactoryID = commandTypeXmlVector[index].getElementsByTagName("readerFactoryID")[0].childNodes[0];
+
+                            //the elements must be grouped by readerFactoryID, so the readerFactoryID will contain the factoryID
+                            //elements associated with it
+
+                            //console.log("factoryID: " + factoryID.nodeValue);
+                            //console.log("description: " + description.nodeValue);
+                            //console.log("readerFactoryID: " + readerFactoryID.nodeValue);
+
+                            //Iterate the children of command management element associated to the server that is equals to the server
+                            //that sends this response, and if this command type does not exist under that structure, then create it
+
+                            partialElementList[0].children.forEach(function(server) {
+
+                                if (server.host == commandTypesResponseHost){
+
+                                    //search for this server, if there exist a responseFactoryElement with this readerFactoryId
+
+                                    var readerFactoryFound = false;
+
+                                    console.log("going to evaluate readerFactoryID.nodeValue: " + readerFactoryID.nodeValue);
+
+                                    console.log("before loop, list of reader factories");
+                                    console.log(server.children[1].children);
+
+                                    server.children[1].children.forEach(function(readerFactoryElement) {
+
+                                        console.log("evaluating readerFactoryElement.readerFactoryID: " + readerFactoryElement.readerFactoryID);
+
+                                        if (readerFactoryElement.readerFactoryID == readerFactoryID.nodeValue){
+
+                                            console.log("readerFactoryFound");
+
+                                            readerFactoryFound = true;
+                                            //TODO How to break here this loop (when readerFactoryFound == true)
+
+                                        }
+
+                                    });
+
+                                    if (readerFactoryFound == false){
+
+                                        console.log("NOT readerFactoryFound");
+
+                                        //complete the reader factory element and add it
+                                        readerFactory.elementId = readerFactoryID.nodeValue + " Commands";
+                                        readerFactory.elementName = readerFactoryID.nodeValue + " Commands" ;
+                                        readerFactory.readerFactoryID = readerFactoryID.nodeValue;
+
+                                        server.children[1].children.push(angular.copy(readerFactory));
+
+                                        console.log("added readerFactory:");
+                                        console.log(readerFactory);
+                                        console.log("list of readerFactories:");
+                                        console.log(server.children[1].children);
+                                    }
+
+                                    //After adding the readerFactory if it did not exist, we have to associate the current
+                                    //factory id to its corresponding reader factory id
+
+                                    //iterate the reader factory elements
+                                    server.children[1].children.forEach(function(readerFactoryElement) {
+
+                                        if ( readerFactoryElement.readerFactoryID == readerFactoryID.nodeValue ){
+
+                                            //add the factory id element to this readerFactoryElement
+                                            var factoryElement = {
+                                                "elementName": factoryID.nodeValue,
+                                                "elementId": factoryID.nodeValue,
+                                                "collapsed": true,
+                                                "factoryID": factoryID.nodeValue,
+                                                "description": description.nodeValue,
+                                                "readerFactoryID": readerFactoryID.nodeValue,
+                                                "children": []
+
+                                            }
+
+                                            readerFactoryElement.children.push(factoryElement);
+                                        }
+
+                                    });
+
+                                    //add this session to the session list of this sensor
+                                    //sensorElement.children.push(sessionElement);
+                                    //server.children[0].children.push(sensorElement);
+                                }
+                            });
+
+
+
+
+
+
+
+                            /*
+                            var sensorElement = {
+                                "elementName": serviceID.nodeValue,
+                                "elementId": serviceID.nodeValue,
+                                "collapsed": true,
+                                "children": []
+                            };
+
+                            //for this responseHost search which sensorManagementElement is associated with, and associate the sensorElement
+                            //console.log("headers('host') from readers service: " + headers('host'));
+
+                            partialElementList[0].children.forEach(function (server) {
+                                if (server.host == sensorsResponseHost) {
+
+                                    //add this sensor to the server
+                                    server.children[0].children.push(sensorElement);
+                                }
+                            });
+*/
+                        }
+
+                        //call the commands service to load the commands associated with each factory id
+
+                        $http.get(server.restProtocol + "://" + server.ipAddress + ":" + server.restPort + '/commands')
+                            .success(function(data, status, headers, config) {
+
+                                var commandsResponseHost = headers('host');
+
+                                var xmlCommands;
+                                if (window.DOMParser)
+                                {
+                                    var parser = new DOMParser();
+                                    xmlCommands = parser.parseFromString(data,"text/xml");
+                                }
+                                else // Internet Explorer
+                                {
+                                    xmlCommands = new ActiveXObject("Microsoft.XMLDOM");
+                                    xmlCommands.async=false;
+                                    xmlCommands.loadXML(data);
+                                }
+
+                                //get the xml response and extract the values to construct the local command object
+                                var commandXmlVector = xmlCommands.getElementsByTagName("command");
+
+                                for(var index = 0; index < commandXmlVector.length; index++) {
+
+                                    var commandID = commandXmlVector[index].getElementsByTagName("commandID")[0].childNodes[0];
+                                    var factoryID = commandXmlVector[index].getElementsByTagName("factoryID")[0].childNodes[0];
+
+                                    //Iterate the children of command factory id element associated to the server that is equals to the server
+                                    //that sends this response, and if factoryID are equal, then associate the command to that command factory
+
+                                    partialElementList[0].children.forEach(function(server) {
+
+                                        if (server.host == commandsResponseHost) {
+
+                                            //search for this server, if there exist a commandElement with this factoryID
+
+                                            server.children[1].children.forEach(function (readerFactoryElement) {
+
+                                                readerFactoryElement.children.forEach(function (factoryElement) {
+
+                                                    if (factoryElement.factoryID ==  factoryID.nodeValue){
+
+                                                        //define an empty command structure to hold the current command
+                                                        var commandElement = {
+                                                            "elementName": commandID.nodeValue,
+                                                            "elementId": commandID.nodeValue,
+                                                            "collapsed": true,
+                                                            "commandID": commandID.nodeValue,
+                                                            "factoryID": factoryID.nodeValue,
+                                                            "children": []
+                                                        };
+
+                                                        factoryElement.children.push(commandElement);
+
+                                                    }
+
+
+
+                                                });
+
+                                            });
+
+                                        }
+
+                                    });
+
+                                }
+
+                            }).
+                            error(function(data, status, headers, config) {
+                                console.log("error reading commands");
+
+
+                                // called asynchronously if an error occurs
+                                // or server returns response with an error status.
+                            });
+
+
+
+
+
+
+
+                    }).
+                    error(function(data, status, headers, config) {
+                        console.log("error reading command types");
+
+
+                        // called asynchronously if an error occurs
+                        // or server returns response with an error status.
+                    });
+
+
+
+
+
+
+                //for each server, add the app management element
                 //app management element:
                 var appManagementElement = { "elementName" : "App Management", "elementId" : "App Management", "collapsed":true, "children" : [] };
                 server.children.push(appManagementElement);
 
+                //add application groups element
+
+                var appGroupsElement = { "elementName" : "App Groups", "elementId" : "App Group", "collapsed":true, "children" : [] };
+
+                appManagementElement.children.push(appGroupsElement);
+
+                //load app groups
+
+                //call apps command
+                $http.get(server.restProtocol + "://" + server.ipAddress + ":" + server.restPort + '/apps')
+
+                    .success(function(data, status, headers, config) {
+
+                        var appsResponseHost = headers('host');
+
+                        var xmlApps;
+                        if (window.DOMParser)
+                        {
+                            var parser = new DOMParser();
+                            xmlApps = parser.parseFromString(data,"text/xml");
+                        }
+                        else // Internet Explorer
+                        {
+                            xmlApps = new ActiveXObject("Microsoft.XMLDOM");
+                            xmlApps.async=false;
+                            xmlApps.loadXML(data);
+                        }
+
+                        //get the xml response and extract the values to construct the app groups
+                        var appsXmlVector = xmlApps.getElementsByTagName("app");
+
+                        for(var index = 0; index < appsXmlVector.length; index++) {
+
+                            var id = appsXmlVector[index].getElementsByTagName("id")[0].childNodes[0];
+                            var number = appsXmlVector[index].getElementsByTagName("number")[0].childNodes[0];
+                            var status = appsXmlVector[index].getElementsByTagName("status")[0].childNodes[0];
+
+                            var groupName = id.nodeValue.split(":")[0];
+                            var appName = id.nodeValue.split(":")[1];
+
+                            //Iterate the children of app groups element associated to the server that is equals to the server
+                            //that sends this response, and if this app group does not exist under that structure, then create it
+
+                            partialElementList[0].children.forEach(function(server) {
+
+                                if (server.host == appsResponseHost){
+
+                                    //search for this server, if there exist an appGroupElement with this groupName
+
+                                    var appGroupFound = false;
+
+                                    server.children[2].children[0].children.forEach(function(appGroupElement) {
+
+                                        if (appGroupElement.groupName == groupName){
+
+                                            console.log("readerFactoryFound");
+
+                                            appGroupFound = true;
+                                            //TODO How to break here this loop (when appGroupFound == true)
+
+                                        }
+
+                                    });
+
+                                    if (appGroupFound == false){
+
+                                        //create the appGroupElement and add it
+                                        var appGroupElement = {
+                                            "elementName" : groupName,
+                                            "elementId" : groupName,
+                                            "collapsed":true,
+                                            "groupName": groupName,
+                                            "readzoneAppId": "",
+                                            "children" : []
+                                        };
+
+                                        //Add Apps element label
+                                        var appsElement = {
+                                            "elementName" : "Apps",
+                                            "elementId" : "Apps",
+                                            "collapsed":true,
+                                            "groupName": groupName,
+                                            "children" : []
+                                        };
+
+                                        appGroupElement.children.push(appsElement);
+
+                                        //Add Readzones element label
+                                        var readZonesElement = {
+                                            "elementName" : "ReadZones",
+                                            "elementId" : "ReadZones",
+                                            "collapsed":true,
+                                            "groupName": groupName,
+                                            "children" : []
+                                        };
+
+                                        appGroupElement.children.push(readZonesElement);
+
+                                        server.children[2].children[0].children.push(angular.copy(appGroupElement));
+
+
+                                    }
+
+                                    //After adding the appGroup if it did not exist, we have to associate the current
+                                    //application to its corresponding app group
+
+                                    //iterate the apps elements
+
+                                    server.children[2].children[0].children.forEach(function(appGroupElement) {
+
+                                        if ( appGroupElement.groupName == groupName ){
+
+                                            //add the app to this appGroup
+                                            var appElement = {
+                                                "elementName": appName,
+                                                "elementId": appName,
+                                                "collapsed": true,
+                                                "groupName": groupName,
+                                                "appName": appName,
+                                                "number": number.nodeValue,
+                                                "status": status.nodeValue,
+                                                "children": []
+
+                                            }
+
+                                            appGroupElement.children[0].children.push(appElement);
+
+                                            //Add the application number to this application group in order to later add the associated read zones
+                                            if (appGroupElement.readzoneAppId == ""){
+                                                appGroupElement.readzoneAppId = appElement.number;
+                                            }
+
+
+                                        }
+
+                                    });
+
+
+                                }
+                            });
+
+                        }
+
+                        //add the readzones
+
+                        //call readzones command
+                        //iterate the app groups an call the readzones command
+
+
+                        server.children[2].children[0].children.forEach(function(appGroupElement) {
+
+
+
+                            $http.get(server.restProtocol + "://" + server.ipAddress + ":" + server.restPort + '/getReadZones/' + appGroupElement.readzoneAppId)
+
+                                .success(function(data, status, headers, config) {
+
+                                    //console.log("config en getreadzones:");
+                                    //console.log(config);
+
+                                    var successReadzoneAppId = config.url.substring(config.url.lastIndexOf("/") + 1, config.url.length);
+                                    //console.log("successReadzoneAppId:" + successReadzoneAppId);
+
+                                    var readzonesResponseHost = headers('host');
+
+                                    var xmlReadzones;
+                                    if (window.DOMParser)
+                                    {
+                                        var parser = new DOMParser();
+                                        xmlReadzones = parser.parseFromString(data,"text/xml");
+                                    }
+                                    else // Internet Explorer
+                                    {
+                                        xmlReadzones = new ActiveXObject("Microsoft.XMLDOM");
+                                        xmlReadzones.async=false;
+                                        xmlReadzones.loadXML(data);
+                                    }
+
+                                    //get the xml response and extract the values to construct the readzone element
+                                    var readzonesXmlVector = xmlReadzones.getElementsByTagName("entry");
+
+
+                                    partialElementList[0].children.forEach(function(server) {
+
+                                        if (server.host == readzonesResponseHost){
+
+                                            //iterate to find the app group where to add this readzone
+                                            server.children[2].children[0].children.forEach(function(appGroupElement) {
+
+                                                if(appGroupElement.readzoneAppId == successReadzoneAppId){
+
+                                                    for(var index = 0; index < readzonesXmlVector.length; index++) {
+
+                                                        var readzone = readzonesXmlVector[index].getElementsByTagName("value")[0].childNodes[0].nodeValue;
+
+                                                        //create the readzoneElement and add it
+                                                        var readzoneElement = {
+                                                            "elementName": readzone,
+                                                            "elementId": readzone,
+                                                            "collapsed": true,
+                                                            "readzone": readzone,
+                                                            "children": []
+                                                        };
+
+                                                        appGroupElement.children[1].children.push(angular.copy(readzoneElement));
+                                                    }
+
+                                                }
+
+                                            });
+
+
+                                        }
+
+                                    });
+
+
+
+                                }).
+                                error(function(data, status, headers, config) {
+                                    console.log("error reading readzones");
+
+
+                                    // called asynchronously if an error occurs
+                                    // or server returns response with an error status.
+                                });
+
+                        });
+
+
+
+                    }).
+                    error(function(data, status, headers, config) {
+                        console.log("error reading apps");
+
+
+                        // called asynchronously if an error occurs
+                        // or server returns response with an error status.
+                    });
 
 
 
