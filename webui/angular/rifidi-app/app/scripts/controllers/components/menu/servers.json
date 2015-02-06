@@ -15,7 +15,7 @@
   {
     "displayName": "Server3-by ip",
     "restProtocol" : "http",
-    "ipAddress" : "192.168.0.10",
+    "ipAddress" : "192.168.88.87",
     "restPort" : "8111"
   },
 

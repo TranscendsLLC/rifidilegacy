@@ -16,7 +16,8 @@ angular
     'ngSanitize',
     'ngTouch',
     'angularTreeview',
-    'ui.bootstrap'
+    'ui.bootstrap',
+    'mgo-angular-wizard'
   ])
   .config(function ($routeProvider) {
     $routeProvider
@@ -27,6 +28,10 @@ angular
       .when('/about', {
         templateUrl: 'views/about.html',
         controller: 'AboutCtrl'
+      })
+      .when('/sensorWizard', {
+        templateUrl: 'views/sensorWizard.html',
+        controller: 'SensorWizardCtrl'
       })
       .otherwise({
         redirectTo: '/'
