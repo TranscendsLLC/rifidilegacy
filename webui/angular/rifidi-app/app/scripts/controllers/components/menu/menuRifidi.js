@@ -365,229 +365,206 @@ angular.module('rifidiApp')
                 server.children.push(commandManagementElement);
 
 
-
-                //for each server, connect and query the list of command types and place them under command management element
-                $http.get(server.restProtocol + "://" + server.ipAddress + ":" + server.restPort + '/commandtypes')
+                //call the readertypes operation
+                $http.get(server.restProtocol + "://" + server.ipAddress + ":" + server.restPort + '/readertypes')
                     .success(function(data, status, headers, config) {
 
-                        var commandTypesResponseHost = headers('host');
+                        var readerTypesResponseHost = headers('host');
 
-                        var xmlCommandTypes;
+                        var xmlReaderTypes;
                         if (window.DOMParser)
                         {
                             var parser = new DOMParser();
-                            xmlCommandTypes = parser.parseFromString(data,"text/xml");
+                            xmlReaderTypes = parser.parseFromString(data,"text/xml");
                         }
                         else // Internet Explorer
                         {
-                            xmlCommandTypes = new ActiveXObject("Microsoft.XMLDOM");
-                            xmlCommandTypes.async=false;
-                            xmlCommandTypes.loadXML(data);
+                            xmlReaderTypes = new ActiveXObject("Microsoft.XMLDOM");
+                            xmlReaderTypes.async=false;
+                            xmlReaderTypes.loadXML(data);
                         }
 
-                        //get the xml response and extract the values to construct the local command type object
-                        var commandTypeXmlVector = xmlCommandTypes.getElementsByTagName("command");
+                        //get the xml response and extract the values to construct the reader type object
+                        var readerTypesXmlVector = xmlReaderTypes.getElementsByTagName("sensor");
 
-                        //define an empty reader factory structure to hold the current command type
-                        var readerFactory = {
-                            "elementName": "",
-                            "elementId": "",
-                            "collapsed": true,
-                            "readerFactoryID": "",
-                            "children": []
-                        };
+                        for(var index = 0; index < readerTypesXmlVector.length; index++) {
 
-                        for(var index = 0; index < commandTypeXmlVector.length; index++) {
+                            var factoryID = readerTypesXmlVector[index].getElementsByTagName("factoryID")[0].childNodes[0];
+                            var description = readerTypesXmlVector[index].getElementsByTagName("description")[0].childNodes[0];
 
-                            var factoryID = commandTypeXmlVector[index].getElementsByTagName("factoryID")[0].childNodes[0];
-                            var description = commandTypeXmlVector[index].getElementsByTagName("description")[0].childNodes[0];
-                            var readerFactoryID = commandTypeXmlVector[index].getElementsByTagName("readerFactoryID")[0].childNodes[0];
-
-                            //the elements must be grouped by readerFactoryID, so the readerFactoryID will contain the factoryID
-                            //elements associated with it
-
-                            //console.log("factoryID: " + factoryID.nodeValue);
-                            //console.log("description: " + description.nodeValue);
-                            //console.log("readerFactoryID: " + readerFactoryID.nodeValue);
-
-                            //Iterate the children of command management element associated to the server that is equals to the server
-                            //that sends this response, and if this command type does not exist under that structure, then create it
+                            //Add the reader type to the command management element
 
                             partialElementList[0].children.forEach(function(server) {
 
-                                if (server.host == commandTypesResponseHost){
+                                if (server.host == readerTypesResponseHost) {
 
-                                    //search for this server, if there exist a responseFactoryElement with this readerFactoryId
+                                    //add the reader type under Command Management element
 
-                                    var readerFactoryFound = false;
+                                    //define an empty command structure to hold the current command
+                                    var readerTypeElement = {
+                                        "elementName": factoryID.nodeValue + " Commands",
+                                        "elementId": factoryID.nodeValue + " Commands",
+                                        "collapsed": true,
+                                        "factoryID": factoryID.nodeValue,
+                                        "description": description.nodeValue,
+                                        "children": []
+                                    };
 
-                                    console.log("going to evaluate readerFactoryID.nodeValue: " + readerFactoryID.nodeValue);
+                                    server.children[1].children.push(readerTypeElement);
 
-                                    console.log("before loop, list of reader factories");
-                                    console.log(server.children[1].children);
-
-                                    server.children[1].children.forEach(function(readerFactoryElement) {
-
-                                        console.log("evaluating readerFactoryElement.readerFactoryID: " + readerFactoryElement.readerFactoryID);
-
-                                        if (readerFactoryElement.readerFactoryID == readerFactoryID.nodeValue){
-
-                                            console.log("readerFactoryFound");
-
-                                            readerFactoryFound = true;
-                                            //TODO How to break here this loop (when readerFactoryFound == true)
-
-                                        }
-
-                                    });
-
-                                    if (readerFactoryFound == false){
-
-                                        console.log("NOT readerFactoryFound");
-
-                                        //complete the reader factory element and add it
-                                        readerFactory.elementId = readerFactoryID.nodeValue + " Commands";
-                                        readerFactory.elementName = readerFactoryID.nodeValue + " Commands" ;
-                                        readerFactory.readerFactoryID = readerFactoryID.nodeValue;
-
-                                        server.children[1].children.push(angular.copy(readerFactory));
-
-                                        console.log("added readerFactory:");
-                                        console.log(readerFactory);
-                                        console.log("list of readerFactories:");
-                                        console.log(server.children[1].children);
-                                    }
-
-                                    //After adding the readerFactory if it did not exist, we have to associate the current
-                                    //factory id to its corresponding reader factory id
-
-                                    //iterate the reader factory elements
-                                    server.children[1].children.forEach(function(readerFactoryElement) {
-
-                                        if ( readerFactoryElement.readerFactoryID == readerFactoryID.nodeValue ){
-
-                                            //add the factory id element to this readerFactoryElement
-                                            var factoryElement = {
-                                                "elementName": factoryID.nodeValue,
-                                                "elementId": factoryID.nodeValue,
-                                                "collapsed": true,
-                                                "factoryID": factoryID.nodeValue,
-                                                "description": description.nodeValue,
-                                                "readerFactoryID": readerFactoryID.nodeValue,
-                                                "children": []
-
-                                            }
-
-                                            readerFactoryElement.children.push(factoryElement);
-                                        }
-
-                                    });
-
-                                    //add this session to the session list of this sensor
-                                    //sensorElement.children.push(sessionElement);
-                                    //server.children[0].children.push(sensorElement);
                                 }
+
                             });
 
-
-
-
-
-
-
-                            /*
-                            var sensorElement = {
-                                "elementName": serviceID.nodeValue,
-                                "elementId": serviceID.nodeValue,
-                                "collapsed": true,
-                                "children": []
-                            };
-
-                            //for this responseHost search which sensorManagementElement is associated with, and associate the sensorElement
-                            //console.log("headers('host') from readers service: " + headers('host'));
-
-                            partialElementList[0].children.forEach(function (server) {
-                                if (server.host == sensorsResponseHost) {
-
-                                    //add this sensor to the server
-                                    server.children[0].children.push(sensorElement);
-                                }
-                            });
-*/
                         }
 
-                        //call the commands service to load the commands associated with each factory id
+                        //load the command types and place them under corresponding reader type
 
-                        $http.get(server.restProtocol + "://" + server.ipAddress + ":" + server.restPort + '/commands')
+                        $http.get(server.restProtocol + "://" + server.ipAddress + ":" + server.restPort + '/commandtypes')
                             .success(function(data, status, headers, config) {
 
-                                var commandsResponseHost = headers('host');
+                                var commandTypesResponseHost = headers('host');
 
-                                var xmlCommands;
+                                var xmlCommandTypes;
                                 if (window.DOMParser)
                                 {
                                     var parser = new DOMParser();
-                                    xmlCommands = parser.parseFromString(data,"text/xml");
+                                    xmlCommandTypes = parser.parseFromString(data,"text/xml");
                                 }
                                 else // Internet Explorer
                                 {
-                                    xmlCommands = new ActiveXObject("Microsoft.XMLDOM");
-                                    xmlCommands.async=false;
-                                    xmlCommands.loadXML(data);
+                                    xmlCommandTypes = new ActiveXObject("Microsoft.XMLDOM");
+                                    xmlCommandTypes.async=false;
+                                    xmlCommandTypes.loadXML(data);
                                 }
 
-                                //get the xml response and extract the values to construct the local command object
-                                var commandXmlVector = xmlCommands.getElementsByTagName("command");
+                                //get the xml response and extract the values to construct the local command type object
+                                var commandTypeXmlVector = xmlCommandTypes.getElementsByTagName("command");
 
-                                for(var index = 0; index < commandXmlVector.length; index++) {
 
-                                    var commandID = commandXmlVector[index].getElementsByTagName("commandID")[0].childNodes[0];
-                                    var factoryID = commandXmlVector[index].getElementsByTagName("factoryID")[0].childNodes[0];
 
-                                    //Iterate the children of command factory id element associated to the server that is equals to the server
-                                    //that sends this response, and if factoryID are equal, then associate the command to that command factory
+                                for(var index = 0; index < commandTypeXmlVector.length; index++) {
+
+                                    var factoryID = commandTypeXmlVector[index].getElementsByTagName("factoryID")[0].childNodes[0];
+                                    var description = commandTypeXmlVector[index].getElementsByTagName("description")[0].childNodes[0];
+                                    var readerFactoryID = commandTypeXmlVector[index].getElementsByTagName("readerFactoryID")[0].childNodes[0];
+
+                                    //Iterate the children of command management element associated to the server that is equals to the server
+                                    //that sends this response, and add the command type under appropriate reader type
 
                                     partialElementList[0].children.forEach(function(server) {
 
-                                        if (server.host == commandsResponseHost) {
+                                        if (server.host == commandTypesResponseHost){
 
-                                            //search for this server, if there exist a commandElement with this factoryID
+                                            server.children[1].children.forEach(function(readerTypeElement) {
 
-                                            server.children[1].children.forEach(function (readerFactoryElement) {
+                                                //console.log("evaluating readerFactoryElement.readerFactoryID: " + readerTypeElement.readerFactoryID);
 
-                                                readerFactoryElement.children.forEach(function (factoryElement) {
+                                                if (readerTypeElement.factoryID == readerFactoryID.nodeValue){
 
-                                                    if (factoryElement.factoryID ==  factoryID.nodeValue){
-
-                                                        //define an empty command structure to hold the current command
-                                                        var commandElement = {
-                                                            "elementName": commandID.nodeValue,
-                                                            "elementId": commandID.nodeValue,
-                                                            "collapsed": true,
-                                                            "commandID": commandID.nodeValue,
-                                                            "factoryID": factoryID.nodeValue,
-                                                            "children": []
-                                                        };
-
-                                                        factoryElement.children.push(commandElement);
+                                                    //define a command type and add it to this reader type                                                    //add the factory id element to this readerFactoryElement
+                                                    var commandTypeElement = {
+                                                        "elementName": factoryID.nodeValue,
+                                                        "elementId": factoryID.nodeValue,
+                                                        "collapsed": true,
+                                                        "factoryID": factoryID.nodeValue,
+                                                        "description": description.nodeValue,
+                                                        "readerFactoryID": readerFactoryID.nodeValue,
+                                                        "children": []
 
                                                     }
 
+                                                    readerTypeElement.children.push(commandTypeElement);
 
+                                                }
 
-                                                });
+                                            });
+
+                                        }
+                                    });
+
+                                }
+
+                                //call the commands service to load the commands associated with each command type
+
+                                $http.get(server.restProtocol + "://" + server.ipAddress + ":" + server.restPort + '/commands')
+                                    .success(function(data, status, headers, config) {
+
+                                        var commandsResponseHost = headers('host');
+
+                                        var xmlCommands;
+                                        if (window.DOMParser)
+                                        {
+                                            var parser = new DOMParser();
+                                            xmlCommands = parser.parseFromString(data,"text/xml");
+                                        }
+                                        else // Internet Explorer
+                                        {
+                                            xmlCommands = new ActiveXObject("Microsoft.XMLDOM");
+                                            xmlCommands.async=false;
+                                            xmlCommands.loadXML(data);
+                                        }
+
+                                        //get the xml response and extract the values to construct the local command object
+                                        var commandXmlVector = xmlCommands.getElementsByTagName("command");
+
+                                        for(var index = 0; index < commandXmlVector.length; index++) {
+
+                                            var commandID = commandXmlVector[index].getElementsByTagName("commandID")[0].childNodes[0];
+                                            var factoryID = commandXmlVector[index].getElementsByTagName("factoryID")[0].childNodes[0];
+
+                                            //Iterate the children of command factory id element associated to the server that is equals to the server
+                                            //that sends this response, and if factoryID are equal, then associate the command to that command factory
+
+                                            partialElementList[0].children.forEach(function(server) {
+
+                                                if (server.host == commandsResponseHost) {
+
+                                                    //search for this server, if there exist a commandElement with this factoryID
+
+                                                    server.children[1].children.forEach(function (readerFactoryElement) {
+
+                                                        readerFactoryElement.children.forEach(function (factoryElement) {
+
+                                                            if (factoryElement.factoryID ==  factoryID.nodeValue){
+
+                                                                //define a command structure to hold the current command
+                                                                var commandElement = {
+                                                                    "elementName": commandID.nodeValue,
+                                                                    "elementId": commandID.nodeValue,
+                                                                    "collapsed": true,
+                                                                    "commandID": commandID.nodeValue,
+                                                                    "factoryID": factoryID.nodeValue,
+                                                                    "children": []
+                                                                };
+
+                                                                factoryElement.children.push(commandElement);
+
+                                                            }
+
+                                                        });
+
+                                                    });
+
+                                                }
 
                                             });
 
                                         }
 
+                                    }).
+                                    error(function(data, status, headers, config) {
+                                        console.log("error reading commands");
+
+
+                                        // called asynchronously if an error occurs
+                                        // or server returns response with an error status.
                                     });
 
-                                }
 
                             }).
                             error(function(data, status, headers, config) {
-                                console.log("error reading commands");
+                                console.log("error reading command types");
 
 
                                 // called asynchronously if an error occurs
@@ -600,14 +577,23 @@ angular.module('rifidiApp')
 
 
 
+
+
+
+
+
                     }).
                     error(function(data, status, headers, config) {
-                        console.log("error reading command types");
+                        console.log("error reading reader types");
 
 
                         // called asynchronously if an error occurs
                         // or server returns response with an error status.
                     });
+
+
+
+                //aca iba
 
 
 
