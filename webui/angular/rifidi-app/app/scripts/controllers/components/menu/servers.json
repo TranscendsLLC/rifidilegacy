@@ -2,7 +2,7 @@
   {
     "displayName": "Server1-by localhost",
     "restProtocol" : "http",
-    "ipAddress" : "localhost",
+    "ipAddress" : "localhostd",
     "restPort" : "8111"
   },
   {
@@ -15,26 +15,6 @@
     "displayName": "Server2",
     "restProtocol" : "http",
     "ipAddress" : "192.168.88.104",
-    "restPort" : "8111"
-  },
-
-  {
-    "displayName": "Server3-by ip",
-    "restProtocol" : "http",
-    "ipAddress" : "192.168.88.87",
-    "restPort" : "8111"
-  },
-
-  {
-    "displayName": "Server4",
-    "restProtocol" : "http",
-    "ipAddress" : "192.168.88.107",
-    "restPort" : "8111"
-  },
-  {
-    "displayName": "Server5",
-    "restProtocol" : "http",
-    "ipAddress" : "192.168.88.109",
     "restPort" : "8111"
   }
 ]

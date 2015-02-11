@@ -1,6 +1,10 @@
 <div class="panel panel-default">
     <div class="panel-heading">
-        <span class="glyphicon glyphicon-list-alt" aria-hidden="true"></span> Elements Menu
+        <span class="glyphicon glyphicon-list-alt" aria-hidden="true"></span> Main menu
+
+        <a href="" alt="add"><span class="glyphicon glyphicon-list-alt" aria-hidden="true"></span></a>
+
+
     </div>
     <div class="panel-body">
        <div
@@ -123,9 +127,9 @@
                         </tab>
                     </tabset>
             </div>
-            <div ng-switch-when="sensorManagement">
+            <div ng-switch-when="sensorManagement" ng-controller="SensorWizardCtrl">
                 <button type="button" class="btn btn-default" aria-label="Left Align">
-                    <a href ="#/sensorWizard"><span class="glyphicon glyphicon-plus" aria-hidden="true">Add Sensor</span></a>
+                    <a href ="#/sensorWizard/{{elementSelected.restProtocol}}/{{elementSelected.ipAddress}}/{{elementSelected.restPort}}"><span class="glyphicon glyphicon-plus" aria-hidden="true">Add Sensor</span></a>
                 </button>
             </div>
             <div ng-switch-when="sensor">

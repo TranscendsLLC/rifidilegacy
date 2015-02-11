@@ -162,7 +162,7 @@ angular.module('rifidiApp')
                 //for each server, add the sensor management element
 
                 //sensor management element:
-                var sensorManagementElement = { "host" : server.ipAddress + ":" + server.restPort, "elementName" : "Sensor Management", "elementId" : "sensorManagement", "collapsed":true, "children" : [] };
+                var sensorManagementElement = { "host" : server.restProtocol + "://" + server.ipAddress + ":" + server.restPort, "restProtocol":server.restProtocol, "ipAddress":server.ipAddress, "restPort":server.restPort, "elementName" : "Sensor Management", "elementId" : "sensorManagement", "collapsed":true, "children" : [] };
                 server.children.push(sensorManagementElement);
 
                 //for each server, connect and query the list of sensors and place them under sensor management element
@@ -977,11 +977,20 @@ angular.module('rifidiApp')
 
           $scope.$watch( 'elementTree.currentNode', function( newObj, oldObj ) {
               console.log($scope.elementTree.currentNode);
+              console.log("newObj:");
+              console.log(newObj);
+              //console.log("oldObj:");
+              //console.log(oldObj);
               if( $scope.elementTree && angular.isObject($scope.elementTree.currentNode) ) {
                   $scope.elementSelected=$scope.elementTree.currentNode;
                   $scope.propertyType=$scope.elementTree.currentNode.elementId;
 
+
+
               }
+
+              console.log("$scope.elementSelected:");
+              console.log($scope.elementSelected);
           }, false);
 
       },
