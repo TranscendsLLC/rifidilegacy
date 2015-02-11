@@ -29,7 +29,7 @@ angular
         templateUrl: 'views/about.html',
         controller: 'AboutCtrl'
       })
-      .when('/sensorWizard', {
+      .when('/sensorWizard/:restProtocol/:ipAddress/:restPort', {
         templateUrl: 'views/sensorWizard.html',
         controller: 'SensorWizardCtrl'
       })
