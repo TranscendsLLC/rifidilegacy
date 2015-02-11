@@ -2,7 +2,7 @@
   {
     "displayName": "Server1-by localhost",
     "restProtocol" : "http",
-    "ipAddress" : "localhostd",
+    "ipAddress" : "localhost",
     "restPort" : "8111"
   },
   {
