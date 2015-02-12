@@ -148,6 +148,7 @@ angular.module('rifidiApp')
               //Create a properties object for this reader
               var readerConnectionProperties = {
                 "readerid": readerid.nodeValue,
+                "startSessionAut": false,
                 "properties": []
               };
 
@@ -157,31 +158,50 @@ angular.module('rifidiApp')
 
                 console.log("indexProp: " + indexProp);
 
-
-                var name = propertiesXmlVector[indexProp].getElementsByTagName("name")[0].childNodes[0];
-                var displayname = propertiesXmlVector[indexProp].getElementsByTagName("displayname")[0].childNodes[0];
-                var description = propertiesXmlVector[indexProp].getElementsByTagName("description")[0].childNodes[0];
-                var type = propertiesXmlVector[indexProp].getElementsByTagName("type")[0].childNodes[0];
                 var category = propertiesXmlVector[indexProp].getElementsByTagName("category")[0].childNodes[0];
-                var writable = propertiesXmlVector[indexProp].getElementsByTagName("writable")[0].childNodes[0];
-                var ordervalue = propertiesXmlVector[indexProp].getElementsByTagName("ordervalue")[0].childNodes[0];
 
-                //if category equals to connection, then extract that property
-                if (category.nodeValue == 'connection'){
+                //console.log("category: '" + category.nodeValue + "'");
 
-                  var propertyElement = {
-                    "name": name.nodeValue,
-                    "displayname": displayname.nodeValue,
-                    "description": description.nodeValue,
-                    "type": type.nodeValue,
-                    "category": category.nodeValue,
-                    "writable": writable.nodeValue,
-                    "ordervalue": ordervalue.nodeValue
-                  };
+                if (category.nodeValue == 'connection') {
 
-                  //Add the property to properties list
-                  readerConnectionProperties.properties.push(propertyElement);
+                  var name = propertiesXmlVector[indexProp].getElementsByTagName("name")[0].childNodes[0];
+                  var displayname = propertiesXmlVector[indexProp].getElementsByTagName("displayname")[0].childNodes[0];
+                  //console.log("displayname: " + displayname.nodeValue);
+                  var defaultvalue = propertiesXmlVector[indexProp].getElementsByTagName("defaultvalue")[0].childNodes[0];
+                  var description = propertiesXmlVector[indexProp].getElementsByTagName("description")[0].childNodes[0];
+                  var type = propertiesXmlVector[indexProp].getElementsByTagName("type")[0].childNodes[0];
+                  var maxvalue = 0;
+                  var minvalue = 0;
+                  if (type == 'java.lang.Integer') {
+                    maxvalue = propertiesXmlVector[indexProp].getElementsByTagName("maxvalue")[0].childNodes[0];
+                    minvalue = propertiesXmlVector[indexProp].getElementsByTagName("minvalue")[0].childNodes[0];
+                  }
 
+
+                  var writable = propertiesXmlVector[indexProp].getElementsByTagName("writable")[0].childNodes[0];
+                  var ordervalue = propertiesXmlVector[indexProp].getElementsByTagName("ordervalue")[0].childNodes[0];
+
+                  //if category equals to connection, then extract that property
+                  if (category.nodeValue == 'connection') {
+
+                    var propertyElement = {
+                      "name": name.nodeValue,
+                      "displayname": displayname.nodeValue,
+                      "description": description.nodeValue,
+                      "type": type.nodeValue,
+                      "maxvalue": maxvalue.nodeValue,
+                      "minvalue": minvalue.nodeValue,
+                      "category": category.nodeValue,
+                      "writable": writable.nodeValue,
+                      "ordervalue": ordervalue.nodeValue,
+                      "value": defaultvalue.nodeValue,
+                      "defaultvalue": defaultvalue.nodeValue
+                    };
+
+                    //Add the property to properties list
+                    readerConnectionProperties.properties.push(propertyElement);
+
+                  }
                 }
 
 
@@ -210,11 +230,11 @@ angular.module('rifidiApp')
         //Clean variable
         $scope.selectedReaderConnectionProperties = [];
 
-        console.log("$scope.selectedReaderType");
-        console.log($scope.selectedReaderType);
+        //console.log("$scope.selectedReaderType");
+        //console.log($scope.selectedReaderType);
 
-        console.log("$scope.customReaderId");
-        console.log($scope.customReaderId);
+        //console.log("$scope.customReaderId");
+        //console.log($scope.customReaderId);
 
 
 
@@ -236,8 +256,8 @@ angular.module('rifidiApp')
 
             console.log("match");
 
-            //Add the property
-            $scope.selectedReaderConnectionProperties.push(readerConnectionProperties.properties);
+            //Add the property, assigning a copy of the property
+            $scope.selectedReaderConnectionProperties = angular.copy(readerConnectionProperties);
 
           }
 
@@ -254,6 +274,15 @@ angular.module('rifidiApp')
 
         $scope.selectedReaderType = selectedReaderType;
         $scope.prepareCreateSessionStep();
+      }
+
+      $scope.readerIdChangeAction = function(customReaderId){
+
+        $scope.customReaderId = customReaderId;
+
+        console.log("readerIdChangeAction:");
+        console.log($scope.customReaderId);
+
       }
 
 
