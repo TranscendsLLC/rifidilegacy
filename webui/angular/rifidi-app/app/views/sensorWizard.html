@@ -23,7 +23,7 @@
                                     ng-change="readerTypeSelectAction(selectedReaderType)"
                                     ng-model="selectedReaderType"
                                     ng-required="true"
-                                    ng-options="value as value.factoryID for value in readerTypes">
+                                    ng-options="value as value.factoryID for value in readerTypes | orderBy:'factoryID'">
                                 <option>--</option>
                             </select>
 
@@ -40,7 +40,7 @@
                             <label class="control-label" for="readerId">Reader ID</label>
                         </div>
                         <div class="col-lg-3">
-                            <input name="readerId" id = "readerId"
+                            <input name="readerId" id = "readerId" ng-change="readerIdChangeAction(customReaderId)"
                                    ng-model="customReaderId">
                             </input>
                         </div>
@@ -58,8 +58,40 @@
             </wz-step>
 
             <wz-step title="Create session">
-                <h4>Create session</h4>
-                <p>The create session step</p>
+                <h4>Create session for reader type: {{selectedReaderType.factoryID}}</h4>
+
+                <form novalidate >
+
+                    <div class="form-group row" >
+
+
+                        <div ng-repeat="property in selectedReaderConnectionProperties.properties | orderBy:['ordervalue', 'displayname']">
+
+                            <div class="col-lg-6">
+                                <label class="control-label">{{property.displayname}}</label>
+                            </div>
+
+                            <div class="col-lg-3">
+                                <input type="text" ng-model="property.value" />
+                            </div>
+
+                            <br>
+                            <p>
+
+                        </div>
+
+                        <div class="col-lg-6">
+                            <label class="control-label">Automatically start session?</label>
+                        </div>
+
+                        <div class="col-lg-3">
+                            <input type="checkbox" ng-model="selectedReaderConnectionProperties.startSessionAut">
+                        </div>
+
+
+                    </div>
+                </form>
+
                 <input type="submit" wz-previous value="Previous" />
                 <input type="submit" wz-next value="Next" />
             </wz-step>
