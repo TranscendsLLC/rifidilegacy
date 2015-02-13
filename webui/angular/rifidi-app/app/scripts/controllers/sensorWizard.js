@@ -17,10 +17,15 @@ angular.module('rifidiApp')
 
       console.log("cleaning readerTypes: ");
       $scope.readerTypes = [];
+      $scope.commandTypes = [];
+      $scope.commandInstances = [];
       $scope.selectedReaderType = "";
+      $scope.selectedCommandType = {};
+      $scope.selectedCommandInstance = {};
       $scope.readersConnectionProperties = [];
       $scope.customReaderId = "";
       $scope.selectedReaderConnectionProperties = [];
+
 
       //loadReaderTypes();
 
@@ -184,6 +189,14 @@ angular.module('rifidiApp')
                   //if category equals to connection, then extract that property
                   if (category.nodeValue == 'connection') {
 
+                    var customdefaultvalue;
+
+                    if (type.nodeValue == 'java.lang.Integer'){
+                      customdefaultvalue = parseInt(defaultvalue.nodeValue);
+                    } else {
+                      customdefaultvalue = defaultvalue.nodeValue;
+                    }
+
                     var propertyElement = {
                       "name": name.nodeValue,
                       "displayname": displayname.nodeValue,
@@ -194,8 +207,8 @@ angular.module('rifidiApp')
                       "category": category.nodeValue,
                       "writable": writable.nodeValue,
                       "ordervalue": ordervalue.nodeValue,
-                      "value": defaultvalue.nodeValue,
-                      "defaultvalue": defaultvalue.nodeValue
+                      "value": customdefaultvalue,
+                      "defaultvalue": customdefaultvalue
                     };
 
                     //Add the property to properties list
@@ -270,10 +283,168 @@ angular.module('rifidiApp')
 
       }
 
+      $scope.prepareCreateCommandStep = function(){
+        console.log("prepareCreateCommandStep called");
+
+        //Clean variable
+        $scope.selectedCommandType = {};
+        $scope.selectedCommandInstance = {};
+
+        $scope.commandTypes = [];
+
+        //console.log("$scope.selectedReaderType");
+        //console.log($scope.selectedReaderType);
+
+        //console.log("$scope.customReaderId");
+        //console.log($scope.customReaderId);
+
+
+
+        //$scope.selectedReaderType = selectedReaderType;
+
+        //console.log("$scope.selectedReaderType");
+        //console.log($scope.selectedReaderType);
+
+        //console.log("selectedReaderType");
+        //console.log(selectedReaderType);
+
+        //load command templates for selected reader type
+        $http.get(host + '/commandtypes')
+            .success(function(data, status, headers, config) {
+
+
+              var xmlCommandTypes;
+              if (window.DOMParser)
+              {
+                var parser = new DOMParser();
+                xmlCommandTypes = parser.parseFromString(data,"text/xml");
+              }
+              else // Internet Explorer
+              {
+                xmlCommandTypes = new ActiveXObject("Microsoft.XMLDOM");
+                xmlCommandTypes.async=false;
+                xmlCommandTypes.loadXML(data);
+              }
+
+              //get the xml response and extract the values to construct the local command type object
+              var commandTypeXmlVector = xmlCommandTypes.getElementsByTagName("command");
+
+
+
+              for(var index = 0; index < commandTypeXmlVector.length; index++) {
+
+                var factoryID = commandTypeXmlVector[index].getElementsByTagName("factoryID")[0].childNodes[0];
+                var description = commandTypeXmlVector[index].getElementsByTagName("description")[0].childNodes[0];
+                var readerFactoryID = commandTypeXmlVector[index].getElementsByTagName("readerFactoryID")[0].childNodes[0];
+
+                console.log("readerFactoryID.nodeValue:");
+                console.log(readerFactoryID.nodeValue);
+
+                console.log("$scope.selectedReaderType:");
+                console.log($scope.selectedReaderType);
+
+                if (readerFactoryID.nodeValue == $scope.selectedReaderType.factoryID){
+
+                  //Add the command type
+                  var commandTypeElement = {
+                    "factoryID": factoryID.nodeValue,
+                    "description": description.nodeValue,
+                    "readerFactoryID": readerFactoryID.nodeValue
+
+                  }
+
+                  $scope.commandTypes.push(commandTypeElement);
+                }
+
+              }
+
+            })
+            .error(function(data, status, headers, config) {
+              console.log("error reading command types for sensor wizard");
+
+              // called asynchronously if an error occurs
+              // or server returns response with an error status.
+            });
+
+
+
+      }
+
       $scope.readerTypeSelectAction = function(selectedReaderType){
 
         $scope.selectedReaderType = selectedReaderType;
         $scope.prepareCreateSessionStep();
+        $scope.prepareCreateCommandStep();
+      }
+
+      $scope.commandTypeSelectAction = function(selectedCommandType){
+
+        //clear command instances list
+        $scope.commandInstances = [];
+
+        //load the command instances for selected command type
+        $http.get(host + '/commands')
+            .success(function(data, status, headers, config) {
+
+
+              var xmlCommands;
+              if (window.DOMParser)
+              {
+                var parser = new DOMParser();
+                xmlCommands = parser.parseFromString(data,"text/xml");
+              }
+              else // Internet Explorer
+              {
+                xmlCommands = new ActiveXObject("Microsoft.XMLDOM");
+                xmlCommands.async=false;
+                xmlCommands.loadXML(data);
+              }
+
+              //get the xml response and extract the values to construct the local command object
+              var commandXmlVector = xmlCommands.getElementsByTagName("command");
+
+              for(var index = 0; index < commandXmlVector.length; index++) {
+
+                var commandID = commandXmlVector[index].getElementsByTagName("commandID")[0].childNodes[0];
+                var factoryID = commandXmlVector[index].getElementsByTagName("factoryID")[0].childNodes[0];
+
+                //console.log("readerFactoryID.nodeValue:");
+                //console.log(readerFactoryID.nodeValue);
+
+                //console.log("$scope.selectedReaderType:");
+                //console.log($scope.selectedReaderType);
+
+                if (factoryID.nodeValue == selectedCommandType.factoryID){
+
+                  //Add the command instance
+                  var commandInstanceElement = {
+                    "commandID": commandID.nodeValue,
+                    "factoryID": factoryID.nodeValue
+                  }
+
+                  $scope.commandInstances.push(commandInstanceElement);
+                }
+
+              }
+
+              //Add the New command instance label
+              var commandInstanceNewElement = {
+                "commandID": "<New>",
+                "factoryID": selectedCommandType.factoryID
+              }
+
+              $scope.commandInstances.push(commandInstanceNewElement);
+
+            })
+            .error(function(data, status, headers, config) {
+              console.log("error reading command instances for sensor wizard");
+
+              // called asynchronously if an error occurs
+              // or server returns response with an error status.
+            });
+
+
+
       }
 
       $scope.readerIdChangeAction = function(customReaderId){
