@@ -60,7 +60,7 @@
             <wz-step title="Create session">
                 <h4>Create session for reader type: {{selectedReaderType.factoryID}}</h4>
 
-                <form novalidate >
+                <form novalidate name="form" >
 
                     <div class="form-group row" >
 
@@ -71,9 +71,15 @@
                                 <label class="control-label">{{property.displayname}}</label>
                             </div>
 
+
                             <div class="col-lg-3">
-                                <input type="text" ng-model="property.value" />
+                                <input ng-show="property.type == 'java.lang.Integer'" type="number" ng-model="property.value" min="property.minvalue" max="property.maxvalue"/>
+                                <input ng-show="property.type != 'java.lang.Integer'" type="text" ng-model="property.value" />
+
+
+
                             </div>
+
 
                             <br>
                             <p>
@@ -98,7 +104,78 @@
 
             <wz-step title="Create command">
                 <h4>Create command</h4>
-                <p>The create command step</p>
+
+                <form novalidate >
+
+                    <div class="form-group row" >
+
+                        <p><h4>1. You can choose a command type</h4></p>
+
+                        <div class="col-lg-3">
+                            <label class="control-label" for="commandType">Command Type</label>
+                        </div>
+                        <div class="col-lg-3">
+                            <select id="commandType"
+                                    ng-change="commandTypeSelectAction(selectedCommandType)"
+                                    ng-model="selectedCommandType"
+                                    ng-required="true"
+                                    ng-options="value as value.factoryID for value in commandTypes | orderBy:'factoryID'">
+                                <option>--</option>
+                            </select>
+
+
+                        </div>
+                        <br>
+                        <p>
+                            {{selectedCommandType.description}}
+                        </p>
+
+                        <p><h4>2. Then you can select an instance of an already created command</h4></p>
+
+                        <div class="col-lg-3">
+                            <label class="control-label" for="commandInstance">Command Instance</label>
+                        </div>
+                        <div class="col-lg-3">
+                            <select id="commandInstance"
+                                    ng-change="commandInstanceSelectAction(selectedCommandInstance)"
+                                    ng-model="selectedCommandInstance"
+                                    ng-required="true"
+                                    ng-options="value as value.commandID for value in commandInstances | orderBy:'commandID'">
+
+                            </select>
+
+
+                        </div>
+                        <br>
+
+
+                        <p><h4>-- properties for new command instance</h4></p>
+
+                        <div class="col-lg-3">
+                            <label class="control-label" for="commandInstance">Command Instance Properties</label>
+                        </div>
+                        <div class="col-lg-3">
+                            <select id="commandInstanceProp"
+                                    ng-change=""
+                                    ng-model="selectedCommandInstance"
+                                    ng-required="true"
+                                    ng-options="value as value.commandID for value in commandInstances | orderBy:'commandID'">
+
+                            </select>
+
+
+                        </div>
+                        <br>
+
+
+
+
+
+                    </div>
+
+                </form>
+
+
                 <input type="submit" wz-next value="Finish now" />
             </wz-step>
         </wizard>
