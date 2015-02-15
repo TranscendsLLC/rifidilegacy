@@ -149,26 +149,45 @@
                         <br>
 
 
-                        <p><h4>-- properties for new command instance</h4></p>
+                        <p><h4>Properties for command instance</h4></p>
 
-                        <div class="col-lg-3">
-                            <label class="control-label" for="commandInstance">Command Instance Properties</label>
-                        </div>
-                        <div class="col-lg-3">
-                            <select id="commandInstanceProp"
-                                    ng-change=""
-                                    ng-model="selectedCommandInstance"
-                                    ng-required="true"
-                                    ng-options="value as value.commandID for value in commandInstances | orderBy:'commandID'">
+                        <tabset>
+                            <tab heading="{{propertyCategory.category}}" ng-repeat="propertyCategory in commandProperties.propertyCategoryList">
+                                <br/>
 
-                            </select>
+                                <form role="form">
+
+                                    <div class="form-group row" >
+
+                                        <div ng-repeat="property in propertyCategory.properties | orderBy:['ordervalue', 'displayname']">
+
+                                            <div class="col-lg-6">
+                                                <label class="control-label">{{property.displayname}}</label>
+                                            </div>
 
 
-                        </div>
+                                            <div class="col-lg-3">
+                                                <input ng-show="property.type == 'java.lang.Integer'" type="number" ng-model="property.value" min="property.minvalue" max="property.maxvalue"/>
+                                                <input ng-show="property.type != 'java.lang.Integer'" type="text" ng-model="property.value" />
+
+
+
+                                            </div>
+
+
+                                            <br>
+                                            <p>
+
+                                        </div>
+
+                                    </div>
+
+
+                                </form>
+                            </tab>
+                        </tabset>
+
                         <br>
-
-
-
 
 
                     </div>
