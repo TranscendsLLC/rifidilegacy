@@ -171,15 +171,15 @@ angular.module('rifidiApp')
 
                   var name = propertiesXmlVector[indexProp].getElementsByTagName("name")[0].childNodes[0];
                   var displayname = propertiesXmlVector[indexProp].getElementsByTagName("displayname")[0].childNodes[0];
-                  //console.log("displayname: " + displayname.nodeValue);
+                  console.log("displayname: " + displayname.nodeValue);
                   var defaultvalue = propertiesXmlVector[indexProp].getElementsByTagName("defaultvalue")[0].childNodes[0];
                   var description = propertiesXmlVector[indexProp].getElementsByTagName("description")[0].childNodes[0];
                   var type = propertiesXmlVector[indexProp].getElementsByTagName("type")[0].childNodes[0];
                   var maxvalue = 0;
                   var minvalue = 0;
-                  if (type == 'java.lang.Integer') {
-                    maxvalue = propertiesXmlVector[indexProp].getElementsByTagName("maxvalue")[0].childNodes[0];
-                    minvalue = propertiesXmlVector[indexProp].getElementsByTagName("minvalue")[0].childNodes[0];
+                  if (type.nodeValue == 'java.lang.Integer') {
+                    //maxvalue = propertiesXmlVector[indexProp].getElementsByTagName("maxvalue")[0].childNodes[0];
+                    //minvalue = propertiesXmlVector[indexProp].getElementsByTagName("minvalue")[0].childNodes[0];
                   }
 
 
@@ -286,11 +286,13 @@ angular.module('rifidiApp')
       $scope.prepareCreateCommandStep = function(){
         console.log("prepareCreateCommandStep called");
 
-        //Clean variable
+        //Clean variables
         $scope.selectedCommandType = {};
         $scope.selectedCommandInstance = {};
 
         $scope.commandTypes = [];
+        $scope.commandInstances = [];
+
 
         //console.log("$scope.selectedReaderType");
         //console.log($scope.selectedReaderType);
@@ -451,8 +453,170 @@ angular.module('rifidiApp')
 
         $scope.customReaderId = customReaderId;
 
-        console.log("readerIdChangeAction:");
-        console.log($scope.customReaderId);
+        //console.log("readerIdChangeAction:");
+        //console.log($scope.customReaderId);
+
+      }
+
+      $scope.commandInstanceSelectAction = function(selectedCommandInstance){
+
+        $scope.selectedCommandInstance = selectedCommandInstance;
+
+        //Get the properties for the selected command type, from readermetadata
+        //$scope.selectedReaderType
+        //$scope.selectedCommandType
+
+        $http.get(host + '/readermetadata')
+            .success(function(data, status, headers, config) {
+
+              var xmlMetadata;
+              if (window.DOMParser)
+              {
+                var parser = new DOMParser();
+                xmlMetadata = parser.parseFromString(data,"text/xml");
+              }
+              else // Internet Explorer
+              {
+                xmlMetadata = new ActiveXObject("Microsoft.XMLDOM");
+                xmlMetadata.async=false;
+                xmlMetadata.loadXML(data);
+              }
+
+              //get the xml response and extract the values to construct the command properties for selected command type
+
+              var commandMetadataXmlVector = xmlMetadata.getElementsByTagName("command");
+
+              //console.log("commandMetadataXmlVector.length: " + commandMetadataXmlVector.length);
+
+
+              for(var index = 0; index < commandMetadataXmlVector.length; index++) {
+
+
+                var propertiesXmlVector = commandMetadataXmlVector[index].getElementsByTagName("property");
+                var id = commandMetadataXmlVector[index].getElementsByTagName("id")[0].childNodes[0];
+                var readerID = commandMetadataXmlVector[index].getElementsByTagName("readerID")[0].childNodes[0];
+
+                console.log("id: " + id.nodeValue);
+                console.log("readerID: " + readerID.nodeValue);
+                console.log("properties length: " + propertiesXmlVector.length);
+                console.log("propertiesXmlVector");
+                console.log(propertiesXmlVector);
+
+                //check if current command is the required one
+                console.log("readerID.nodeValue:");
+                console.log(readerID.nodeValue);
+                console.log("$scope.selectedReaderType:");
+                console.log($scope.selectedReaderType);
+                console.log("id.nodeValue:");
+                console.log(id.nodeValue);
+                console.log("selectedCommandInstance.factoryID:");
+                console.log(selectedCommandInstance.factoryID);
+
+                if (readerID.nodeValue == $scope.selectedReaderType.factoryID && id.nodeValue ==  selectedCommandInstance.factoryID){
+
+                  console.log("found selectedCommandInstance.factoryID: " + selectedCommandInstance.factoryID);
+
+                  //Create the properties object for this command
+                  $scope.commandProperties = {
+                    "readerID": readerID.nodeValue,
+                    "id": id.nodeValue,
+                    "propertyCategoryList": []
+
+                  };
+
+                  //extract the properties
+                  for(var indexProp = 0; indexProp < propertiesXmlVector.length; indexProp++) {
+
+
+                    var name = propertiesXmlVector[indexProp].getElementsByTagName("name")[0].childNodes[0];
+                    var displayname = propertiesXmlVector[indexProp].getElementsByTagName("displayname")[0].childNodes[0];
+                    var description = propertiesXmlVector[indexProp].getElementsByTagName("description")[0].childNodes[0];
+                    var type = propertiesXmlVector[indexProp].getElementsByTagName("type")[0].childNodes[0];
+                    var maxvalue = 0;
+                    var minvalue = 0;
+                    if (type.nodeValue == 'java.lang.Integer') {
+                      maxvalue = propertiesXmlVector[indexProp].getElementsByTagName("maxvalue")[0].childNodes[0];
+                      minvalue = propertiesXmlVector[indexProp].getElementsByTagName("minvalue")[0].childNodes[0];
+                    }
+                    var category = propertiesXmlVector[indexProp].getElementsByTagName("category")[0].childNodes[0];
+                    var writable = propertiesXmlVector[indexProp].getElementsByTagName("writable")[0].childNodes[0];
+                    var ordervalue = propertiesXmlVector[indexProp].getElementsByTagName("ordervalue")[0].childNodes[0];
+
+                    //check if current category already exists in propertyCategories
+                    var existingCategory = false;
+
+                    $scope.commandProperties.propertyCategoryList.forEach(function (propertyCategory) {
+
+                      if (category.nodeValue == propertyCategory.category){
+                        existingCategory = true;
+                      }
+
+                    });
+
+                    if (!existingCategory){
+
+                      var propertyCategory = {
+                        "category": category.nodeValue,
+                        "properties": []
+                      };
+
+                      $scope.commandProperties.propertyCategoryList.push(propertyCategory);
+                    }
+
+                    /*
+                    var customdefaultvalue;
+
+                    if (type.nodeValue == 'java.lang.Integer'){
+                      customdefaultvalue = parseInt(defaultvalue.nodeValue);
+                    } else {
+                      customdefaultvalue = defaultvalue.nodeValue;
+                    }
+                    */
+
+                    var propertyElement = {
+                      "name": name.nodeValue,
+                      "displayname": displayname.nodeValue,
+                      "description": description.nodeValue,
+                      "type": type.nodeValue,
+                      "maxvalue": maxvalue.nodeValue,
+                      "minvalue": minvalue.nodeValue,
+                      "category": category.nodeValue,
+                      "writable": writable.nodeValue,
+                      "ordervalue": ordervalue.nodeValue,
+                      "value": ""
+                    };
+
+                    //Add the property to appropriate property category list
+                    $scope.commandProperties.propertyCategoryList.forEach(function (propertyCategory) {
+
+                      if (category.nodeValue == propertyCategory.category){
+
+                        propertyCategory.properties.push(angular.copy(propertyElement));
+
+                      }
+
+                    });
+
+                  }
+
+                }
+
+
+              }
+
+
+            })
+            .error(function(data, status, headers, config) {
+              console.log("error reading readermetadata for sensor wizard: command instance selection");
+
+              // called asynchronously if an error occurs
+              // or server returns response with an error status.
+            });
+
+
+
+
+
 
       }
 
