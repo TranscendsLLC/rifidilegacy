@@ -15,7 +15,7 @@ angular.module('rifidiApp')
       'Karma'
     ];
 
-      console.log("cleaning readerTypes: ");
+      //console.log("cleaning readerTypes: ");
       $scope.readerTypes = [];
       $scope.commandTypes = [];
       $scope.commandInstances = [];
@@ -39,7 +39,7 @@ angular.module('rifidiApp')
 
         var host = restProtocol + "://" + ipAddress + ":" + restPort;
 
-        console.log("host: " + host);
+        //console.log("host: " + host);
 
 
 
@@ -102,8 +102,8 @@ angular.module('rifidiApp')
                 { id: 4, name: 'Bar44', factoryID: 'yyy44' }
               ];
 */
-              console.log("$scope.readerTypes");
-              console.log($scope.readerTypes);
+              //console.log("$scope.readerTypes");
+              //console.log($scope.readerTypes);
 
             })
             .error(function(data, status, headers, config) {
@@ -145,8 +145,8 @@ angular.module('rifidiApp')
               var readerid = readerMetadataXmlVector[index].getElementsByTagName("readerid")[0].childNodes[0];
               var propertiesXmlVector = readerMetadataXmlVector[index].getElementsByTagName("property");
 
-              console.log("readerid: " + readerid.nodeValue);
-              console.log("properties length: " + propertiesXmlVector.length);
+              //console.log("readerid: " + readerid.nodeValue);
+              //console.log("properties length: " + propertiesXmlVector.length);
               //console.log("propertiesXmlVector");
               //console.log(propertiesXmlVector);
 
@@ -161,7 +161,7 @@ angular.module('rifidiApp')
 
               for(var indexProp = 0; indexProp < propertiesXmlVector.length; indexProp++) {
 
-                console.log("indexProp: " + indexProp);
+                //console.log("indexProp: " + indexProp);
 
                 var category = propertiesXmlVector[indexProp].getElementsByTagName("category")[0].childNodes[0];
 
@@ -171,7 +171,7 @@ angular.module('rifidiApp')
 
                   var name = propertiesXmlVector[indexProp].getElementsByTagName("name")[0].childNodes[0];
                   var displayname = propertiesXmlVector[indexProp].getElementsByTagName("displayname")[0].childNodes[0];
-                  console.log("displayname: " + displayname.nodeValue);
+                  //console.log("displayname: " + displayname.nodeValue);
                   var defaultvalue = propertiesXmlVector[indexProp].getElementsByTagName("defaultvalue")[0].childNodes[0];
                   var description = propertiesXmlVector[indexProp].getElementsByTagName("description")[0].childNodes[0];
                   var type = propertiesXmlVector[indexProp].getElementsByTagName("type")[0].childNodes[0];
@@ -226,8 +226,8 @@ angular.module('rifidiApp')
 
             }
 
-            console.log("$scope.readersConnectionProperties");
-            console.log($scope.readersConnectionProperties);
+            //console.log("$scope.readersConnectionProperties");
+            //console.log($scope.readersConnectionProperties);
 
           })
           .error(function(data, status, headers, config) {
@@ -267,7 +267,7 @@ angular.module('rifidiApp')
 
           if (readerConnectionProperties.readerid == $scope.selectedReaderType.factoryID){
 
-            console.log("match");
+            //console.log("match");
 
             //Add the property, assigning a copy of the property
             $scope.selectedReaderConnectionProperties = angular.copy(readerConnectionProperties);
@@ -276,8 +276,8 @@ angular.module('rifidiApp')
 
         });
 
-        console.log("$scope.selectedReaderConnectionProperties");
-        console.log($scope.selectedReaderConnectionProperties);
+        //console.log("$scope.selectedReaderConnectionProperties");
+        //console.log($scope.selectedReaderConnectionProperties);
 
 
 
@@ -292,6 +292,7 @@ angular.module('rifidiApp')
 
         $scope.commandTypes = [];
         $scope.commandInstances = [];
+        $scope.commandProperties = [];
 
 
         //console.log("$scope.selectedReaderType");
@@ -339,11 +340,13 @@ angular.module('rifidiApp')
                 var description = commandTypeXmlVector[index].getElementsByTagName("description")[0].childNodes[0];
                 var readerFactoryID = commandTypeXmlVector[index].getElementsByTagName("readerFactoryID")[0].childNodes[0];
 
+                /*
                 console.log("readerFactoryID.nodeValue:");
                 console.log(readerFactoryID.nodeValue);
 
                 console.log("$scope.selectedReaderType:");
                 console.log($scope.selectedReaderType);
+                */
 
                 if (readerFactoryID.nodeValue == $scope.selectedReaderType.factoryID){
 
@@ -496,13 +499,16 @@ angular.module('rifidiApp')
                 var id = commandMetadataXmlVector[index].getElementsByTagName("id")[0].childNodes[0];
                 var readerID = commandMetadataXmlVector[index].getElementsByTagName("readerID")[0].childNodes[0];
 
+                /*
                 console.log("id: " + id.nodeValue);
                 console.log("readerID: " + readerID.nodeValue);
                 console.log("properties length: " + propertiesXmlVector.length);
                 console.log("propertiesXmlVector");
                 console.log(propertiesXmlVector);
+                */
 
                 //check if current command is the required one
+                /*
                 console.log("readerID.nodeValue:");
                 console.log(readerID.nodeValue);
                 console.log("$scope.selectedReaderType:");
@@ -511,10 +517,11 @@ angular.module('rifidiApp')
                 console.log(id.nodeValue);
                 console.log("selectedCommandInstance.factoryID:");
                 console.log(selectedCommandInstance.factoryID);
+                */
 
                 if (readerID.nodeValue == $scope.selectedReaderType.factoryID && id.nodeValue ==  selectedCommandInstance.factoryID){
 
-                  console.log("found selectedCommandInstance.factoryID: " + selectedCommandInstance.factoryID);
+                  //console.log("found selectedCommandInstance.factoryID: " + selectedCommandInstance.factoryID);
 
                   //Create the properties object for this command
                   $scope.commandProperties = {
@@ -596,6 +603,74 @@ angular.module('rifidiApp')
                       }
 
                     });
+
+                  }
+
+                  //If user selects a command instance (not the <New> option), then load the current values for every property
+                  if (selectedCommandInstance.commandID != '<New>'){
+
+                    console.log("selectedCommandInstance.commandID != '<New>'");
+
+
+                    //call the service to get properties of command instance
+                    $http.get(host + '/getproperties/' + selectedCommandInstance.commandID)
+                        .success(function(data, status, headers, config) {
+
+                          var xmlCommandProperties;
+                          if (window.DOMParser)
+                          {
+                            var parser = new DOMParser();
+                            xmlCommandProperties = parser.parseFromString(data,"text/xml");
+                          }
+                          else // Internet Explorer
+                          {
+                            xmlCommandProperties = new ActiveXObject("Microsoft.XMLDOM");
+                            xmlCommandProperties.async=false;
+                            xmlCommandProperties.loadXML(data);
+                          }
+
+                          //get the xml response and extract the values for properties
+                          var propertiesXmlVector = xmlCommandProperties.getElementsByTagName("entry");
+
+                          for(var indexPropertyValue = 0; indexPropertyValue < propertiesXmlVector.length; indexPropertyValue++) {
+
+                            var key = propertiesXmlVector[indexPropertyValue].getElementsByTagName("key")[0].childNodes[0];
+                            var value = propertiesXmlVector[indexPropertyValue].getElementsByTagName("value")[0].childNodes[0];
+
+                            //Iterate the loaded properties and set this value when property key matches
+                            $scope.commandProperties.propertyCategoryList.forEach(function (propertyCategory) {
+
+                              //Iterate al categories to find this property and set the value
+                              propertyCategory.properties.forEach(function (property) {
+
+                                if (property.name == key.nodeValue){
+
+                                  //Set the value for property
+
+                                  if (property.type == 'java.lang.Integer'){
+                                    property.value = angular.copy(parseInt(value.nodeValue));
+                                  } else {
+                                    property.value = angular.copy(value.nodeValue);
+                                  }
+                                  
+                                }
+
+                              });
+
+
+                            });
+
+
+                          }
+
+                        }).
+                        error(function(data, status, headers, config) {
+                          console.log("error reading command instance properties");
+
+
+                          // called asynchronously if an error occurs
+                          // or server returns response with an error status.
+                        });
 
                   }
 
