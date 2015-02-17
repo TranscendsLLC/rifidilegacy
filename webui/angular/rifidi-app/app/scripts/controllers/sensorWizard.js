@@ -386,6 +386,7 @@ angular.module('rifidiApp')
 
         //clear command instances list
         $scope.commandInstances = [];
+        $scope.selectedCommandType = selectedCommandType;
 
         //load the command instances for selected command type
         $http.get(host + '/commands')
@@ -537,6 +538,7 @@ angular.module('rifidiApp')
 
                     var name = propertiesXmlVector[indexProp].getElementsByTagName("name")[0].childNodes[0];
                     var displayname = propertiesXmlVector[indexProp].getElementsByTagName("displayname")[0].childNodes[0];
+                    var defaultvalue = propertiesXmlVector[indexProp].getElementsByTagName("defaultvalue")[0].childNodes[0];
                     var description = propertiesXmlVector[indexProp].getElementsByTagName("description")[0].childNodes[0];
                     var type = propertiesXmlVector[indexProp].getElementsByTagName("type")[0].childNodes[0];
                     var maxvalue = 0;
@@ -590,8 +592,19 @@ angular.module('rifidiApp')
                       "category": category.nodeValue,
                       "writable": writable.nodeValue,
                       "ordervalue": ordervalue.nodeValue,
-                      "value": ""
+                      "value": "",
+                      "defaultvalue": ""
                     };
+
+                    //Set the default value for property
+
+                    if (type.nodeValue == 'java.lang.Integer'){
+                      propertyElement.value = angular.copy(parseInt(defaultvalue.nodeValue));
+                      propertyElement.defaultvalue = angular.copy(parseInt(defaultvalue.nodeValue));
+                    } else {
+                      propertyElement.value = angular.copy(defaultvalue.nodeValue);
+                      propertyElement.defaultvalue = angular.copy(defaultvalue.nodeValue);
+                    }
 
                     //Add the property to appropriate property category list
                     $scope.commandProperties.propertyCategoryList.forEach(function (propertyCategory) {
@@ -652,7 +665,7 @@ angular.module('rifidiApp')
                                   } else {
                                     property.value = angular.copy(value.nodeValue);
                                   }
-                                  
+
                                 }
 
                               });
