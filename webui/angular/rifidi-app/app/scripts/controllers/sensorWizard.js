@@ -15,16 +15,19 @@ angular.module('rifidiApp')
       'Karma'
     ];
 
+
+
       //console.log("cleaning readerTypes: ");
-      $scope.readerTypes = [];
-      $scope.commandTypes = [];
-      $scope.commandInstances = [];
-      $scope.selectedReaderType = "";
-      $scope.selectedCommandType = {};
-      $scope.selectedCommandInstance = {};
-      $scope.readersConnectionProperties = [];
-      $scope.customReaderId = "";
-      $scope.selectedReaderConnectionProperties = [];
+      //$scope.readerTypes = [];
+      //$scope.commandTypes = [];
+      //$scope.commandInstances = [];
+      //$scope.selectedReaderType = "xx";
+      //console.log("set $scope.selectedReaderType:  " + $scope.selectedReaderType);
+      //$scope.selectedCommandType = {};
+      //$scope.selectedCommandInstance = {};
+      //$scope.readersConnectionProperties = [];
+      //$scope.customReaderId = "";
+      //$scope.selectedReaderConnectionProperties = [];
 
 
       //loadReaderTypes();
@@ -75,7 +78,7 @@ angular.module('rifidiApp')
 
               var readerTypesXmlVector = xmlReaderTypes.getElementsByTagName("sensor");
 
-
+              $scope.readerTypes = [];
 
 
               for(var index = 0; index < readerTypesXmlVector.length; index++) {
@@ -137,6 +140,8 @@ angular.module('rifidiApp')
             var readerMetadataXmlVector = xmlMetadata.getElementsByTagName("reader");
 
             //console.log("readerMetadataXmlVector.length: " + readerMetadataXmlVector.length);
+
+            $scope.readersConnectionProperties = [];
 
 
             for(var index = 0; index < readerMetadataXmlVector.length; index++) {
@@ -707,6 +712,466 @@ angular.module('rifidiApp')
 
 
       }
+
+      $scope.finishedSensorWizard = function(selectedReaderType){
+
+        console.log("finishedSensorWizard");
+        //create the reader
+
+        $scope.showSensorCreationResponse = true;
+
+        $scope.sensorCreationResponseStatus = {};
+        $scope.sensorCreationResponseStatus.message = "";
+        $scope.sensorCreationResponseStatus.description = "";
+
+        $scope.commandCreationResponseStatus = {};
+        $scope.commandCreationResponseStatus.message = "";
+        $scope.commandCreationResponseStatus.description = "";
+
+        var strProperties = "";
+
+        console.log("$scope.selectedReaderConnectionProperties");
+        console.log($scope.selectedReaderConnectionProperties);
+
+        for (var i=0; i < $scope.selectedReaderConnectionProperties.properties.length; i++){
+          strProperties += $scope.selectedReaderConnectionProperties.properties[i].name + "="
+          + $scope.selectedReaderConnectionProperties.properties[i].value + ";"
+        }
+
+        //Quit the last semicolon ;
+        if (strProperties.length > 0){
+          strProperties = strProperties.substring(0, strProperties.length - 1);
+        }
+
+        //If there is customreaderid, then set
+        if ($scope.customReaderId && $scope.customReaderId != ''){
+          strProperties += ";readerID=" + $scope.customReaderId
+        }
+
+        //before create the reader, query the list of readers to know what is going to be the new reader id after creation
+
+        var serviceIdListBeforeCreation = [];
+
+        $http.get(host + '/readers')
+            .success(function(data, status, headers, config) {
+
+
+
+              var xmlReadersQueryResponse;
+              if (window.DOMParser)
+              {
+                var parser = new DOMParser();
+                xmlReadersQueryResponse = parser.parseFromString(data,"text/xml");
+              }
+              else // Internet Explorer
+              {
+                xmlReadersQueryResponse = new ActiveXObject("Microsoft.XMLDOM");
+                xmlReadersQueryResponse.async=false;
+                xmlReadersQueryResponse.loadXML(data);
+              }
+
+              //get the xml response and extract the values
+              var xmlReaderList = xmlReadersQueryResponse.getElementsByTagName("sensor");
+
+              for(var indexReader = 0; indexReader < xmlReaderList.length; indexReader++) {
+
+                var serviceID = xmlReaderList[indexReader].getElementsByTagName("serviceID")[0].childNodes[0];
+                serviceIdListBeforeCreation.push(serviceID);
+              }
+
+            })
+            .error(function(data, status, headers, config) {
+              console.log("error querying the readers by wizard");
+
+              // called asynchronously if an error occurs
+              // or server returns response with an error status.
+            });
+
+
+        $http.get(host + '/createreader/' + $scope.selectedReaderConnectionProperties.readerid + "/" + strProperties)
+            .success(function(data, status, headers, config) {
+
+
+
+              var xmlCreateReaderResponse;
+              if (window.DOMParser)
+              {
+                var parser = new DOMParser();
+                xmlCreateReaderResponse = parser.parseFromString(data,"text/xml");
+              }
+              else // Internet Explorer
+              {
+                xmlCreateReaderResponse = new ActiveXObject("Microsoft.XMLDOM");
+                xmlCreateReaderResponse.async=false;
+                xmlCreateReaderResponse.loadXML(data);
+              }
+
+              //get the xml response and extract the value
+              var message = xmlCreateReaderResponse.getElementsByTagName("message")[0].childNodes[0].nodeValue;
+
+              //$scope.sensorCreationResponseStatus = {};
+              $scope.sensorCreationResponseStatus.message = message;
+              //$scope.sensorCreationResponseStatus.description = "";
+
+              if (message == 'Success'){
+                console.log("success creating reader by wizard");
+
+                //Query the readers after creation and compare with readers created before creation, to get the new reader id
+                var serviceIdListAfterCreation = [];
+
+                $http.get(host + '/readers')
+                    .success(function(data, status, headers, config) {
+
+                      var xmlReadersQueryResponse;
+                      if (window.DOMParser)
+                      {
+                        var parser = new DOMParser();
+                        xmlReadersQueryResponse = parser.parseFromString(data,"text/xml");
+                      }
+                      else // Internet Explorer
+                      {
+                        xmlReadersQueryResponse = new ActiveXObject("Microsoft.XMLDOM");
+                        xmlReadersQueryResponse.async=false;
+                        xmlReadersQueryResponse.loadXML(data);
+                      }
+
+                      //get the xml response and extract the values
+                      var xmlReaderList = xmlReadersQueryResponse.getElementsByTagName("sensor");
+
+                      for(var indexReader = 0; indexReader < xmlReaderList.length; indexReader++) {
+
+                        var serviceID = xmlReaderList[indexReader].getElementsByTagName("serviceID")[0].childNodes[0];
+                        serviceIdListAfterCreation.push(serviceID);
+                      }
+
+                      //From serviceIdListBeforeCreation and serviceIdListAfterCreation arrays, extract the created reader id
+
+                      var newIdFound = false;
+
+                      serviceIdListAfterCreation.forEach(function (serviceIDAfter) {
+
+                        //console.log("serviceIDAfter: ");
+                        //console.log(serviceIDAfter);
+
+                        if ( !newIdFound && !arrayContainsValue(serviceIdListBeforeCreation, serviceIDAfter)   ){
+
+                          newIdFound = true;
+                          console.log("not found ");
+                          console.log(serviceIDAfter.nodeValue);
+
+
+                          //Create a session on that created reader
+                          $http.get(host + '/createsession/' + serviceIDAfter.nodeValue)
+                              .success(function(data, status, headers, config) {
+
+                                console.log("success creating session by wizard");
+
+                                //construct the properties to be set on command, be it an already existing command or a new one
+                                var strCommandProperties = "";
+
+                                console.log("$scope.ommandProperties.propertyCategoryList");
+                                console.log($scope.commandProperties.propertyCategoryList);
+                                console.log("$scopecommandProperties.propertyCategoryList.length");
+                                console.log($scope.commandProperties.propertyCategoryList.length);
+
+                                for (var idxCat=0; idxCat < $scope.commandProperties.propertyCategoryList.length; idxCat++){
+
+                                  console.log("$scope.commandProperties.propertyCategoryList[idxCat]");
+                                  console.log($scope.commandProperties.propertyCategoryList[idxCat]);
+
+                                  for (var idxProp=0; idxProp < $scope.commandProperties.propertyCategoryList[idxCat].properties.length; idxProp++){
+
+                                    strCommandProperties += $scope.commandProperties.propertyCategoryList[idxCat].properties[idxProp].name + "="
+                                    + $scope.commandProperties.propertyCategoryList[idxCat].properties[idxProp].value + ";"
+                                  }
+
+
+                                }
+
+                                //Quit the last semicolon ;
+                                if (strCommandProperties.length > 0){
+                                  strCommandProperties = strCommandProperties.substring(0, strCommandProperties.length - 1);
+                                }
+
+                                console.log("strCommandProperties");
+                                console.log(strCommandProperties);
+
+
+                                //Check if need to create command
+                                if($scope.selectedCommandInstance.commandID == '<New>'){
+
+                                  //Create command
+                                  console.log("going to create command");
+
+                                  //Before creating command, query the commands to retrieve the new command id once it is created
+
+                                  var commandIdListBeforeCreation = [];
+
+                                  $http.get(host + '/commands')
+                                      .success(function(data, status, headers, config) {
+
+                                        var xmlCommandsQueryResponse;
+                                        if (window.DOMParser)
+                                        {
+                                          var parser = new DOMParser();
+                                          xmlCommandsQueryResponse = parser.parseFromString(data,"text/xml");
+                                        }
+                                        else // Internet Explorer
+                                        {
+                                          xmlCommandsQueryResponse = new ActiveXObject("Microsoft.XMLDOM");
+                                          xmlCommandsQueryResponse.async=false;
+                                          xmlCommandsQueryResponse.loadXML(data);
+                                        }
+
+                                        //get the xml response and extract the values
+                                        var xmlCommandList = xmlCommandsQueryResponse.getElementsByTagName("command");
+
+                                        for(var indexCommand = 0; indexCommand < xmlCommandList.length; indexCommand++) {
+
+                                          var commandID = xmlCommandList[indexCommand].getElementsByTagName("commandID")[0].childNodes[0];
+                                          commandIdListBeforeCreation.push(commandID);
+                                        }
+
+
+                                        //create command
+                                        console.log("$scope.selectedCommandType");
+                                        console.log($scope.selectedCommandType);
+                                        console.log($scope.selectedCommandType.factoryID);
+                                        console.log("going to execute: " + host + '/createcommand/' + $scope.selectedCommandType.factoryID + "/" + strCommandProperties);
+
+                                        $http.get(host + '/createcommand/' + $scope.selectedCommandType.factoryID + "/" + strCommandProperties)
+                                            .success(function(data, status, headers, config) {
+
+                                              console.log("success response creating command in wizard");
+
+                                              var xmlCreateCommandResponse;
+                                              if (window.DOMParser)
+                                              {
+                                                var parser = new DOMParser();
+                                                xmlCreateCommandResponse = parser.parseFromString(data,"text/xml");
+                                              }
+                                              else // Internet Explorer
+                                              {
+                                                xmlCreateCommandResponse = new ActiveXObject("Microsoft.XMLDOM");
+                                                xmlCreateCommandResponse.async=false;
+                                                xmlCreateCommandResponse.loadXML(data);
+                                              }
+
+                                              //get the xml response and extract the values for properties
+                                              var createCommandMessage = xmlCreateCommandResponse.getElementsByTagName("message")[0].childNodes[0].nodeValue;
+
+                                              $scope.commandCreationResponseStatus.message = createCommandMessage;
+
+                                              if (createCommandMessage == 'Success') {
+                                                console.log("success creating command by wizard");
+
+                                                //Query the commands after creation and compare with commands created before creation, to get the new command id
+                                                var commandIdListAfterCreation = [];
+
+                                                $http.get(host + '/commands')
+                                                    .success(function(data, status, headers, config) {
+
+                                                      var xmlCommandsQueryResponse;
+                                                      if (window.DOMParser)
+                                                      {
+                                                        var parser = new DOMParser();
+                                                        xmlCommandsQueryResponse = parser.parseFromString(data,"text/xml");
+                                                      }
+                                                      else // Internet Explorer
+                                                      {
+                                                        xmlCommandsQueryResponse = new ActiveXObject("Microsoft.XMLDOM");
+                                                        xmlCommandsQueryResponse.async=false;
+                                                        xmlCommandsQueryResponse.loadXML(data);
+                                                      }
+
+                                                      //get the xml response and extract the values
+                                                      var xmlCommandList = xmlCommandsQueryResponse.getElementsByTagName("command");
+
+                                                      for(var indexCommand = 0; indexCommand < xmlCommandList.length; indexCommand++) {
+
+                                                        var commandID = xmlCommandList[indexCommand].getElementsByTagName("commandID")[0].childNodes[0];
+                                                        commandIdListAfterCreation.push(commandID);
+                                                      }
+
+
+                                                      //From commandIdListBeforeCreation and commandIdListAfterCreation arrays, extract the created command id
+
+                                                      var newIdFound = false;
+
+                                                      commandIdListAfterCreation.forEach(function (commandIDAfter) {
+
+                                                        //console.log("commandIDAfter: ");
+                                                        //console.log(commandIDAfter);
+
+                                                        if ( !newIdFound && !arrayContainsValue(commandIdListBeforeCreation, commandIDAfter)   ) {
+
+                                                          newIdFound = true;
+                                                          console.log("not found ");
+                                                          console.log(commandIDAfter.nodeValue);
+
+                                                        }
+
+                                                      });
+
+
+                                                    }).
+                                                    error(function(data, status, headers, config) {
+                                                      console.log("error querying commands after command creation in wizard");
+
+
+                                                      // called asynchronously if an error occurs
+                                                      // or server returns response with an error status.
+                                                    });
+
+
+
+
+
+                                              } else {
+                                                var createCommandDescription = xmlCreateCommandResponse.getElementsByTagName("description")[0].childNodes[0].nodeValue;
+                                                $scope.commandCreationResponseStatus.description = createCommandDescription;
+                                                console.log("fail creating command by wizard");
+                                                console.log(createCommandDescription);
+                                              }
+
+
+
+
+                                            }).
+                                            error(function(data, status, headers, config) {
+                                              console.log("error creating command in wizard");
+
+
+                                              // called asynchronously if an error occurs
+                                              // or server returns response with an error status.
+                                            });
+
+
+
+
+
+                                      })
+                                      .error(function(data, status, headers, config) {
+                                        console.log("error querying the commands by wizard");
+
+                                        // called asynchronously if an error occurs
+                                        // or server returns response with an error status.
+                                      });
+
+
+
+                                } else {
+
+                                  console.log("NOT going to create command");
+                                  //Set properties for already existing command instance
+
+
+                                }
+
+                                //Set properties for command
+                                var strProperties = "";
+
+                                console.log("$scope.selectedReaderConnectionProperties");
+                                console.log($scope.selectedReaderConnectionProperties);
+
+                                for (var i=0; i < $scope.selectedReaderConnectionProperties.properties.length; i++){
+                                  strProperties += $scope.selectedReaderConnectionProperties.properties[i].name + "="
+                                  + $scope.selectedReaderConnectionProperties.properties[i].value + ";"
+                                }
+
+                                //Quit the last semicolon ;
+                                if (strProperties.length > 0){
+                                  strProperties = strProperties.substring(0, strProperties.length - 1);
+                                }
+
+                              })
+                              .error(function(data, status, headers, config) {
+                                console.log("error creating session by wizard");
+
+                                // called asynchronously if an error occurs
+                                // or server returns response with an error status.
+                              });
+
+
+
+                        }
+
+
+
+                      });
+
+
+
+                    })
+                    .error(function(data, status, headers, config) {
+                      console.log("error querying the readers after reader creation by wizard");
+
+                      // called asynchronously if an error occurs
+                      // or server returns response with an error status.
+                    });
+
+
+
+              } else {
+                var description = xmlCreateReaderResponse.getElementsByTagName("description")[0].childNodes[0].nodeValue;
+                $scope.sensorCreationResponseStatus.description = description;
+                console.log("fail creating reader by wizard");
+              }
+
+              console.log($scope.sensorCreationResponseStatus);
+
+
+
+        })
+        .error(function(data, status, headers, config) {
+          console.log("error creating reader by wizard");
+
+          // called asynchronously if an error occurs
+          // or server returns response with an error status.
+        });
+
+
+      }
+
+      function arrayContainsValue(array, value) {
+
+        var found = false;
+        console.log("arrayContainsValue called");
+        console.log("array");
+        console.log(array);
+        console.log("value");
+        console.log(value);
+
+
+        array.forEach(function (data) {
+
+          console.log("iterating data");
+          console.log(data);
+
+          console.log("data.nodeValue");
+          console.log(data.nodeValue);
+
+          if(!found){
+
+            if ( data.nodeValue == value.nodeValue ){
+
+              console.log("data == value");
+
+              found = true;
+            }
+
+          }
+
+        });
+
+        console.log("going to return found: ");
+        console.log(found);
+
+        return found;
+      }
+
+
+
 
 
   });
