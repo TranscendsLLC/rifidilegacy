@@ -4,7 +4,7 @@
     </div>
     <div class="panel-body">
 
-        <wizard on-finish="finishedWizard()" edit-mode="false" ng-controller="SensorWizardCtrl">
+        <wizard on-finish="finishedSensorWizard(selectedReaderType)" edit-mode="false" ng-controller="SensorWizardCtrl">
             <wz-step title="Reader Type Selection">
                 <h4>Reader adapter configuration wizard</h4>
 
@@ -307,7 +307,34 @@
                 </form>
 
                 <input type="submit" wz-previous value="Previous" />
-                <input type="submit" wz-next value="Confirm and execute" />
+                <input type="submit" wz-finish value="Confirm and execute" />
+
+
+                <div >
+
+                    <div class="col-lg-6">
+                        <label class="control-label" >Creation of reader response:</label>
+                    </div>
+                    <div class="col-lg-3">
+                        x{{sensorCreationResponseStatus.message}}
+                        <br>
+                        y{{sensorCreationResponseStatus.description}}
+                    </div>
+
+                    <br>
+                    <p></p>
+
+                    <div class="col-lg-6">
+                        <label class="control-label" >Reader id</label>
+                    </div>
+                    <div class="col-lg-3">
+                        {{customReaderId}}
+                    </div>
+
+                    <br>
+                    <p></p>
+                </div>
+
             </wz-step>
 
         </wizard>
