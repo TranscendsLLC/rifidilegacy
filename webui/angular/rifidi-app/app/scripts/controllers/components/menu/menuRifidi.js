@@ -64,6 +64,16 @@ angular.module('rifidiApp')
               console.log($scope.elementTree.currentNode);
           };
 
+          $scope.saveServer = function(){
+              console.log("saveServer");
+              console.log("$scope.elementSelected");
+              console.log($scope.elementSelected);
+              console.log("$scope.elementTree.currentNode");
+              console.log($scope.elementTree.currentNode);
+              console.log("show alert dialog to confirm");
+
+          }
+
           $http.get('scripts/controllers/components/menu/servers.json').
           success(function(data, status, headers, config) {
             console.log("funciono lectura servers ");
@@ -76,6 +86,8 @@ angular.module('rifidiApp')
                 server.colapsed = true;
                 server.elementName = server.displayName;
                 server.elementId = "server";
+                server.iconClass = "server-disconnected";
+                server.contextMenuId = "contextMenuServer";
                 server.children = [];
                 server.host = server.restProtocol + "://" + server.ipAddress + ":" + server.restPort;
                 server.status = 'CONNECTING';
@@ -116,6 +128,7 @@ angular.module('rifidiApp')
 
                                     //change server status
                                     server.status = 'CONNECTED';
+                                    server.iconClass = "server-connected";
                                 }
                             });
 
@@ -124,6 +137,8 @@ angular.module('rifidiApp')
                     })
                     .error(function(data, status, headers, config) {
                         console.log("error haciendo ping server.ipAddress: " + server.ipAddress);
+
+                        //server.iconClass = "server";
 
                         // called asynchronously if an error occurs
                         // or server returns response with an error status.
@@ -162,7 +177,16 @@ angular.module('rifidiApp')
                 //for each server, add the sensor management element
 
                 //sensor management element:
-                var sensorManagementElement = { "host" : server.restProtocol + "://" + server.ipAddress + ":" + server.restPort, "restProtocol":server.restProtocol, "ipAddress":server.ipAddress, "restPort":server.restPort, "elementName" : "Sensor Management", "elementId" : "sensorManagement", "collapsed":true, "children" : [] };
+                var sensorManagementElement = {
+                    "host" : server.restProtocol + "://" + server.ipAddress + ":" + server.restPort,
+                    "restProtocol":server.restProtocol,
+                    "ipAddress":server.ipAddress,
+                    "restPort":server.restPort,
+                    "elementName" : "Sensor Management",
+                    "elementId" : "sensorManagement",
+                    "collapsed":true,
+                    "contextMenuId": "contextMenuSensorManagement",
+                    "children" : [] };
                 server.children.push(sensorManagementElement);
 
                 //for each server, connect and query the list of sensors and place them under sensor management element
@@ -194,7 +218,12 @@ angular.module('rifidiApp')
                             //console.log("serviceID: " + serviceID.nodeValue);
                             //console.log("factoryID: " + factoryID.nodeValue);
 
-                            var sensorElement = { "elementName" : serviceID.nodeValue, "elementId" : serviceID.nodeValue, "collapsed":true, "children" : [] };
+                            var sensorElement = {
+                                "elementName" : serviceID.nodeValue,
+                                "elementId" : serviceID.nodeValue,
+                                "collapsed":true,
+                                "contextMenuId" : "contextMenuSensor",
+                                "children" : [] };
 
                             //for this responseHost search which sensorManagementElement is associated with, and associate the sensorElement
                             //console.log("headers('host') from readers service: " + headers('host'));
@@ -248,6 +277,7 @@ angular.module('rifidiApp')
                                             "elementId": "session " + sessionID.nodeValue,
                                             "collapsed": true,
                                             "status": sessionStatus.nodeValue,
+                                            "contextMenuId" : "contextMenuSession",
                                             "children": []
                                         };
 

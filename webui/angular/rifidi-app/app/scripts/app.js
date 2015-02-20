@@ -17,7 +17,8 @@ angular
     'ngTouch',
     'angularTreeview',
     'ui.bootstrap',
-    'mgo-angular-wizard'
+    'mgo-angular-wizard',
+    'directive.contextMenu'
   ])
   .config(function ($routeProvider) {
     $routeProvider
