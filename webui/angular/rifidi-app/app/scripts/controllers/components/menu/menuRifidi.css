@@ -30,13 +30,13 @@ div[data-tree-model] li {
 
 div[data-tree-model] li .expanded {
     padding: 1px 10px;
-    background-image: url("http://cfile23.uf.tistory.com/image/205B973A50C13F4B19D9BD");
+    background-image: url("/images/expanded.png");
     background-repeat: no-repeat;
 }
 
 div[data-tree-model] li .collapsed {
     padding: 1px 10px;
-    background-image: url("http://cfile23.uf.tistory.com/image/1459193A50C13F4B1B05FB");
+    background-image: url("/images/collapsed.png");
     background-repeat: no-repeat;
 }
 
@@ -57,4 +57,22 @@ div[data-tree-model] li .selected {
 }
 .nav-tabs {
     border-bottom: 1px solid #ccc;
+}
+
+div[data-tree-model] li .server-disconnected {
+    padding: 1px 10px;
+    background-image: url("/images/server-red.png");
+    background-repeat: no-repeat;
+}
+
+div[data-tree-model] li .server-connected {
+     padding: 1px 10px;
+     background-image: url("/images/server-green.png");
+     background-repeat: no-repeat;
+ }
+
+div[data-tree-model] li .server {
+    padding: 1px 10px;
+    background-image: url("/images/server.png");
+    background-repeat: no-repeat;
 }
