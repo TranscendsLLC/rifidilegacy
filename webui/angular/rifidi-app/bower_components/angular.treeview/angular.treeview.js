@@ -44,17 +44,49 @@
 				//children
 				var nodeChildren = attrs.nodeChildren || 'children';
 
+	  			//server menu
+				var menuServer = '<ul id="contextMenuServer" class="dropdown-menu">'+
+					'<li><a ng-click="saveServer()">Save server</a></li>'+
+				'<li><a ng-click="link()">Link</a></li>'+
+				'<li><a ng-click="delete()">Delete</a></li>'+
+				'<li class="divider"></li>'+
+				'<li><a ng-click="properties()">Properties</a></li>'+
+				'</ul>';
+
+				//sensor management menu
+				var menuSensorManagement = '<ul id="contextMenuSensorManagement" class="dropdown-menu">'+
+					'<li><a href ="#/sensorWizard/{{elementSelected.restProtocol}}/{{elementSelected.ipAddress}}/{{elementSelected.restPort}}">Add Sensor</a></li>'+
+					'</ul>';
+
+				//sensor menu
+				var menuSensor = '<ul id="contextMenuSensor" class="dropdown-menu">'+
+					'<li><a ng-click="deleteSensor()">Delete Sensor</a></li>'+
+					'<li><a ng-click="createSession()">Create Session</a></li>'+
+					'</ul>';
+
+				//session menu
+				var menuSession = '<ul id="contextMenuSession" class="dropdown-menu">'+
+					'<li><a ng-click="startSession()">Start Session</a></li>'+
+					'<li><a ng-click="deleteSession()">Delete Session</a></li>'+
+					'</ul>';
+
 				//tree template
 				var template =
 					'<ul>' +
 						'<li data-ng-repeat="node in ' + treeModel + '">' +
 							'<i class="collapsed" data-ng-show="node.' + nodeChildren + '.length && node.collapsed" data-ng-click="' + treeId + '.selectNodeHead(node)"></i>' +
 							'<i class="expanded" data-ng-show="node.' + nodeChildren + '.length && !node.collapsed" data-ng-click="' + treeId + '.selectNodeHead(node)"></i>' +
-							'<i class="normal" data-ng-hide="node.' + nodeChildren + '.length"></i> ' +
-							'<span data-ng-class="node.selected" data-ng-click="' + treeId + '.selectNodeLabel(node)">{{node.' + nodeLabel + '}}</span>' +
-							'<div data-ng-hide="node.collapsed" data-tree-id="' + treeId + '" data-tree-model="node.' + nodeChildren + '" data-node-id=' + nodeId + ' data-node-label=' + nodeLabel + ' data-node-children=' + nodeChildren + '></div>' +
+							'<i class="normal" data-ng-hide="node.' + nodeChildren + '.length"></i>' +
+							'<i class="{{node.iconClass}}"></i> ' +
+							'<span context="{{node.contextMenuId}}" data-ng-class="node.selected" data-ng-click="' + treeId + '.selectNodeLabel(node)">{{node.' + nodeLabel + '}}</span>' +
+							'<div  data-ng-hide="node.collapsed" data-tree-id="' + treeId + '" data-tree-model="node.' + nodeChildren + '" data-node-id=' + nodeId + ' data-node-label=' + nodeLabel + ' data-node-children=' + nodeChildren + '></div>' +
 						'</li>' +
-					'</ul>';
+					'</ul>' +
+						menuServer +
+						menuSensorManagement +
+						menuSensor +
+						menuSession
+					;
 
 
 				//check tree id, tree model
