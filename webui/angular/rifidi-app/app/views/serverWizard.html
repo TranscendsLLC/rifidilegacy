@@ -1,0 +1,202 @@
+<div class="panel panel-default">
+    <div class="panel-heading">
+        <span class="glyphicon glyphicon-dashboard" aria-hidden="true"></span> Server creation wizard
+    </div>
+    <div class="panel-body">
+
+        <wizard on-finish="finishedServerWizard()" edit-mode="false" ng-controller="ServerWizardCtrl">
+            <wz-step title="Server properties">
+
+
+
+                <form role="form">
+
+                    <div class="form-group row" >
+                        <div class="col-lg-6">
+                            <label class="control-label" for="ipAddress">Display Name</label>
+                        </div>
+                        <div class="col-lg-6">
+                            <input id="displayName" name="displayName" type="text" placeholder="Server 1" class="input-xlarge" value="{{elementSelected.displayName}}" data-ng-model="elementTree.currentNode.elementName"/>
+                        </div>
+
+                    </div>
+                    <div class="form-group row">
+                        <div class="col-lg-6">
+                            <label class="control-label" for="ipAddress">IP Address</label>
+                        </div>
+                        <div class="col-lg-6">
+                            <input id="ipAddress" name="ipAddress" type="text" placeholder="127.0.0.1" class="input-xlarge" value="{{elementSelected.ipAddress}}" data-ng-model="elementTree.currentNode.ipAddress">
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <div class="col-lg-6">
+                            <label class="control-label" for="ipAddress">Rest Protocol</label>
+                        </div>
+                        <div class="col-lg-6">
+                            <input id="restProtocol" name="restProtocol" type="text" placeholder="http" class="input-xlarge" value="{{elementSelected.restProtocol}}" data-ng-model="elementTree.currentNode.restProtocol">
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <div class="col-lg-6">
+                            <label class="control-label" for="ipAddress">Rest Port</label>
+                        </div>
+                        <div class="col-lg-6">
+                            <input id="restPort" name="restPort" type="text" placeholder="8111" class="input-xlarge" value="{{elementSelected.restPort}}" data-ng-model="elementTree.currentNode.restPort">
+                        </div>
+                    </div>
+                    <!--
+                    <input type="button" value="Save" class="done_button" data-ng-click="done()">
+                    <input type="button" value="Delete" class="done_button" data-ng-click="deleteServer()">
+                    -->
+                </form>
+
+                <input type="submit" wz-next value="Next" />
+            </wz-step>
+
+
+            <wz-step title="Summary">
+                <h4>Summary</h4>
+
+                <form novalidate >
+
+                    <div class="form-group row" >
+
+
+                        <h4>System is going to execute next steps:</h4>
+
+                        <h4>* Create reader</h4>
+
+                        <div class="col-lg-6">
+                            <label class="control-label" >Reader type</label>
+                        </div>
+                        <div class="col-lg-3">
+                            {{selectedReaderType.factoryID}}
+                        </div>
+
+                        <br>
+                        <p></p>
+
+                        <div class="col-lg-6">
+                            <label class="control-label" >Reader id</label>
+                        </div>
+                        <div class="col-lg-3">
+                            {{customReaderId}}
+                        </div>
+
+                        <br>
+                        <p></p>
+
+
+                        <div class="col-lg-6">
+                            <label class="control-label" >Set reader properties:</label>
+                        </div>
+                        <br>
+                        <p></p>
+
+                        <div ng-repeat="property in selectedReaderConnectionProperties.properties | orderBy:['ordervalue', 'displayname']">
+
+                            <div class="col-lg-6">
+                                <label class="control-label">{{property.displayname}}</label>
+                            </div>
+
+
+                            <div class="col-lg-3">
+                                {{property.value}}
+                            </div>
+
+
+                            <br>
+                            <p>
+
+                        </div>
+
+                        <h4>* Create session</h4>
+
+                        <h4 ng-show="selectedCommandInstance.commandID == '<New>'">* Create command of type {{selectedCommandType.factoryID}}</h4>
+                        <h4 ng-show="selectedCommandInstance.commandID != '<New>'">* Do not create command of type {{selectedCommandType.factoryID}}</h4>
+
+
+                        <div class="col-lg-6">
+                            <label class="control-label" >Set command properties:</label>
+                        </div>
+                        <br>
+                        <p></p>
+
+                        <tabset>
+                            <tab heading="{{propertyCategory.category}}" ng-repeat="propertyCategory in commandProperties.propertyCategoryList">
+                                <br/>
+
+                                <div ng-repeat="property in propertyCategory.properties | orderBy:['ordervalue', 'displayname']">
+
+                                    <div class="col-lg-6">
+                                        {{property.displayname}}
+                                    </div>
+
+
+                                    <div class="col-lg-3">
+                                        {{property.value}}
+
+                                    </div>
+
+
+                                    <br>
+                                    <p>
+
+                                </div>
+
+
+                            </tab>
+                        </tabset>
+
+                        <br>
+
+                        <h4 >* Execute command</h4>
+
+                        <h4 ng-show="selectedReaderConnectionProperties.startSessionAut">* Start session</h4>
+
+                        <h4 ng-show="!selectedReaderConnectionProperties.startSessionAut">* Do not start session</h4>
+
+
+                    </div>
+
+                </form>
+
+                <input type="submit" wz-previous value="Previous" />
+                <input type="submit" wz-finish value="Confirm and execute" />
+
+
+                <div >
+
+                    <div class="col-lg-6">
+                        <label class="control-label" >Creation of reader response:</label>
+                    </div>
+                    <div class="col-lg-3">
+                        x{{sensorCreationResponseStatus.message}}
+                        <br>
+                        y{{sensorCreationResponseStatus.description}}
+                    </div>
+
+                    <br>
+                    <p></p>
+
+                    <div class="col-lg-6">
+                        <label class="control-label" >Reader id</label>
+                    </div>
+                    <div class="col-lg-3">
+                        {{customReaderId}}
+                    </div>
+
+                    <br>
+                    <p></p>
+                </div>
+
+            </wz-step>
+
+        </wizard>
+
+
+    </div>
+</div>
+
+
+

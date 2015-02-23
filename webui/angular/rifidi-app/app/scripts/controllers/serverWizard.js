@@ -8,7 +8,7 @@
  * Controller of the rifidiApp
  */
 angular.module('rifidiApp')
-  .controller('SensorWizardCtrl', function ($scope, $http, $routeParams) {
+  .controller('ServerWizardCtrl', function ($scope, $http, $routeParams) {
     $scope.awesomeThings = [
       'HTML5 Boilerplate',
       'AngularJS',

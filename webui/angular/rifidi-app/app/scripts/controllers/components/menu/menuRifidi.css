@@ -42,7 +42,7 @@ div[data-tree-model] li .collapsed {
 
 div[data-tree-model] li .normal {
     padding: 1px 10px;
-    background-image: url("http://cfile23.uf.tistory.com/image/165B663A50C13F4B196CCA");
+    background-image: url("");
     background-repeat: no-repeat;
 }
 
@@ -74,5 +74,47 @@ div[data-tree-model] li .server-connected {
 div[data-tree-model] li .server {
     padding: 1px 10px;
     background-image: url("/images/server.png");
+    background-repeat: no-repeat;
+}
+
+div[data-tree-model] li .reader {
+    padding: 1px 10px;
+    background-image: url("/images/reader.png");
+    background-repeat: no-repeat;
+}
+
+div[data-tree-model] li .reader-cog {
+    padding: 1px 10px;
+    background-image: url("/images/reader-cog.png");
+    background-repeat: no-repeat;
+}
+
+div[data-tree-model] li .link-red {
+    padding: 1px 10px;
+    background-image: url("/images/link-red.png");
+    background-repeat: no-repeat;
+}
+
+div[data-tree-model] li .link-yellow {
+    padding: 1px 10px;
+    background-image: url("/images/link-yellow.png");
+    background-repeat: no-repeat;
+}
+
+div[data-tree-model] li .link-green {
+    padding: 1px 10px;
+    background-image: url("/images/link-green.png");
+    background-repeat: no-repeat;
+}
+
+div[data-tree-model] li .script-gear {
+    padding: 1px 10px;
+    background-image: url("/images/script_gear.png");
+    background-repeat: no-repeat;
+}
+
+div[data-tree-model] li .cog {
+    padding: 1px 10px;
+    background-image: url("/images/cog.png");
     background-repeat: no-repeat;
 }

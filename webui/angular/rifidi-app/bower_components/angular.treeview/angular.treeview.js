@@ -70,6 +70,11 @@
 					'<li><a ng-click="deleteSession()">Delete Session</a></li>'+
 					'</ul>';
 
+				//servers menu
+				var menuServers = '<ul id="contextMenuServers" class="dropdown-menu">'+
+					'<li><a href ="#/serverWizard">Add server</a></li>'+
+					'</ul>';
+
 				//tree template
 				var template =
 					'<ul>' +
@@ -85,7 +90,8 @@
 						menuServer +
 						menuSensorManagement +
 						menuSensor +
-						menuSession
+						menuSession +
+						menuServers
 					;
 
 
