@@ -34,6 +34,10 @@ angular
         templateUrl: 'views/sensorWizard.html',
         controller: 'SensorWizardCtrl'
       })
+      .when('/serverWizard', {
+        templateUrl: 'views/serverWizard.html',
+        controller: 'ServerWizardCtrl'
+      })
       .otherwise({
         redirectTo: '/'
       });
