@@ -18,7 +18,7 @@ angular.module('rifidiApp')
       restrict: 'E',
       transclude: true,
       scope: {},
-      controller: function($scope, $http) {
+      controller: function($scope, $http, ngDialog) {
         $scope.elementSelected={};
         $scope.temporaryNode = {
               children: []
@@ -56,12 +56,80 @@ angular.module('rifidiApp')
 
             $scope.done();
         };
+
+          $scope.openContactForm = function() {
+
+              ngDialog.openConfirm({template: 'popupTmpl.html',
+
+                  scope: $scope, //Pass the scope object if you need to access in the template
+                  showClose: false,
+
+                  closeByEscape: true,
+
+                  closeByDocument: true
+
+              }).then(
+
+                  function(value) {
+
+                      //save the contact form
+
+                  },
+
+                  function(value) {
+
+                      //Cancel or do nothing
+
+                  }
+
+              );
+
+          };
+
+
           $scope.deleteServer=function(){
               console.log("delete $scope.elementTree.currentNode")
 
               //console.log($scope.elementTree.currentNode);
               console.log("$scope.elementTree");
               console.log($scope.elementTree.currentNode);
+
+              //ngDialog.open({ template: 'popupTmpl.html' });
+              //ngDialog.open({ template: '<p>my template</p>', plain:true });
+
+              /*
+              ngDialog.open({
+                  preCloseCallback: function(value) {
+                      if(confirm('Are you sure you want to close without saving your changes?')) {
+                          return true;
+                      }
+                      return false;
+                  }
+              });
+              */
+
+              /*
+              ngDialog.open({
+                  preCloseCallback: function(value) {
+                      var nestedConfirmDialog = ngDialog.openConfirm({
+                          template:'\
+                <p>Are you sure you want to close the parent dialog?</p>\
+                <div class="ngdialog-buttons">\
+                    <button type="button" class="ngdialog-button ngdialog-button-secondary" ng-click="closeThisDialog(0)">No</button>\
+                    <button type="button" class="ngdialog-button ngdialog-button-primary" ng-click="confirm(1)">Yes</button>\
+                </div>',
+                          plain: true
+                      });
+
+                      // NOTE: return the promise from openConfirm
+                      return nestedConfirmDialog;
+                  }
+              });
+              */
+
+
+
+
           };
 
           $scope.saveServer = function(){
@@ -651,6 +719,7 @@ angular.module('rifidiApp')
                               "elementName": "App Groups",
                               "elementId": "App Group",
                               "collapsed": true,
+                              "iconClass": "appgroups",
                               "children": []
                           };
 
@@ -722,6 +791,7 @@ angular.module('rifidiApp')
                                                       "collapsed": true,
                                                       "groupName": groupName,
                                                       "readzoneAppId": "",
+                                                      "iconClass": "group",
                                                       "children": []
                                                   };
 
@@ -731,6 +801,7 @@ angular.module('rifidiApp')
                                                       "elementId": "Apps",
                                                       "collapsed": true,
                                                       "groupName": groupName,
+                                                      "iconClass": "apps",
                                                       "children": []
                                                   };
 
@@ -848,6 +919,7 @@ angular.module('rifidiApp')
                                                                       "elementId": readzone,
                                                                       "collapsed": true,
                                                                       "readzone": readzone,
+                                                                      "iconClass": "readzone",
                                                                       "children": []
                                                                   };
 
