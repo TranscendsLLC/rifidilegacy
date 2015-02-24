@@ -640,6 +640,7 @@ angular.module('rifidiApp')
                               "elementName": "App Management",
                               "elementId": "App Management",
                               "collapsed": true,
+                              "iconClass": "app-dev",
                               "children": []
                           };
                           server.children.push(appManagementElement);

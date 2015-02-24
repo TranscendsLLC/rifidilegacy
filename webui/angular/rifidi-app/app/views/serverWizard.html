@@ -7,50 +7,111 @@
         <wizard on-finish="finishedServerWizard()" edit-mode="false" ng-controller="ServerWizardCtrl">
             <wz-step title="Server properties">
 
+                <!--
+                ng-submit="submitForm(form.$valid)"
+                -->
+                <form class="form-horizontal" role="form" name="form" novalidate >
 
-
-                <form role="form">
-
-                    <div class="form-group row" >
-                        <div class="col-lg-6">
+                    <!--
+                    ng-class="{ 'has-error' : form.displayName.$invalid && !form.displayName.$pristine }"
+                    -->
+                    <div class="form-group">
+                        <div class="col-sm-3">
                             <label class="control-label" for="ipAddress">Display Name</label>
                         </div>
-                        <div class="col-lg-6">
-                            <input id="displayName" name="displayName" type="text" placeholder="Server 1" class="input-xlarge" value="{{elementSelected.displayName}}" data-ng-model="elementTree.currentNode.elementName"/>
+                        <div class="col-sm-6">
+                            <input aria-describedby="helpDisplayName" id="displayName" name="displayName" type="text"
+                                   class="form-control" value="" data-ng-model="serverToCreate.displayName" required />
+
+                            <div ng-show="form.$submitted || form.displayName.$touched" >
+
+                                <div ng-show="form.displayName.$error.required">
+
+                                    Display name is required.
+
+                                </div>
+                            </div>
+
+                            <span id="helpDisplayName" class="help-block">The display name.</span>
                         </div>
 
                     </div>
-                    <div class="form-group row">
-                        <div class="col-lg-6">
+                    <div class="form-group">
+                        <div class="col-sm-3">
                             <label class="control-label" for="ipAddress">IP Address</label>
                         </div>
-                        <div class="col-lg-6">
-                            <input id="ipAddress" name="ipAddress" type="text" placeholder="127.0.0.1" class="input-xlarge" value="{{elementSelected.ipAddress}}" data-ng-model="elementTree.currentNode.ipAddress">
+                        <div class="col-sm-6">
+                            <input aria-describedby="helpIpAddress" id="ipAddress" name="ipAddress" type="text"
+                                   class="form-control" value="" data-ng-model="serverToCreate.ipAddress" required >
+
+                            <div ng-show="form.$submitted || form.ipAddress.$touched" >
+
+                                <div ng-show="form.ipAddress.$error.required">
+
+                                    IP address is required.
+
+                                </div>
+                            </div>
+
+                            <span id="helpIpAddress" class="help-block">The ip address or server name.</span>
                         </div>
                     </div>
-                    <div class="form-group row">
-                        <div class="col-lg-6">
+                    <div class="form-group">
+                        <div class="col-sm-3">
                             <label class="control-label" for="ipAddress">Rest Protocol</label>
                         </div>
-                        <div class="col-lg-6">
-                            <input id="restProtocol" name="restProtocol" type="text" placeholder="http" class="input-xlarge" value="{{elementSelected.restProtocol}}" data-ng-model="elementTree.currentNode.restProtocol">
+                        <div class="col-sm-6">
+                            <input aria-describedby="helpProtocol" id="restProtocol" name="restProtocol" type="text"
+                                   class="form-control" value="" data-ng-model="serverToCreate.restProtocol" required>
+
+                            <div ng-show="form.$submitted || form.restProtocol.$touched" >
+
+                                <div ng-show="form.restProtocol.$error.required">
+
+                                    Protocol is required.
+
+                                </div>
+                            </div>
+
+                            <span id="helpProtocol" class="help-block">The protocol to communicate with rest services, be it http or https.</span>
                         </div>
                     </div>
-                    <div class="form-group row">
-                        <div class="col-lg-6">
+                    <div class="form-group">
+                        <div class="col-sm-3">
                             <label class="control-label" for="ipAddress">Rest Port</label>
                         </div>
-                        <div class="col-lg-6">
-                            <input id="restPort" name="restPort" type="text" placeholder="8111" class="input-xlarge" value="{{elementSelected.restPort}}" data-ng-model="elementTree.currentNode.restPort">
+                        <div class="col-sm-6">
+                            <!--
+                            placeholder="8111"
+                            -->
+                            <input aria-describedby="helpPort" id="restPort" name="restPort" type="text"
+                                   class="form-control" value="" data-ng-model="serverToCreate.restPort" required="true">
+
+                            <div ng-show="form.$submitted || form.restPort.$touched" >
+
+                                <div ng-show="form.restPort.$error.required">
+
+                                    Port is required.
+
+                                </div>
+                            </div>
+
+                            <span id="helpPort" class="help-block">The port number to call rest services.</span>
                         </div>
                     </div>
                     <!--
                     <input type="button" value="Save" class="done_button" data-ng-click="done()">
                     <input type="button" value="Delete" class="done_button" data-ng-click="deleteServer()">
                     -->
+
+                    <!--
+                    ng-disabled="form.displayName.$dirty && form.displayName.$error"
+                    -->
+                    <input class="btn btn-primary" ng-disabled="form.$invalid" type="submit" wz-next value="Next" />
+                    <input class="btn btn-danger" type="button" value="Cancel" />
                 </form>
 
-                <input type="submit" wz-next value="Next" />
+
             </wz-step>
 
 

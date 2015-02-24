@@ -757,46 +757,7 @@ angular.module('rifidiApp')
           strProperties += ";readerID=" + $scope.customReaderId
         }
 
-        //before create the reader, query the list of readers to know what is going to be the new reader id after creation
 
-        var serviceIdListBeforeCreation = [];
-
-        $http.get(host + '/readers')
-            .success(function(data, status, headers, config) {
-
-
-
-              var xmlReadersQueryResponse;
-              if (window.DOMParser)
-              {
-                var parser = new DOMParser();
-                xmlReadersQueryResponse = parser.parseFromString(data,"text/xml");
-              }
-              else // Internet Explorer
-              {
-                xmlReadersQueryResponse = new ActiveXObject("Microsoft.XMLDOM");
-                xmlReadersQueryResponse.async=false;
-                xmlReadersQueryResponse.loadXML(data);
-              }
-
-              //get the xml response and extract the values
-              var xmlReaderList = xmlReadersQueryResponse.getElementsByTagName("sensor");
-
-              for(var indexReader = 0; indexReader < xmlReaderList.length; indexReader++) {
-
-                var serviceID = xmlReaderList[indexReader].getElementsByTagName("serviceID")[0].childNodes[0];
-                serviceIdListBeforeCreation.push(serviceID);
-              }
-
-            })
-            .error(function(data, status, headers, config) {
-              console.log("error querying the readers by wizard");
-
-              // called asynchronously if an error occurs
-              // or server returns response with an error status.
-            });
-
-        console.log("going to call create reader: " + host + '/createreader/' + $scope.selectedReaderConnectionProperties.readerid + "/" + encodeURIComponent(strProperties));
 
         $http.get(host + '/createreader/' + $scope.selectedReaderConnectionProperties.readerid + "/" + encodeURIComponent(strProperties))
             .success(function(data, status, headers, config) {
@@ -825,53 +786,10 @@ angular.module('rifidiApp')
               if (message == 'Success'){
                 console.log("success creating reader by wizard");
 
-                //Query the readers after creation and compare with readers created before creation, to get the new reader id
-                var serviceIdListAfterCreation = [];
-
-                $http.get(host + '/readers')
-                    .success(function(data, status, headers, config) {
-
-                      var xmlReadersQueryResponse;
-                      if (window.DOMParser)
-                      {
-                        var parser = new DOMParser();
-                        xmlReadersQueryResponse = parser.parseFromString(data,"text/xml");
-                      }
-                      else // Internet Explorer
-                      {
-                        xmlReadersQueryResponse = new ActiveXObject("Microsoft.XMLDOM");
-                        xmlReadersQueryResponse.async=false;
-                        xmlReadersQueryResponse.loadXML(data);
-                      }
-
-                      //get the xml response and extract the values
-                      var xmlReaderList = xmlReadersQueryResponse.getElementsByTagName("sensor");
-
-                      for(var indexReader = 0; indexReader < xmlReaderList.length; indexReader++) {
-
-                        var serviceID = xmlReaderList[indexReader].getElementsByTagName("serviceID")[0].childNodes[0];
-                        serviceIdListAfterCreation.push(serviceID);
-                      }
-
-                      //From serviceIdListBeforeCreation and serviceIdListAfterCreation arrays, extract the created reader id
-
-                      var newIdFound = false;
-
-                      serviceIdListAfterCreation.forEach(function (serviceIDAfter) {
-
-                        //console.log("serviceIDAfter: ");
-                        //console.log(serviceIDAfter);
-
-                        if ( !newIdFound && !arrayContainsValue(serviceIdListBeforeCreation, serviceIDAfter)   ){
-
-                          newIdFound = true;
-                          console.log("not found ");
-                          console.log(serviceIDAfter.nodeValue);
-
-                          $scope.readerID = serviceIDAfter.nodeValue;
+                          $scope.readerID = xmlCreateReaderResponse.getElementsByTagName("readerID")[0].childNodes[0].nodeValue;
 
                           //Create a session on that created reader
-                          $http.get(host + '/createsession/' + serviceIDAfter.nodeValue)
+                          $http.get(host + '/createsession/' +  $scope.readerID)
                               .success(function(data, status, headers, config) {
 
                                 console.log("success creating session by wizard");
@@ -913,36 +831,6 @@ angular.module('rifidiApp')
                                   //Create command
                                   console.log("going to create command");
 
-                                  //Before creating command, query the commands to retrieve the new command id once it is created
-
-                                  var commandIdListBeforeCreation = [];
-
-                                  $http.get(host + '/commands')
-                                      .success(function(data, status, headers, config) {
-
-                                        var xmlCommandsQueryResponse;
-                                        if (window.DOMParser)
-                                        {
-                                          var parser = new DOMParser();
-                                          xmlCommandsQueryResponse = parser.parseFromString(data,"text/xml");
-                                        }
-                                        else // Internet Explorer
-                                        {
-                                          xmlCommandsQueryResponse = new ActiveXObject("Microsoft.XMLDOM");
-                                          xmlCommandsQueryResponse.async=false;
-                                          xmlCommandsQueryResponse.loadXML(data);
-                                        }
-
-                                        //get the xml response and extract the values
-                                        var xmlCommandList = xmlCommandsQueryResponse.getElementsByTagName("command");
-
-                                        for(var indexCommand = 0; indexCommand < xmlCommandList.length; indexCommand++) {
-
-                                          var commandID = xmlCommandList[indexCommand].getElementsByTagName("commandID")[0].childNodes[0];
-                                          commandIdListBeforeCreation.push(commandID);
-                                        }
-
-
                                         //create command
                                         console.log("$scope.selectedCommandType");
                                         console.log($scope.selectedCommandType);
@@ -975,71 +863,9 @@ angular.module('rifidiApp')
                                               if (createCommandMessage == 'Success') {
                                                 console.log("success creating command by wizard");
 
-                                                //Query the commands after creation and compare with commands created before creation, to get the new command id
-                                                var commandIdListAfterCreation = [];
+                                                var commandID = xmlCreateCommandResponse.getElementsByTagName("commandID")[0].childNodes[0].nodeValue;
 
-                                                $http.get(host + '/commands')
-                                                    .success(function(data, status, headers, config) {
-
-                                                      var xmlCommandsQueryResponse;
-                                                      if (window.DOMParser)
-                                                      {
-                                                        var parser = new DOMParser();
-                                                        xmlCommandsQueryResponse = parser.parseFromString(data,"text/xml");
-                                                      }
-                                                      else // Internet Explorer
-                                                      {
-                                                        xmlCommandsQueryResponse = new ActiveXObject("Microsoft.XMLDOM");
-                                                        xmlCommandsQueryResponse.async=false;
-                                                        xmlCommandsQueryResponse.loadXML(data);
-                                                      }
-
-                                                      //get the xml response and extract the values
-                                                      var xmlCommandList = xmlCommandsQueryResponse.getElementsByTagName("command");
-
-                                                      for(var indexCommand = 0; indexCommand < xmlCommandList.length; indexCommand++) {
-
-                                                        var commandID = xmlCommandList[indexCommand].getElementsByTagName("commandID")[0].childNodes[0];
-                                                        commandIdListAfterCreation.push(commandID);
-                                                      }
-
-
-                                                      //From commandIdListBeforeCreation and commandIdListAfterCreation arrays, extract the created command id
-
-                                                      var newIdFound = false;
-
-                                                      commandIdListAfterCreation.forEach(function (commandIDAfter) {
-
-                                                        //console.log("commandIDAfter: ");
-                                                        //console.log(commandIDAfter);
-
-                                                        if ( !newIdFound && !arrayContainsValue(commandIdListBeforeCreation, commandIDAfter)   ) {
-
-                                                          newIdFound = true;
-                                                          console.log("not found ");
-                                                          console.log(commandIDAfter.nodeValue);
-
-
-
-                                                          continueExecutingCommand(commandIDAfter.nodeValue);
-
-                                                        }
-
-                                                      });
-
-
-                                                    }).
-                                                    error(function(data, status, headers, config) {
-                                                      console.log("error querying commands after command creation in wizard");
-
-
-                                                      // called asynchronously if an error occurs
-                                                      // or server returns response with an error status.
-                                                    });
-
-
-
-
+                                                    continueExecutingCommand(commandID);
 
                                               } else {
                                                 var createCommandDescription = xmlCreateCommandResponse.getElementsByTagName("description")[0].childNodes[0].nodeValue;
@@ -1047,8 +873,6 @@ angular.module('rifidiApp')
                                                 console.log("fail creating command by wizard");
                                                 console.log(createCommandDescription);
                                               }
-
-
 
 
                                             }).
@@ -1059,18 +883,6 @@ angular.module('rifidiApp')
                                               // called asynchronously if an error occurs
                                               // or server returns response with an error status.
                                             });
-
-
-
-
-
-                                      })
-                                      .error(function(data, status, headers, config) {
-                                        console.log("error querying the commands by wizard");
-
-                                        // called asynchronously if an error occurs
-                                        // or server returns response with an error status.
-                                      });
 
 
 
@@ -1138,25 +950,6 @@ angular.module('rifidiApp')
                                 // called asynchronously if an error occurs
                                 // or server returns response with an error status.
                               });
-
-
-
-                        }
-
-
-
-                      });
-
-
-
-                    })
-                    .error(function(data, status, headers, config) {
-                      console.log("error querying the readers after reader creation by wizard");
-
-                      // called asynchronously if an error occurs
-                      // or server returns response with an error status.
-                    });
-
 
 
               } else {

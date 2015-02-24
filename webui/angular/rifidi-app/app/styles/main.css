@@ -76,3 +76,13 @@ body {
     border-bottom: 0;
   }
 }
+
+input.ng-invalid.ng-touched {
+  /*background-color: #FA787E;*/
+  border-color: #FA787E;
+}
+
+input.ng-valid.ng-touched {
+  /*background-color: #78FA89;*/
+  border-color: #78FA89;
+}
