@@ -124,3 +124,39 @@ div[data-tree-model] li .app-dev {
     background-image: url("/images/app-dev.png");
     background-repeat: no-repeat;
 }
+
+div[data-tree-model] li .appgroups {
+    padding: 1px 10px;
+    background-image: url("/images/appgroups.png");
+    background-repeat: no-repeat;
+}
+
+div[data-tree-model] li .application {
+    padding: 1px 10px;
+    background-image: url("/images/application.png");
+    background-repeat: no-repeat;
+}
+
+div[data-tree-model] li .appmanagement {
+    padding: 1px 10px;
+    background-image: url("/images/appmanagement.png");
+    background-repeat: no-repeat;
+}
+
+div[data-tree-model] li .apps {
+    padding: 1px 10px;
+    background-image: url("/images/apps.png");
+    background-repeat: no-repeat;
+}
+
+div[data-tree-model] li .group {
+    padding: 1px 10px;
+    background-image: url("/images/group.png");
+    background-repeat: no-repeat;
+}
+
+div[data-tree-model] li .readzone {
+    padding: 1px 10px;
+    background-image: url("/images/readzone.png");
+    background-repeat: no-repeat;
+}

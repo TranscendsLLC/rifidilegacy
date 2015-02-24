@@ -8,12 +8,69 @@
  * Controller of the rifidiApp
  */
 angular.module('rifidiApp')
-  .controller('ServerWizardCtrl', function ($scope, $http, $routeParams) {
+  .controller('ServerWizardCtrl', function ($scope, $http, $routeParams, $location) {
     $scope.awesomeThings = [
       'HTML5 Boilerplate',
       'AngularJS',
       'Karma'
     ];
+
+      $scope.go = function ( path ) {
+        $location.path( path );
+      };
+
+      $scope.serverToCreate = {};
+      $scope.serverCreationStatus = {};
+
+      $scope.createServer = function(){
+        console.log("create server");
+
+        $scope.serverCreationStatus = {};
+
+        console.log($scope.serverToCreate);
+
+        //Validate display name does not exist
+        $http.get('scripts/controllers/components/menu/servers.json').
+            success(function (data, status, headers, config) {
+              console.log("worked servers load on server creation");
+
+              var displayNameisUnique = true;
+
+              data.forEach(function (server) {
+
+                if (server.displayName == $scope.serverToCreate.displayName){
+
+                  //displayName already exists, then can not be created again
+                  displayNameisUnique = false;
+                }
+
+              });
+
+              if (displayNameisUnique){
+
+                //create server
+
+
+                $scope.serverCreationStatus.status = 'Success';
+
+              } else {
+
+                //do not create server, and display error message
+                $scope.serverCreationStatus.status = 'Fail';
+                $scope.serverCreationStatus.message = 'Display name ' + $scope.serverToCreate.displayName + ' already exists';
+
+              }
+
+            }).
+            error(function (data, status, headers, config) {
+              console.log("error reading servers on creating server");
+
+
+              // called asynchronously if an error occurs
+              // or server returns response with an error status.
+            });
+
+      }
 
       $scope.submitForm = function(isValid) {
 

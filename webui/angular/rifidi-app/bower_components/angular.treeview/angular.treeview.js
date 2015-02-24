@@ -47,11 +47,9 @@
 	  			//server menu
 				var menuServer = '<ul id="contextMenuServer" class="dropdown-menu">'+
 					'<li><a ng-click="saveServer()">Save server</a></li>'+
-				'<li><a ng-click="link()">Link</a></li>'+
-				'<li><a ng-click="delete()">Delete</a></li>'+
-				'<li class="divider"></li>'+
-				'<li><a ng-click="properties()">Properties</a></li>'+
-				'</ul>';
+					'<li><a ng-click="openContactForm()">Delete server</a></li>'+
+					'<li class="divider"></li>'+
+					'</ul>';
 
 				//sensor management menu
 				var menuSensorManagement = '<ul id="contextMenuSensorManagement" class="dropdown-menu">'+

@@ -18,7 +18,8 @@ angular
     'angularTreeview',
     'ui.bootstrap',
     'mgo-angular-wizard',
-    'directive.contextMenu'
+    'directive.contextMenu',
+    'ngDialog'
   ])
   .config(function ($routeProvider) {
     $routeProvider
