@@ -118,3 +118,9 @@ div[data-tree-model] li .cog {
     background-image: url("/images/cog.png");
     background-repeat: no-repeat;
 }
+
+div[data-tree-model] li .app-dev {
+    padding: 1px 10px;
+    background-image: url("/images/app-dev.png");
+    background-repeat: no-repeat;
+}
