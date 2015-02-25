@@ -57,28 +57,83 @@ angular.module('rifidiApp')
             $scope.done();
         };
 
-          $scope.openContactForm = function() {
+          $scope.openDeleteServerDialog = function() {
 
-              ngDialog.openConfirm({template: 'popupTmpl.html',
+              ngDialog.openConfirm({template: 'deleteServerDialogTmpl.html',
 
                   scope: $scope, //Pass the scope object if you need to access in the template
+
                   showClose: false,
 
                   closeByEscape: true,
 
-                  closeByDocument: true
+                  closeByDocument: false
 
               }).then(
 
                   function(value) {
 
-                      //save the contact form
+                      //confirm operation
+                      if (value == 'Delete'){
+                          console.log("to delete");
+                      }
 
                   },
 
                   function(value) {
 
                       //Cancel or do nothing
+                      console.log("cancel");
+
+                  }
+
+              );
+
+          };
+
+          $scope.openSaveServerDialog = function() {
+
+              ngDialog.openConfirm({template: 'saveServerDialogTmpl.html',
+
+                  scope: $scope, //Pass the scope object if you need to access in the template
+
+                  showClose: false,
+
+                  closeByEscape: true,
+
+                  closeByDocument: false,
+
+                  preCloseCallback: function(value) {
+
+                      console.log("preCloseCallback value");
+                      console.log(value);
+
+                      if(confirm('Are you sure you want to close without saving your changes?')) {
+                          return true;
+                      }
+                      return false;
+                  }
+
+
+              }).then(
+
+                  function(value) {
+
+                      //confirm operation
+                      if (value == 'Save'){
+                          console.log("to save");
+                          console.log("old display name:");
+                          console.log($scope.elementTree.currentNode.displayName);
+                          console.log("new server values:");
+                          console.log($scope.elementSelected);
+                      }
+
+                  },
+
+                  function(value) {
+
+                      //Cancel or do nothing
+                      console.log("cancel");
 
                   }
 
@@ -813,6 +868,7 @@ angular.module('rifidiApp')
                                                       "elementId": "ReadZones",
                                                       "collapsed": true,
                                                       "groupName": groupName,
+                                                      "iconClass": "readzones",
                                                       "children": []
                                                   };
 
@@ -841,6 +897,7 @@ angular.module('rifidiApp')
                                                           "appName": appName,
                                                           "number": number.nodeValue,
                                                           "status": status.nodeValue,
+                                                          "iconClass": "app",
                                                           "children": []
 
                                                       }
@@ -1093,8 +1150,8 @@ angular.module('rifidiApp')
               //console.log("oldObj:");
               //console.log(oldObj);
               if( $scope.elementTree && angular.isObject($scope.elementTree.currentNode) ) {
-                  $scope.elementSelected=$scope.elementTree.currentNode;
-                  $scope.propertyType=$scope.elementTree.currentNode.elementId;
+                  $scope.elementSelected = angular.copy($scope.elementTree.currentNode);
+                  $scope.propertyType = angular.copy($scope.elementTree.currentNode.elementId);
 
 
 
