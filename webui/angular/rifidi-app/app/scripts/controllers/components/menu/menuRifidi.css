@@ -149,9 +149,21 @@ div[data-tree-model] li .apps {
     background-repeat: no-repeat;
 }
 
+div[data-tree-model] li .app {
+    padding: 1px 10px;
+    background-image: url("/images/app.png");
+    background-repeat: no-repeat;
+}
+
 div[data-tree-model] li .group {
     padding: 1px 10px;
     background-image: url("/images/group.png");
+    background-repeat: no-repeat;
+}
+
+div[data-tree-model] li .readzones {
+    padding: 1px 10px;
+    background-image: url("/images/readzones.jpg");
     background-repeat: no-repeat;
 }
 

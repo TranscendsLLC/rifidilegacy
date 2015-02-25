@@ -47,7 +47,7 @@
 	  			//server menu
 				var menuServer = '<ul id="contextMenuServer" class="dropdown-menu">'+
 					'<li><a ng-click="saveServer()">Save server</a></li>'+
-					'<li><a ng-click="openContactForm()">Delete server</a></li>'+
+					'<li><a ng-click="openDeleteServerDialog()">Delete server</a></li>'+
 					'<li class="divider"></li>'+
 					'</ul>';
 
