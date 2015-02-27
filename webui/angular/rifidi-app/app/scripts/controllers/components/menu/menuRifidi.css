@@ -172,3 +172,39 @@ div[data-tree-model] li .readzone {
     background-image: url("/images/readzone.png");
     background-repeat: no-repeat;
 }
+
+div[data-tree-model] li .readeradd {
+    padding: 1px 10px;
+    background-image: url("/images/readeradd.png");
+    background-repeat: no-repeat;
+}
+
+div[data-tree-model] li .readerdelete {
+    padding: 1px 10px;
+    background-image: url("/images/readerdelete.png");
+    background-repeat: no-repeat;
+}
+
+div[data-tree-model] li .linkadd {
+    padding: 1px 10px;
+    background-image: url("/images/link_add.png");
+    background-repeat: no-repeat;
+}
+
+div[data-tree-model] li .linkdelete {
+    padding: 1px 10px;
+    background-image: url("/images/link_delete.png");
+    background-repeat: no-repeat;
+}
+
+div[data-tree-model] li .linkstart {
+    padding: 1px 10px;
+    background-image: url("/images/link-start.png");
+    background-repeat: no-repeat;
+}
+
+div[data-tree-model] li .linkstop {
+    padding: 1px 10px;
+    background-image: url("/images/link-stop.png");
+    background-repeat: no-repeat;
+}

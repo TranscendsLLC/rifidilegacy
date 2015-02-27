@@ -53,24 +53,26 @@
 
 				//sensor management menu
 				var menuSensorManagement = '<ul id="contextMenuSensorManagement" class="dropdown-menu">'+
-					'<li><a href ="#/sensorWizard/{{elementSelected.restProtocol}}/{{elementSelected.ipAddress}}/{{elementSelected.restPort}}">Add Sensor</a></li>'+
+					'<li><a href ="#/sensorWizard/{{elementSelected.restProtocol}}/{{elementSelected.ipAddress}}/{{elementSelected.restPort}}"><i class="readeradd">&nbsp;&nbsp;&nbsp;&nbsp;Add Sensor</i></a></li>'+
 					'</ul>';
 
 				//sensor menu
 				var menuSensor = '<ul id="contextMenuSensor" class="dropdown-menu">'+
-					'<li><a ng-click="deleteSensor()">Delete Sensor</a></li>'+
-					'<li><a ng-click="createSession()">Create Session</a></li>'+
+					'<li><a ng-click="deleteSensor()"><i class="readerdelete">&nbsp;&nbsp;&nbsp;&nbsp;Delete Sensor</i></a></li>'+
+					'<li><a ng-click="createSession()"><i class="linkadd">&nbsp;&nbsp;&nbsp;&nbsp;Create Session</i></a></li>'+
 					'</ul>';
 
 				//session menu
 				var menuSession = '<ul id="contextMenuSession" class="dropdown-menu">'+
-					'<li><a ng-click="startSession()">Start Session</a></li>'+
-					'<li><a ng-click="deleteSession()">Delete Session</a></li>'+
+					'<li><a ng-click="deleteSession()"><i class="linkdelete">&nbsp;&nbsp;&nbsp;&nbsp;Delete Session</i></a></li>'+
+					'<li><a ng-click="startSession()"><i class="linkstart">&nbsp;&nbsp;&nbsp;&nbsp;Start Session</i></a></li>'+
+					'<li><a ng-click="stopSession()"><i class="linkstop">&nbsp;&nbsp;&nbsp;&nbsp;Stop Session</i></a></li>'+
 					'</ul>';
 
 				//servers menu
 				var menuServers = '<ul id="contextMenuServers" class="dropdown-menu">'+
 					'<li><a href ="#/serverWizard">Add server</a></li>'+
+					'<li><a ng-click ="saveAllServers()">Save all servers</a></li>'+
 					'</ul>';
 
 				//tree template

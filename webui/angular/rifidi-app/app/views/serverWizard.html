@@ -32,7 +32,7 @@
                                 </div>
                             </div>
 
-                            <span id="helpDisplayName" class="help-block">The display name.</span>
+                            <span id="helpDisplayName" class="help-block">The display name, must be unique.</span>
                         </div>
 
                     </div>
@@ -61,8 +61,18 @@
                             <label class="control-label" for="ipAddress">Rest Protocol</label>
                         </div>
                         <div class="col-sm-6">
+
+                            <select id="restProtocol" name="restProtocol" aria-describedby="helpProtocol"
+                                    class="form-control" value="" data-ng-model="serverToCreate.restProtocol"
+                                    ng-required="true"
+                                    ng-options="value as value.protocol for value in serverProtocols | orderBy:'protocol'">
+                                <option>--</option>
+                            </select>
+
+                            <!--
                             <input aria-describedby="helpProtocol" id="restProtocol" name="restProtocol" type="text"
                                    class="form-control" value="" data-ng-model="serverToCreate.restProtocol" required>
+                                   -->
 
                             <div ng-show="form.$submitted || form.restProtocol.$touched" >
 
@@ -85,7 +95,7 @@
                             placeholder="8111"
                             -->
                             <input aria-describedby="helpPort" id="restPort" name="restPort" type="text"
-                                   class="form-control" value="" data-ng-model="serverToCreate.restPort" required>
+                                   class="form-control"  data-ng-model="serverToCreate.restPort" required>
 
                             <div ng-show="form.$submitted || form.restPort.$touched" >
 
@@ -96,7 +106,7 @@
                                 </div>
                             </div>
 
-                            <span id="helpPort" class="help-block">The port number to call rest services.</span>
+                            <span id="helpPort" class="help-block">The port number to call rest services. The default value is 8111</span>
                         </div>
                     </div>
                     <!--
@@ -145,7 +155,7 @@
                             <label class="control-label" for="restProtocolSummary">Rest Protocol</label>
                         </div>
                         <div class="col-sm-6" id="restProtocolSummary">
-                            {{serverToCreate.restProtocol}}
+                            {{serverToCreate.restProtocol.protocol}}
                         </div>
                     </div>
                     <div class="form-group">
