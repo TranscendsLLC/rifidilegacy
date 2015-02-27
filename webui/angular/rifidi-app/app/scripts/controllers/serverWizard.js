@@ -22,6 +22,11 @@ angular.module('rifidiApp')
       $scope.serverToCreate = {};
       $scope.serverCreationStatus = {};
 
+      $scope.serverProtocols = [{"protocol": "http"}, {"protocol":"https"}];
+
+      var defaultPort = 8111;
+      $scope.serverToCreate.restPort = angular.copy(defaultPort);
+
       $scope.createServer = function(){
         console.log("create server");
 
