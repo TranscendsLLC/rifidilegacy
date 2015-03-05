@@ -831,6 +831,7 @@ angular.module('rifidiApp')
 
         //before create the reader, query the list of readers to know what is going to be the new reader id after creation
 
+        /*
         var serviceIdListBeforeCreation = [];
 
         $http.get(host + '/readers')
@@ -867,6 +868,7 @@ angular.module('rifidiApp')
               // called asynchronously if an error occurs
               // or server returns response with an error status.
             });
+            */
 
         console.log("going to call create reader: " + host + '/createreader/' + $scope.selectedReaderConnectionProperties.readerid + "/" + encodeURIComponent(strProperties));
 
@@ -897,8 +899,13 @@ angular.module('rifidiApp')
               if (message == 'Success'){
                 console.log("success creating reader by wizard");
 
+                var serviceIDAfter = xmlCreateReaderResponse.getElementsByTagName("readerID")[0].childNodes[0].nodeValue;
+
                 //Query the readers after creation and compare with readers created before creation, to get the new reader id
+
+                /*
                 var serviceIdListAfterCreation = [];
+
 
                 $http.get(host + '/readers')
                     .success(function(data, status, headers, config) {
@@ -929,12 +936,12 @@ angular.module('rifidiApp')
 
                       var newIdFound = false;
 
-                      serviceIdListAfterCreation.forEach(function (serviceIDAfter) {
+                      //serviceIdListAfterCreation.forEach(function (serviceIDAfter) {
 
                         //console.log("serviceIDAfter: ");
                         //console.log(serviceIDAfter);
 
-                        if ( !newIdFound && !arrayContainsValue(serviceIdListBeforeCreation, serviceIDAfter)   ){
+                        //if ( !newIdFound && !arrayContainsValue(serviceIdListBeforeCreation, serviceIDAfter)   ){
 
                           newIdFound = true;
                           console.log("not found ");
@@ -942,8 +949,10 @@ angular.module('rifidiApp')
 
                           $scope.readerID = serviceIDAfter.nodeValue;
 
+                          */
+
                           //Create a session on that created reader
-                          $http.get(host + '/createsession/' + serviceIDAfter.nodeValue)
+                          $http.get(host + '/createsession/' + serviceIDAfter)
                               .success(function(data, status, headers, config) {
 
                                 console.log("success creating session by wizard");
@@ -1213,14 +1222,14 @@ angular.module('rifidiApp')
 
 
 
-                        }
+                        //}
 
 
 
-                      });
+                      //});
 
 
-
+/*
                     })
                     .error(function(data, status, headers, config) {
                       console.log("error querying the readers after reader creation by wizard");
@@ -1228,7 +1237,7 @@ angular.module('rifidiApp')
                       // called asynchronously if an error occurs
                       // or server returns response with an error status.
                     });
-
+*/
 
 
               } else {

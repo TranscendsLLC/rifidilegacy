@@ -11,16 +11,21 @@
  * Controller of the rifidiApp
  */
 var module = angular.module('rifidiApp')
-  .controller('MenuController', function ($scope, $http, ngDialog, TreeViewPainting) {
+  .controller('MenuController', function ($scope, $http, $location, ngDialog, TreeViewPainting) {
 
+        /*
+        $scope.go = function ( path ) {
+            $location.path( path );
+        };
+        */
 
         $scope.elementSelected={};
         $scope.temporaryNode = {
               children: []
           };
-        $scope.propertyType="servers";
+        //$scope.propertyType="servers";
 
-        console.log("set propertyType = servers");
+        //console.log("set propertyType = servers");
         $scope.mode = undefined;
 
         $scope.done = function () {
@@ -40,7 +45,7 @@ var module = angular.module('rifidiApp')
           console.log("addServerDone");
           /* add server */
           if( $scope.temporaryNode.elementName  ) {//TODO: Validate all values or use a require validation
-              $scope.temporaryNode.elementId="server";
+              $scope.temporaryNode.elementType="server";
               $scope.temporaryNode.displayName= $scope.temporaryNode.elementName;
               console.log($scope.elementTree.currentNode);
               $scope.elementTree.currentNode.children.push( angular.copy($scope.temporaryNode) );
@@ -48,7 +53,7 @@ var module = angular.module('rifidiApp')
               //console.log($scope.elementTree.currentNode.children);
           }
           /* reset */
-          $scope.temporaryNode.elementId = "";
+          $scope.temporaryNode.elementType = "";
           $scope.temporaryNode.elementName = "";
           $scope.temporaryNode.displayName="";
 
@@ -692,6 +697,7 @@ var module = angular.module('rifidiApp')
                       var partialElementList = [{
                           "elementName": "Servers",
                           "elementId": "servers",
+                          "elementType": "servers",
                           "collapsed": true,
                           "contextMenuId": "contextMenuServers",
                           "iconClass":"server",
@@ -703,6 +709,7 @@ var module = angular.module('rifidiApp')
                           server.colapsed = true;
                           server.elementName = server.displayName;
                           server.elementId = "server";
+                          server.elementType = "server";
                           server.iconClass = "server-disconnected";
                           server.contextMenuId = "contextMenuServer";
                           server.children = [];
@@ -798,6 +805,7 @@ var module = angular.module('rifidiApp')
                               "restPort": server.restPort,
                               "elementName": "Sensor Management",
                               "elementId": "sensorManagement",
+                              "elementType": "sensorManagement",
                               "collapsed": true,
                               "iconClass":"reader-cog",
                               "contextMenuId": "contextMenuSensorManagement",
@@ -836,7 +844,9 @@ var module = angular.module('rifidiApp')
                                       var sensorElement = {
                                           "elementName": serviceID.nodeValue,
                                           "elementId": serviceID.nodeValue,
+                                          "elementType": "sensor",
                                           "collapsed": true,
+                                          "factoryID": factoryID.nodeValue,
                                           "contextMenuId": "contextMenuSensor",
                                           "iconClass":"reader",
                                           "allowCreateSession": false,
@@ -1652,9 +1662,253 @@ var module = angular.module('rifidiApp')
               //console.log(oldObj);
               if( $scope.elementTree && angular.isObject($scope.elementTree.currentNode) ) {
                   $scope.elementSelected = angular.copy($scope.elementTree.currentNode);
-                  $scope.propertyType = angular.copy($scope.elementTree.currentNode.elementId);
+                  //$scope.propertyType = angular.copy($scope.elementTree.currentNode.elementId);
 
-                  console.log("set 2 propertyType: " + $scope.propertyType);
+                  //if selected element is sensor, then load the properties for this sensor
+                  if ($scope.elementTree.currentNode.elementType == 'sensor'){
+                      //load properties for this sensor
+
+                      $http.get($scope.elementTree.currentNode.host + '/readermetadata')
+                          .success(function(data, status, headers, config) {
+
+                              var xmlMetadata;
+                              if (window.DOMParser)
+                              {
+                                  var parser = new DOMParser();
+                                  xmlMetadata = parser.parseFromString(data,"text/xml");
+                              }
+                              else // Internet Explorer
+                              {
+                                  xmlMetadata = new ActiveXObject("Microsoft.XMLDOM");
+                                  xmlMetadata.async=false;
+                                  xmlMetadata.loadXML(data);
+                              }
+
+                              //get the xml response and extract the values to construct the sensor properties for selected sensor
+
+                              var sensorMetadataXmlVector = xmlMetadata.getElementsByTagName("reader");
+
+                              for(var index = 0; index < sensorMetadataXmlVector.length; index++) {
+
+
+                                  var propertiesXmlVector = sensorMetadataXmlVector[index].getElementsByTagName("property");
+                                  var readerid = sensorMetadataXmlVector[index].getElementsByTagName("readerid")[0].childNodes[0].nodeValue;
+
+                                  /*
+                                   console.log("readerid: " + readerid.nodeValue);
+                                   console.log("properties length: " + propertiesXmlVector.length);
+                                   console.log("propertiesXmlVector");
+                                   console.log(propertiesXmlVector);
+                                   */
+
+                                  //check if current command is the required one
+                                  /*
+                                   console.log("readerid:");
+                                   console.log(readerid);
+                                   console.log("$scope.selectedReaderType:");
+                                   console.log($scope.selectedReaderType);
+                                   console.log("selectedCommandInstance.factoryID:");
+                                   console.log(selectedCommandInstance.factoryID);
+                                   */
+
+                                  if (readerid == $scope.elementTree.currentNode.factoryID){
+
+                                      //Create the properties object for this sensor
+                                      $scope.sensorProperties = {
+                                          "readerid": readerid,
+                                          "propertyCategoryList": []
+
+                                      };
+
+                                      console.log("$scope.sensorProperties:");
+                                      console.log($scope.sensorProperties);
+
+
+                                      //extract the properties
+                                      for(var indexProp = 0; indexProp < propertiesXmlVector.length; indexProp++) {
+
+
+                                          var name = propertiesXmlVector[indexProp].getElementsByTagName("name")[0].childNodes[0].nodeValue;
+                                          var displayname = propertiesXmlVector[indexProp].getElementsByTagName("displayname")[0].childNodes[0].nodeValue;
+                                          var defaultvalue;
+                                          if (propertiesXmlVector[indexProp].getElementsByTagName('defaultvalue').length > 0){
+                                              defaultvalue = propertiesXmlVector[indexProp].getElementsByTagName("defaultvalue")[0].childNodes[0].nodeValue;
+                                          }
+
+                                          var description = propertiesXmlVector[indexProp].getElementsByTagName("description")[0].childNodes[0].nodeValue;
+                                          var type = propertiesXmlVector[indexProp].getElementsByTagName("type")[0].childNodes[0].nodeValue;
+                                          var maxvalue;
+                                          var minvalue;
+                                          if (type.nodeValue == 'java.lang.Integer') {
+                                              maxvalue = propertiesXmlVector[indexProp].getElementsByTagName("maxvalue")[0].childNodes[0].nodeValue;
+                                              minvalue = propertiesXmlVector[indexProp].getElementsByTagName("minvalue")[0].childNodes[0].nodeValue;
+                                          }
+                                          var category = propertiesXmlVector[indexProp].getElementsByTagName("category")[0].childNodes[0].nodeValue;
+                                          var strWritable = propertiesXmlVector[indexProp].getElementsByTagName("writable")[0].childNodes[0].nodeValue;
+                                          var writable = false;
+                                          if (strWritable == 'true'){
+                                              writable = true;
+                                          }
+
+                                          /*
+                                          console.log("propertiesXmlVector[indexProp].getElementsByTagName('writable')[0].childNodes[0].nodeValue:");
+                                          console.log(propertiesXmlVector[indexProp].getElementsByTagName('writable')[0].childNodes[0].nodeValue);
+
+                                          console.log("writable:");
+                                          console.log(writable);
+                                          */
+
+
+                                          var ordervalue = propertiesXmlVector[indexProp].getElementsByTagName("ordervalue")[0].childNodes[0].nodeValue;
+
+                                          //check if current category already exists in propertyCategories
+                                          var existingCategory = false;
+
+                                          $scope.sensorProperties.propertyCategoryList.forEach(function (propertyCategory) {
+
+                                              if (category == propertyCategory.category){
+                                                  existingCategory = true;
+                                              }
+
+                                          });
+
+                                          if (!existingCategory){
+
+                                              var propertyCategory = {
+                                                  "category": category,
+                                                  "properties": []
+                                              };
+
+                                              $scope.sensorProperties.propertyCategoryList.push(propertyCategory);
+                                          }
+
+                                          /*
+                                           var customdefaultvalue;
+
+                                           if (type.nodeValue == 'java.lang.Integer'){
+                                           customdefaultvalue = parseInt(defaultvalue.nodeValue);
+                                           } else {
+                                           customdefaultvalue = defaultvalue.nodeValue;
+                                           }
+                                           */
+
+                                          var propertyElement = {
+                                              "name": name,
+                                              "displayname": displayname,
+                                              "description": description,
+                                              "type": type,
+                                              "maxvalue": maxvalue,
+                                              "minvalue": minvalue,
+                                              "category": category,
+                                              "writable": writable,
+                                              "ordervalue": ordervalue,
+                                              "value": ""
+                                          };
+
+                                          //Set the default value for property
+
+                                          if (type == 'java.lang.Integer'){
+                                              propertyElement.value = angular.copy(parseInt(defaultvalue));
+                                          } else {
+                                              propertyElement.value = angular.copy(defaultvalue);
+                                          }
+
+                                          //Add the property to appropriate property category list
+                                          $scope.sensorProperties.propertyCategoryList.forEach(function (propertyCategory) {
+
+                                              if (category == propertyCategory.category){
+
+                                                  propertyCategory.properties.push(angular.copy(propertyElement));
+
+                                              }
+
+                                          });
+
+                                      }
+
+                                      //Then, load the current values for every property
+
+                                          //call the service to get properties of sensor instance
+                                          $http.get($scope.elementTree.currentNode.host + '/getproperties/' + $scope.elementTree.currentNode.elementId)
+                                              .success(function(data, status, headers, config) {
+
+                                                  var xmlSensorProperties;
+                                                  if (window.DOMParser)
+                                                  {
+                                                      var parser = new DOMParser();
+                                                      xmlSensorProperties = parser.parseFromString(data,"text/xml");
+                                                  }
+                                                  else // Internet Explorer
+                                                  {
+                                                      xmlSensorProperties = new ActiveXObject("Microsoft.XMLDOM");
+                                                      xmlSensorProperties.async=false;
+                                                      xmlSensorProperties.loadXML(data);
+                                                  }
+
+                                                  //get the xml response and extract the values for properties
+                                                  var propertiesXmlVector = xmlSensorProperties.getElementsByTagName("entry");
+
+                                                  for(var indexPropertyValue = 0; indexPropertyValue < propertiesXmlVector.length; indexPropertyValue++) {
+
+                                                      var key = propertiesXmlVector[indexPropertyValue].getElementsByTagName("key")[0].childNodes[0].nodeValue;
+                                                      var value = propertiesXmlVector[indexPropertyValue].getElementsByTagName("value")[0].childNodes[0].nodeValue;
+
+                                                      //Iterate the loaded properties and set this value when property key matches
+                                                      $scope.sensorProperties.propertyCategoryList.forEach(function (propertyCategory) {
+
+                                                          //Iterate al categories to find this property and set the value
+                                                          propertyCategory.properties.forEach(function (property) {
+
+                                                              if (property.name == key){
+
+                                                                  //Set the value for property
+
+                                                                  if (property.type == 'java.lang.Integer'){
+                                                                      property.value = angular.copy(parseInt(value));
+                                                                  } else {
+                                                                      property.value = angular.copy(value);
+                                                                  }
+
+                                                              }
+
+                                                          });
+
+
+                                                      });
+
+
+                                                  }
+
+                                              }).
+                                              error(function(data, status, headers, config) {
+                                                  console.log("error reading sensor properties");
+
+
+                                                  // called asynchronously if an error occurs
+                                                  // or server returns response with an error status.
+                                              });
+
+
+
+                                  }
+
+
+                              }
+
+
+                          })
+                          .error(function(data, status, headers, config) {
+                              console.log("error reading readermetadata for sensor wizard: command instance selection");
+
+                              // called asynchronously if an error occurs
+                              // or server returns response with an error status.
+                          });
+
+
+
+                  }
+
+                  //console.log("set 2 propertyType: " + $scope.propertyType);
                   $scope.operationSuccessMsg = null;
 
 
@@ -1666,8 +1920,144 @@ var module = angular.module('rifidiApp')
           }, false);
 
 
+        $scope.openSaveSensorPropertiesDialog = function(){
+
+                ngDialog.openConfirm({template: 'saveSensorPropertiesDialogTmpl.html',
+
+                    scope: $scope, //Pass the scope object if you need to access in the template
+
+                    showClose: false,
+
+                    closeByEscape: true,
+
+                    closeByDocument: false
+
+                }).then(
+
+                    function(value) {
+
+                        //confirm operation
+                        if (value == 'Save'){
+                            console.log("to save");
+
+                            //call save sensor properties operation
+                            saveSensorProperties($scope.elementTree.currentNode);
+
+                        }
+
+                    },
+
+                    function(value) {
+
+                        //Cancel or do nothing
+                        console.log("cancel");
+
+                    }
+
+                );
+
+        };
+
+        var saveSensorProperties = function(sensor){
+
+            var strSensorProperties = "";
+
+            for (var idxCat=0; idxCat < $scope.sensorProperties.propertyCategoryList.length; idxCat++){
+
+                for (var idxProp=0; idxProp < $scope.sensorProperties.propertyCategoryList[idxCat].properties.length; idxProp++){
+
+                    var property = $scope.sensorProperties.propertyCategoryList[idxCat].properties[idxProp];
+
+                    console.log("property");
+                    console.log(property);
+
+                    //only update if writable
+                    if (property.writable) {
+                        strSensorProperties += property.name + "=" + property.value + ";"
+                    }
+                }
+
+            }
+
+            //Quit the last semicolon ;
+            if (strSensorProperties.length > 0){
+                strSensorProperties = strSensorProperties.substring(0, strSensorProperties.length - 1);
+            }
+
+            console.log("strSensorProperties");
+            console.log(strSensorProperties);
+
+            //call the rest operation to update sensor properties
+
+            $http.get(sensor.host + '/setproperties/' + sensor.elementId + "/" + encodeURIComponent(strSensorProperties))
+                .success(function (data, status, headers, config) {
+
+                    var updateSensorPropertiesCommandResponse;
+                    if (window.DOMParser) {
+                        var parser = new DOMParser();
+                        updateSensorPropertiesCommandResponse = parser.parseFromString(data, "text/xml");
+                    }
+                    else // Internet Explorer
+                    {
+                        updateSensorPropertiesCommandResponse = new ActiveXObject("Microsoft.XMLDOM");
+                        updateSensorPropertiesCommandResponse.async = false;
+                        updateSensorPropertiesCommandResponse.loadXML(data);
+                    }
+
+                    //get the xml response and extract the message response
+                    var message = updateSensorPropertiesCommandResponse.getElementsByTagName("message")[0].childNodes[0].nodeValue;
+
+                    if (message == 'Success') {
+                        console.log("success updating sensor properties");
+                        TreeViewPainting.paintTreeView($scope);
+
+                    } else {
+                        var updateSensorPropertiesCommandDescription = updateSensorPropertiesCommandResponse.getElementsByTagName("description")[0].childNodes[0].nodeValue;
+                        //$scope.setCommandPropertiesResponseStatus.description = setCommandPropertiesDescription;
+                        console.log("fail updating sensor properties");
+                        console.log(updateSensorPropertiesCommandDescription);
+
+                        //show modal dialog with error
+                        showErrorDialog('Error updating sensor properties: ' + updateSensorPropertiesCommandDescription);
+
+                    }
+
+
+                }).
+                error(function (data, status, headers, config) {
+                    console.log("error updating sensor properties");
+
+                    //show modal dialog with error
+                    showErrorDialog('Error updating sensor properties');
+
+
+                    // called asynchronously if an error occurs
+                    // or server returns response with an error status.
+                });
+
+        }
+
+
 
   });
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 module.service('TreeViewPainting', function($http) {
        var service = {
