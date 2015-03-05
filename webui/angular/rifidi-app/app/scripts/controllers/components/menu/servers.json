@@ -1,8 +1,8 @@
 [
   {
-    "displayName": "Server1-by localhost",
+    "displayName": "Server1-by ip",
     "restProtocol" : "http",
-    "ipAddress" : "localhost",
+    "ipAddress" : "10.99.6.21",
     "restPort" : "8111"
   },
   {
@@ -13,7 +13,7 @@
   },
   {
     "displayName": "Server2",
-    "restProtocol" : "http",
+    "restProtocol" : "https",
     "ipAddress" : "192.168.88.104",
     "restPort" : "8111"
   }
