@@ -111,7 +111,7 @@
                    </div>
                    <div class="panel-body">
 
-                       <div ng-switch="propertyType">
+                       <div ng-switch="elementTree.currentNode.elementType">
                            <div ng-switch-when="servers">
                                <div class="serversProperties">
                                    <button type="button" class="btn btn-default" aria-label="Left Align" data-ng-click="mode = 'server'">
@@ -343,28 +343,97 @@
 
                                    -->
                            </div>
+
                            <div ng-switch-when="sensorManagement">
                                <button type="button" class="btn btn-default" aria-label="Left Align">
                                    <a href ="#/sensorWizard/{{elementSelected.restProtocol}}/{{elementSelected.ipAddress}}/{{elementSelected.restPort}}"><span class="glyphicon glyphicon-plus" aria-hidden="true">Add Sensor</span></a>
                                </button>
                            </div>
+
+
+                           <div ng-switch-when="sensorxx">
+                               <ul class="nav nav-tabs">
+                                   <li role="presentation" class="active">Home</li>
+                                   <li role="presentation">Profile</li>
+                                   <li role="presentation">Messages</li>
+                               </ul>
+                           </div>
+
+
                            <div ng-switch-when="sensor">
+
+                               <form class="form-horizontal" role="form" name="form" novalidate>
+
                                <tabset>
-                                   <tab heading="Connection"></tab>
-                                   <tab heading="General"></tab>
-                                   <tab heading="GPIO"></tab>
-                                   <tab heading="Miscellanous"></tab>
-                                   <tab heading="Administration">
+                                   <tab heading="{{propertyCategory.category}}" ng-repeat="propertyCategory in sensorProperties.propertyCategoryList | orderBy:'category'">
                                        <br/>
-                                       <button type="button" class="btn btn-default" aria-label="Left Align">
-                                           <span class="glyphicon glyphicon-edit" aria-hidden="true">Edit Sensor</span>
-                                       </button>
-                                       <br/><br/>
-                                       <button type="button" class="btn btn-default" aria-label="Left Align">
-                                           <span class="glyphicon glyphicon-trash" aria-hidden="true">Delete Sensor</span>
-                                       </button>
+
+                                               <div class="form-group" ng-repeat="property in propertyCategory.properties | orderBy:['ordervalue', 'displayname']">
+
+                                                   <div class="col-sm-6">
+                                                       <label class="control-label" for="{{property.name}}">{{property.displayname}}</label>
+                                                   </div>
+
+                                                   <div class="col-sm-6" ng-show="property.type != 'java.lang.Integer'">
+
+                                                       <input aria-describedby="help{{property.name}}" id="{{property.name}}"
+                                                              name="{{property.name}}" ng-disabled="!property.writable" ng-readonly="!property.writable"
+                                                              type="text" ng-value="property.value" ng-model="property.value"
+                                                              class="form-control"
+                                                               />
+
+                                                       <div ng-show="form.$submitted || form.property.name.$touched" >
+
+                                                           <div ng-show="form.property.name.$error.required">
+
+                                                               {{property.name}} is required.
+
+                                                           </div>
+                                                       </div>
+
+                                                       <span id="help{{property.name}}" class="help-block">{{property.description}}</span>
+
+                                                   </div>
+
+
+                                                   <div class="col-sm-6" ng-show="property.type == 'java.lang.Integer'">
+
+                                                       <input aria-describedby="help{{property.name}}" id="{{property.name}}"
+                                                              name="{{property.name}}" ng-disabled="!property.writable" ng-readonly="!property.writable"
+                                                              type="number" ng-value="property.value" ng-model="property.value" min="property.minvalue" max="property.maxvalue"
+                                                              class="form-control"
+                                                               />
+
+                                                       <div ng-show="form.$submitted || form.property.name.$touched" >
+
+                                                           <div ng-show="form.property.name.$error.required">
+
+                                                               {{property.name}} is required.
+
+                                                           </div>
+                                                       </div>
+
+                                                       <span id="help{{property.name}}" class="help-block">{{property.description}}</span>
+
+                                                   </div>
+
+
+
+                                                   <br>
+                                                   <p>
+
+                                               </div>
+
+
                                    </tab>
                                </tabset>
+
+                               <!--
+                               <input class="btn btn-danger" type="button" value="Cancel" ng-click="go('/#')" />
+                               -->
+                               <input class="btn btn-primary" ng-click="openSaveSensorPropertiesDialog()" ng-disabled="form.$invalid" type="submit" value="Save" />
+
+                               </form>
                            </div>
                        </div>
                    </div>
