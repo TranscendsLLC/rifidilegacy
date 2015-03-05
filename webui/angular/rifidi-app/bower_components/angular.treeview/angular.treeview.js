@@ -46,7 +46,7 @@
 
 	  			//server menu
 				var menuServer = '<ul id="contextMenuServer" class="dropdown-menu">'+
-					'<li><a ng-click="saveServer()">Save server</a></li>'+
+					'<li><a ng-click="saveServer()">Save server config</a></li>'+
 					'<li><a ng-click="openDeleteServerDialog()">Delete server</a></li>'+
 					'<li class="divider"></li>'+
 					'</ul>';
@@ -58,13 +58,13 @@
 
 				//sensor menu
 				var menuSensor = '<ul id="contextMenuSensor" class="dropdown-menu">'+
-					'<li><a ng-click="deleteSensor()"><i class="readerdelete">&nbsp;&nbsp;&nbsp;&nbsp;Delete Sensor</i></a></li>'+
-					'<li><a ng-click="createSession()"><i class="linkadd">&nbsp;&nbsp;&nbsp;&nbsp;Create Session</i></a></li>'+
+					'<li><a ng-click="openDeleteSensorDialog()"><i class="readerdelete">&nbsp;&nbsp;&nbsp;&nbsp;Delete Sensor</i></a></li>'+
+					'<li ng-class="{' + 'disabledLink' + ': !elementSelected.allowCreateSession' +  '}"' + '><a ng-click="createSession()"><i ng-class="{' + 'disabledLink' + ': !elementSelected.allowCreateSession, ' + 'linkadd' + ': elementSelected.allowCreateSession' + '}"' + '>&nbsp;&nbsp;&nbsp;&nbsp;Create Session</i></a></li>'+
 					'</ul>';
 
 				//session menu
 				var menuSession = '<ul id="contextMenuSession" class="dropdown-menu">'+
-					'<li><a ng-click="deleteSession()"><i class="linkdelete">&nbsp;&nbsp;&nbsp;&nbsp;Delete Session</i></a></li>'+
+					'<li><a ng-click="openDeleteSessionDialog()"><i class="linkdelete">&nbsp;&nbsp;&nbsp;&nbsp;Delete Session</i></a></li>'+
 					'<li><a ng-click="startSession()"><i class="linkstart">&nbsp;&nbsp;&nbsp;&nbsp;Start Session</i></a></li>'+
 					'<li><a ng-click="stopSession()"><i class="linkstop">&nbsp;&nbsp;&nbsp;&nbsp;Stop Session</i></a></li>'+
 					'</ul>';
@@ -72,7 +72,7 @@
 				//servers menu
 				var menuServers = '<ul id="contextMenuServers" class="dropdown-menu">'+
 					'<li><a href ="#/serverWizard">Add server</a></li>'+
-					'<li><a ng-click ="saveAllServers()">Save all servers</a></li>'+
+					'<li><a ng-click ="saveAllServers()">Save all servers config</a></li>'+
 					'</ul>';
 
 				//tree template
@@ -84,7 +84,7 @@
 							'<i class="normal" data-ng-hide="node.' + nodeChildren + '.length"></i>' +
 							'<i class="{{node.iconClass}}"></i> ' +
 							'<span context="{{node.contextMenuId}}" data-ng-class="node.selected" data-ng-click="' + treeId + '.selectNodeLabel(node)">{{node.' + nodeLabel + '}}</span>' +
-							'<div  data-ng-hide="node.collapsed" data-tree-id="' + treeId + '" data-tree-model="node.' + nodeChildren + '" data-node-id=' + nodeId + ' data-node-label=' + nodeLabel + ' data-node-children=' + nodeChildren + '></div>' +
+							'<div data-ng-hide="node.collapsed" data-tree-id="' + treeId + '" data-tree-model="node.' + nodeChildren + '" data-node-id=' + nodeId + ' data-node-label=' + nodeLabel + ' data-node-children=' + nodeChildren + '></div>' +
 						'</li>' +
 					'</ul>' +
 						menuServer +
