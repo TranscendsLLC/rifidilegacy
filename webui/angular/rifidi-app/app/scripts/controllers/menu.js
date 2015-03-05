@@ -11,19 +11,16 @@
  * Controller of the rifidiApp
  */
 var module = angular.module('rifidiApp')
-  .directive('menuRifidi', function () {
+  .controller('MenuController', function ($scope, $http, ngDialog, TreeViewPainting) {
 
 
-    return {
-      restrict: 'E',
-      transclude: true,
-      scope: {},
-      controller: function($scope, $http, ngDialog, TreeViewPainting) {
         $scope.elementSelected={};
         $scope.temporaryNode = {
               children: []
           };
         $scope.propertyType="servers";
+
+        console.log("set propertyType = servers");
         $scope.mode = undefined;
 
         $scope.done = function () {
@@ -479,7 +476,7 @@ var module = angular.module('rifidiApp')
 
           };
 
-          $scope.openSaveServerDialog = function() {
+          $scope.openSaveServerPropertiesDialog = function() {
 
               ngDialog.openConfirm({template: 'saveServerPropertiesDialogTmpl.html',
 
@@ -519,7 +516,14 @@ var module = angular.module('rifidiApp')
 
                           //Validate server display name is unique only if display name has changed
 
+                          console.log("$scope.elementTree.currentNode.displayName:");
+                          console.log($scope.elementTree.currentNode.displayName);
+                          console.log("$scope.elementSelected.displayName:");
+                          console.log($scope.elementSelected.displayName);
+
                           if ($scope.elementTree.currentNode.displayName != $scope.elementSelected.displayName) {
+
+                              console.log("displayName with change");
 
                               $http.get('scripts/controllers/components/menu/servers.json').
                                   success(function (data, status, headers, config) {
@@ -538,10 +542,8 @@ var module = angular.module('rifidiApp')
 
                                       if (displayNameisUnique) {
 
-                                          //create server
-
-                                          $scope.operationSuccessMsg = "Save operation success";
-                                          $scope.$apply();
+                                          //save server properties
+                                          saveServerProperties($scope.elementSelected);
 
 
                                       } else {
@@ -592,6 +594,10 @@ var module = angular.module('rifidiApp')
                                       // called asynchronously if an error occurs
                                       // or server returns response with an error status.
                                   });
+                          } else {
+
+                              saveServerProperties($scope.elementSelected);
+
                           }
 
                       }
@@ -654,6 +660,13 @@ var module = angular.module('rifidiApp')
 
 
           };
+
+        var saveServerProperties = function(server) {
+
+            console.log("saveServerProperties op success");
+            $scope.operationSuccessMsg = "Save server properties operation success";
+            //$scope.$apply();
+        }
 
           $scope.saveServer = function(){
               console.log("saveServer");
@@ -1641,6 +1654,9 @@ var module = angular.module('rifidiApp')
                   $scope.elementSelected = angular.copy($scope.elementTree.currentNode);
                   $scope.propertyType = angular.copy($scope.elementTree.currentNode.elementId);
 
+                  console.log("set 2 propertyType: " + $scope.propertyType);
+                  $scope.operationSuccessMsg = null;
+
 
 
               }
@@ -1649,9 +1665,7 @@ var module = angular.module('rifidiApp')
               console.log($scope.elementSelected);
           }, false);
 
-      },
-      templateUrl: 'scripts/controllers/components/menu/menuRifidi.html'
-    };
+
 
   });
 

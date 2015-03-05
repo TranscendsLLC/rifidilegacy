@@ -131,9 +131,8 @@
                             <select id="restProtocol" name="restProtocol" aria-describedby="helpProtocol"
                                     class="form-control"
                                     ng-required="true"
-                                    ng-options="value as value.protocol for value in serverProtocols | orderBy:'protocol'"
-                                    value="{{elementSelected.restProtocol}}" data-ng-model="elementSelected.restProtocol"
-
+                                    ng-options="value.protocol as value.protocol for value in serverProtocols | orderBy:'protocol'"
+                                    data-ng-model="elementSelected.restProtocol"
                                     >
 
                             </select>

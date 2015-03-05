@@ -208,3 +208,11 @@ div[data-tree-model] li .linkstop {
     background-image: url("/images/link-stop.png");
     background-repeat: no-repeat;
 }
+
+div[data-tree-model] li .disabledLink {
+    color: darkgray;
+    cursor: not-allowed;
+    pointer-events: none;
+    text-decoration: line-through;
+
+}
