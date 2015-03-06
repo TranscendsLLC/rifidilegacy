@@ -105,7 +105,7 @@
                <div ng-view=""></div>
 
                <div class="panel panel-default">
-                   {{operationSuccessMsg}}
+                   
                    <div class="panel-heading">
                        <span class="glyphicon glyphicon-wrench" aria-hidden="true"></span> {{elementSelected.elementName}} Properties
                    </div>
@@ -374,11 +374,12 @@
                                                        <label class="control-label" for="{{property.name}}">{{property.displayname}}</label>
                                                    </div>
 
-                                                   <div class="col-sm-6" ng-show="property.type != 'java.lang.Integer'">
+
+                                                   <div class="col-sm-6" >
 
                                                        <input aria-describedby="help{{property.name}}" id="{{property.name}}"
                                                               name="{{property.name}}" ng-disabled="!property.writable" ng-readonly="!property.writable"
-                                                              type="text" ng-value="property.value" ng-model="property.value"
+                                                              type="{{property.htmlType}}" ng-value="property.value" ng-model="property.value" min="property.minvalue" max="property.maxvalue"
                                                               class="form-control"
                                                                />
 
@@ -394,30 +395,6 @@
                                                        <span id="help{{property.name}}" class="help-block">{{property.description}}</span>
 
                                                    </div>
-
-
-                                                   <div class="col-sm-6" ng-show="property.type == 'java.lang.Integer'">
-
-                                                       <input aria-describedby="help{{property.name}}" id="{{property.name}}"
-                                                              name="{{property.name}}" ng-disabled="!property.writable" ng-readonly="!property.writable"
-                                                              type="number" ng-value="property.value" ng-model="property.value" min="property.minvalue" max="property.maxvalue"
-                                                              class="form-control"
-                                                               />
-
-                                                       <div ng-show="form.$submitted || form.property.name.$touched" >
-
-                                                           <div ng-show="form.property.name.$error.required">
-
-                                                               {{property.name}} is required.
-
-                                                           </div>
-                                                       </div>
-
-                                                       <span id="help{{property.name}}" class="help-block">{{property.description}}</span>
-
-                                                   </div>
-
-
 
                                                    <br>
                                                    <p>

@@ -1809,8 +1809,10 @@ var module = angular.module('rifidiApp')
 
                                           if (type == 'java.lang.Integer'){
                                               propertyElement.value = angular.copy(parseInt(defaultvalue));
+                                              propertyElement.htmlType = 'number';
                                           } else {
                                               propertyElement.value = angular.copy(defaultvalue);
+                                              propertyElement.htmlType = 'text';
                                           }
 
                                           //Add the property to appropriate property category list
@@ -2009,6 +2011,7 @@ var module = angular.module('rifidiApp')
 
                     if (message == 'Success') {
                         console.log("success updating sensor properties");
+                        $scope.operationSuccessMsg = "Save sensor properties operation success";
                         TreeViewPainting.paintTreeView($scope);
 
                     } else {
