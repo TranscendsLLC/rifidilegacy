@@ -13,8 +13,8 @@
   },
   {
     "displayName": "Server2",
-    "restProtocol" : "https",
-    "ipAddress" : "192.168.88.104",
+    "restProtocol" : "http",
+    "ipAddress" : "localhost",
     "restPort" : "8111"
   }
 ]
