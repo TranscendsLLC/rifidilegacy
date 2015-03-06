@@ -2,7 +2,7 @@
   {
     "displayName": "Server1-by ip",
     "restProtocol" : "http",
-    "ipAddress" : "10.99.6.23",
+    "ipAddress" : "10.99.7.233",
     "restPort" : "8111"
   },
   {
