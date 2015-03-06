@@ -861,6 +861,7 @@ var module = angular.module('rifidiApp')
 
                                               //add this sensor to the server
                                               sensorElement.host = server.host;
+                                              sensorElement.sensorManagementElement = server.children[0];
                                               server.children[0].children.push(sensorElement);
                                           }
                                       });

@@ -216,3 +216,33 @@ div[data-tree-model] li .disabledLink {
     text-decoration: line-through;
 
 }
+
+div[data-tree-model] li .saveserver {
+    padding: 1px 10px;
+    background-image: url("/images/disk.png");
+    background-repeat: no-repeat;
+}
+
+div[data-tree-model] li .saveservers {
+    padding: 1px 10px;
+    background-image: url("/images/disk.png");
+    background-repeat: no-repeat;
+}
+
+div[data-tree-model] li .addserver {
+    padding: 1px 10px;
+    background-image: url("/images/add-server.png");
+    background-repeat: no-repeat;
+}
+
+div[data-tree-model] li .deleteserver {
+    padding: 1px 10px;
+    background-image: url("/images/delete-server.png");
+    background-repeat: no-repeat;
+}
+
+div[data-tree-model] li .submit-job {
+    padding: 1px 10px;
+    background-image: url("/images/script_add.png");
+    background-repeat: no-repeat;
+}
