@@ -46,8 +46,8 @@
 
 	  			//server menu
 				var menuServer = '<ul id="contextMenuServer" class="dropdown-menu">'+
-					'<li><a ng-click="saveServer()">Save server config</a></li>'+
-					'<li><a ng-click="openDeleteServerDialog()">Delete server</a></li>'+
+					'<li><a ng-click="saveServer()"><i class="saveserver">&nbsp;&nbsp;&nbsp;&nbsp;Save server config</i></a></li>'+
+					'<li><a ng-click="openDeleteServerDialog()"><i class="deleteserver">&nbsp;&nbsp;&nbsp;&nbsp;Delete server</i></a></li>'+
 					'<li class="divider"></li>'+
 					'</ul>';
 
@@ -67,12 +67,13 @@
 					'<li><a ng-click="openDeleteSessionDialog()"><i class="linkdelete">&nbsp;&nbsp;&nbsp;&nbsp;Delete Session</i></a></li>'+
 					'<li><a ng-click="startSession()"><i class="linkstart">&nbsp;&nbsp;&nbsp;&nbsp;Start Session</i></a></li>'+
 					'<li><a ng-click="stopSession()"><i class="linkstop">&nbsp;&nbsp;&nbsp;&nbsp;Stop Session</i></a></li>'+
+					'<li><a href="#/commandWizard"><i class="submit-job">&nbsp;&nbsp;&nbsp;&nbsp;Submit Job</i></a></li>'+
 					'</ul>';
 
 				//servers menu
 				var menuServers = '<ul id="contextMenuServers" class="dropdown-menu">'+
-					'<li><a href ="#/serverWizard">Add server</a></li>'+
-					'<li><a ng-click ="saveAllServers()">Save all servers config</a></li>'+
+					'<li><a href ="#/serverWizard"><i class="addserver">&nbsp;&nbsp;&nbsp;&nbsp;Add server</i></a></li>'+
+					'<li><a ng-click ="saveAllServers()"><i class="saveservers">&nbsp;&nbsp;&nbsp;&nbsp;Save all servers config</i></a></li>'+
 					'</ul>';
 
 				//tree template
