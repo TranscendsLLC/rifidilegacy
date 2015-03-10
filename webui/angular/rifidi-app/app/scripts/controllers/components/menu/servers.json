@@ -2,13 +2,13 @@
   {
     "displayName": "Server1-by ip",
     "restProtocol" : "http",
-    "ipAddress" : "10.99.7.233",
+    "ipAddress" : "10.99.128.135",
     "restPort" : "8111"
   },
   {
     "displayName": "Server1-by new wifi ip",
     "restProtocol" : "http",
-    "ipAddress" : "10.99.128.135",
+    "ipAddress" : "10.99.128.138",
     "restPort" : "8111"
   },
   {
