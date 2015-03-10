@@ -10,7 +10,10 @@
     "restProtocol" : "http",
     "ipAddress" : "192.168.88.104",
     "restPort" : "8111"
-  },
+  }
+
+  /*
+,
   {
     "displayName": "Server3",
     "restProtocol" : "http",
@@ -29,4 +32,5 @@
     "ipAddress" : "192.168.88.104",
     "restPort" : "8111"
   }
+  */
 ]
