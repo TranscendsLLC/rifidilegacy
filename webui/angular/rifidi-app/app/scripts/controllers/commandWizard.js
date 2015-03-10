@@ -8,7 +8,18 @@
  * Controller of the rifidiApp
  */
 angular.module('rifidiApp')
-  .controller('CommandWizardCtrl', function ($scope, $http, $routeParams, $location, ngDialog) {
+  .controller('CommandWizardCtrl', function ($scope, $http, $routeParams, $location, ngDialog, commonVariableService) {
+
+
+      $scope.getSuccessMessage = function () {
+        return commonVariableService.getSuccessMessage();
+      };
+
+      $scope.setSuccessMessage = function (msg) {
+        if (msg != '') {
+          commonVariableService.setSuccessMessage(msg);
+        }
+      };
 
       //retrieve the server data
 
@@ -203,7 +214,11 @@ angular.module('rifidiApp')
 
                     var name = propertiesXmlVector[indexProp].getElementsByTagName("name")[0].childNodes[0];
                     var displayname = propertiesXmlVector[indexProp].getElementsByTagName("displayname")[0].childNodes[0];
-                    var defaultvalue = propertiesXmlVector[indexProp].getElementsByTagName("defaultvalue")[0].childNodes[0];
+                    var defaultvalue = {};
+                    if (propertiesXmlVector[indexProp].getElementsByTagName("defaultvalue").length > 0){
+                      defaultvalue = propertiesXmlVector[indexProp].getElementsByTagName("defaultvalue")[0].childNodes[0];
+                    }
+
                     var description = propertiesXmlVector[indexProp].getElementsByTagName("description")[0].childNodes[0];
                     var type = propertiesXmlVector[indexProp].getElementsByTagName("type")[0].childNodes[0];
                     var maxvalue = 0;
@@ -398,17 +413,18 @@ angular.module('rifidiApp')
 
       var submitJob = function(){
 
-        for (var idxCat=0; idxCat < $scope.commandProperties.propertyCategoryList.length; idxCat++){
+        var strCommandProperties = "";
 
-          console.log("$scope.commandProperties.propertyCategoryList[idxCat]");
-          console.log($scope.commandProperties.propertyCategoryList[idxCat]);
+        for (var idxCat=0; idxCat < $scope.commandWizardData.commandProperties.propertyCategoryList.length; idxCat++){
 
-          for (var idxProp=0; idxProp < $scope.commandProperties.propertyCategoryList[idxCat].properties.length; idxProp++){
+          //console.log("$scope.commandProperties.propertyCategoryList[idxCat]");
+          //console.log($scope.commandProperties.propertyCategoryList[idxCat]);
 
-            strCommandProperties += $scope.commandProperties.propertyCategoryList[idxCat].properties[idxProp].name + "="
-            + $scope.commandProperties.propertyCategoryList[idxCat].properties[idxProp].value + ";"
+          for (var idxProp=0; idxProp < $scope.commandWizardData.commandProperties.propertyCategoryList[idxCat].properties.length; idxProp++){
+
+            strCommandProperties += $scope.commandWizardData.commandProperties.propertyCategoryList[idxCat].properties[idxProp].name + "="
+            + $scope.commandWizardData.commandProperties.propertyCategoryList[idxCat].properties[idxProp].value + ";"
           }
-
 
         }
 
@@ -425,9 +441,10 @@ angular.module('rifidiApp')
 
           //Create command
           console.log("going to create command");
+          $scope.commandWizardData.commandCreationResponseStatus = {};
 
           //create command
-          $http.get(host + '/createcommand/' + $scope.selectedCommandType.factoryID + "/" + strCommandProperties)
+          $http.get(host + '/createcommand/' + $scope.commandWizardData.commandType.factoryID + "/" + strCommandProperties)
               .success(function(data, status, headers, config) {
 
                 console.log("success response creating command in wizard");
@@ -448,26 +465,31 @@ angular.module('rifidiApp')
                 //get the xml response and extract the values for properties
                 var createCommandMessage = xmlCreateCommandResponse.getElementsByTagName("message")[0].childNodes[0].nodeValue;
 
-                $scope.commandCreationResponseStatus.message = createCommandMessage;
+                $scope.commandWizardData.commandCreationResponseStatus.message = createCommandMessage;
 
                 if (createCommandMessage == 'Success') {
                   console.log("success creating command by wizard");
 
                   var commandID = xmlCreateCommandResponse.getElementsByTagName("commandID")[0].childNodes[0].nodeValue;
 
+                  $scope.operationSuccessMsg = "Success creating command: " + commandID;
+
                   continueExecutingCommand(commandID);
 
                 } else {
                   var createCommandDescription = xmlCreateCommandResponse.getElementsByTagName("description")[0].childNodes[0].nodeValue;
-                  $scope.commandCreationResponseStatus.description = createCommandDescription;
+                  $scope.commandWizardData.commandCreationResponseStatus.description = createCommandDescription;
                   console.log("fail creating command by wizard");
                   console.log(createCommandDescription);
+                  showErrorDialog('Error creating command: ' + createCommandDescription);
                 }
 
 
               }).
               error(function(data, status, headers, config) {
                 console.log("error creating command in wizard");
+
+                showErrorDialog('Error creating command');
 
 
                 // called asynchronously if an error occurs
@@ -481,9 +503,10 @@ angular.module('rifidiApp')
           console.log("NOT going to create command");
           //Set properties for already existing command instance
 
-          console.log("going to set command properties: " + host + '/setproperties/' + $scope.selectedCommandInstance.commandID + '/' + strCommandProperties);
+          //console.log("going to set command properties: " + host + '/setproperties/' + $scope.selectedCommandInstance.commandID + '/' + strCommandProperties);
+          $scope.commandWizardData.setCommandPropertiesResponseStatus = {};
 
-          $http.get(host + '/setproperties/' + $scope.selectedCommandInstance.commandID + '/' + strCommandProperties)
+          $http.get(host + '/setproperties/' + $scope.commandWizardData.commandInstance.commandID + '/' + strCommandProperties)
               .success(function(data, status, headers, config) {
 
                 var xmlSetCommandPropertiesResponse;
@@ -503,28 +526,35 @@ angular.module('rifidiApp')
                 //get the xml response and extract the value
                 var message = xmlSetCommandPropertiesResponse.getElementsByTagName("message")[0].childNodes[0].nodeValue;
 
-                $scope.setCommandPropertiesResponseStatus.message = message;
+                $scope.commandWizardData.setCommandPropertiesResponseStatus.message = message;
 
                 if (message == 'Success') {
                   console.log("success setting properties for command in wizard");
 
+                  $scope.operationSuccessMsg = angular.copy($scope.operationSuccessMsg) + ". Success setting properties for command";
+
+
                   //Can continue with next service call in wizard: execute command, but must ensure that asynchronous call
                   //was made and successfully finished
                   //canExecuteCommand = true;
-                  continueExecutingCommand($scope.selectedCommandInstance.commandID);
+                  continueExecutingCommand($scope.commandWizardData.commandInstance.commandID);
 
 
                 } else {
                   var setCommandPropertiesDescription = xmlSetCommandPropertiesResponse.getElementsByTagName("description")[0].childNodes[0].nodeValue;
-                  $scope.setCommandPropertiesResponseStatus.description = setCommandPropertiesDescription;
+                  $scope.commandWizardData.setCommandPropertiesResponseStatus.description = setCommandPropertiesDescription;
                   console.log("fail set command properties by wizard");
                   console.log(setCommandPropertiesDescription);
+
+                  showErrorDialog('Error setting properties for command: ' + setCommandPropertiesDescription);
                 }
 
 
               })
               .error(function(data, status, headers, config) {
                 console.log("error setting properties for existing command in wizard");
+
+                showErrorDialog('Error setting properties for command');
 
                 // called asynchronously if an error occurs
                 // or server returns response with an error status.
@@ -533,97 +563,113 @@ angular.module('rifidiApp')
 
         }
 
+        function continueExecutingCommand(commandId){
+
+          $scope.commandWizardData.executeCommandResponseStatus = {};
+
+          console.log("continueExecutingCommand for command id: " + commandId);
+
+          var repeatInterval = -1;
+
+          if ($scope.commandWizardData.schedulingOption == "recurring"){
+            repeatInterval = $scope.commandWizardData.interval;
+          }
+
+          console.log("session.sensor.elementId:");
+          console.log(session.sensor.elementId);
+
+          console.log("going to call execute command: " + host + '/executecommand/' + session.sensor.elementId + "/" + session.sessionID + "/" +  commandId + '/' + repeatInterval);
+
+          $http.get(host + '/executecommand/' + session.sensor.elementId + "/" + session.sessionID + "/" + commandId + '/' + repeatInterval)
+              .success(function(data, status, headers, config) {
+
+                var xmlExecuteCommandResponse;
+                if (window.DOMParser)
+                {
+                  var parser = new DOMParser();
+                  xmlExecuteCommandResponse = parser.parseFromString(data,"text/xml");
+                }
+                else // Internet Explorer
+                {
+                  xmlExecuteCommandResponse = new ActiveXObject("Microsoft.XMLDOM");
+                  xmlExecuteCommandResponse.async=false;
+                  xmlExecuteCommandResponse.loadXML(data);
+                }
 
 
+                //get the xml response and extract the value
+                var message = xmlExecuteCommandResponse.getElementsByTagName("message")[0].childNodes[0].nodeValue;
+
+                $scope.commandWizardData.executeCommandResponseStatus.message = message;
+
+                if (message == 'Success') {
+                  console.log("success executing command in wizard");
+
+                  $scope.operationSuccessMsg = angular.copy($scope.operationSuccessMsg) + ". Success executing command";
+
+                } else {
+                  var executeCommandDescription = xmlExecuteCommandResponse.getElementsByTagName("description")[0].childNodes[0].nodeValue;
+                  $scope.commandWizardData.executeCommandResponseStatus.description = executeCommandDescription;
+                  console.log("fail executing command by wizard");
+                  console.log(executeCommandDescription);
+
+                  showErrorDialog('Error executing command: ' + executeCommandDescription);
+
+                }
 
 
+              })
+              .error(function(data, status, headers, config) {
+                console.log("error executong command in wizard");
 
+                showErrorDialog('Error executing command');
 
+                // called asynchronously if an error occurs
+                // or server returns response with an error status.
+              });
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-        $http.get(host + '/executecommand/' + session.sensor.elementId + "/" + session.sessionID + "/" + commandId + '/' + repeatInterval)
-            .success(function(data, status, headers, config) {
-
-              var xmlExecuteCommandResponse;
-              if (window.DOMParser)
-              {
-                var parser = new DOMParser();
-                xmlExecuteCommandResponse = parser.parseFromString(data,"text/xml");
-              }
-              else // Internet Explorer
-              {
-                xmlExecuteCommandResponse = new ActiveXObject("Microsoft.XMLDOM");
-                xmlExecuteCommandResponse.async=false;
-                xmlExecuteCommandResponse.loadXML(data);
-              }
-
-
-              //get the xml response and extract the value
-              var message = xmlExecuteCommandResponse.getElementsByTagName("message")[0].childNodes[0].nodeValue;
-
-              $scope.executeCommandResponseStatus.message = message;
-
-              if (message == 'Success') {
-                console.log("success executing command in wizard");
-
-                //If start session chosen, then start the session
-
-              } else {
-                var executeCommandDescription = xmlExecuteCommandResponse.getElementsByTagName("description")[0].childNodes[0].nodeValue;
-                $scope.executeCommandResponseStatus.description = executeCommandDescription;
-                console.log("fail executing command by wizard");
-                console.log(executeCommandDescription);
-              }
-
-
-            })
-            .error(function(data, status, headers, config) {
-              console.log("error setting properties for existing command in wizard");
-
-              // called asynchronously if an error occurs
-              // or server returns response with an error status.
-            });
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+        }
 
 
       }
+
+      function showErrorDialog(errorMsg) {
+
+        $scope.errorMsg = errorMsg;
+
+        ngDialog.openConfirm({template: 'errorDialogTmpl.html',
+
+          scope: $scope, //Pass the scope object if you need to access in the template
+
+          showClose: false,
+
+          closeByEscape: true,
+
+          closeByDocument: false
+
+        }).then(
+
+            function(value) {
+
+              //confirm operation
+              console.log("first");
+
+            },
+
+            function(value) {
+
+              //Cancel or do nothing
+              console.log("second");
+              console.log("value: " + value);
+
+
+
+
+            }
+
+        );
+
+      };
 
 
   });

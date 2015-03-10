@@ -46,4 +46,22 @@ angular
       .otherwise({
         redirectTo: '/'
       });
-  });
+  })
+
+    .service('commonVariableService', function () {
+
+      var successMsg = null;
+
+      return {
+        getSuccessMessage:function () {
+          return successMsg;
+        },
+        setSuccessMessage:function (msg) {
+          successMsg = msg;
+        },
+        deleteNote:function (id) {
+        }
+      };
+    })
+
+;
