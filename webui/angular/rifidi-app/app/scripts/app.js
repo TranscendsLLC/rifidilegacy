@@ -35,7 +35,7 @@ angular
         templateUrl: 'views/sensorWizard.html',
         controller: 'SensorWizardCtrl'
       })
-      .when('/commandWizard/:restProtocol/:ipAddress/:restPort/:readerType', {
+      .when('/commandWizard', {
         templateUrl: 'views/commandWizard.html',
         controller: 'CommandWizardCtrl'
       })

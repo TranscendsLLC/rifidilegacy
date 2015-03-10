@@ -8,15 +8,27 @@
  * Controller of the rifidiApp
  */
 angular.module('rifidiApp')
-  .controller('CommandWizardCtrl', function ($scope, $http, $routeParams) {
+  .controller('CommandWizardCtrl', function ($scope, $http, $routeParams, $location, ngDialog) {
 
       //retrieve the server data
-      var restProtocol = $routeParams.restProtocol;
-      var ipAddress = $routeParams.ipAddress;
-      var restPort = $routeParams.restPort;
-      var readerType = $routeParams.readerType;
+
+      var restProtocol = angular.copy($scope.elementSelected.sensor.sensorManagementElement.restProtocol);
+      var ipAddress = angular.copy($scope.elementSelected.sensor.sensorManagementElement.ipAddress);
+      var restPort = angular.copy($scope.elementSelected.sensor.sensorManagementElement.restPort);
+      var readerType = angular.copy($scope.elementSelected.sensor.factoryID);
+
+      var session = angular.copy($scope.elementSelected);
 
       var host = restProtocol + "://" +  ipAddress + ":" + restPort;
+
+      $scope.commandWizardData = {};
+      $scope.commandWizardData.interval = 1000;
+      $scope.commandWizardData.schedulingOption = "recurring";
+      $scope.commandWizardData.session = session;
+
+      $scope.go = function ( path ) {
+        $location.path( path );
+      };
 
       //load the command types
 
@@ -41,7 +53,6 @@ angular.module('rifidiApp')
             //get the xml response and extract the values to construct the local command type object
             var commandTypeXmlVector = xmlCommandTypes.getElementsByTagName("command");
 
-            $scope.commandWizardData = {};
             $scope.commandWizardData.commandTypes = [];
 
             for(var index = 0; index < commandTypeXmlVector.length; index++) {
@@ -139,6 +150,476 @@ angular.module('rifidiApp')
               // called asynchronously if an error occurs
               // or server returns response with an error status.
             });
+
+
+
+      }
+
+
+      $scope.commandInstanceSelectAction = function(selectedCommandInstance){
+
+        $scope.commandWizardData.commandInstance = selectedCommandInstance;
+
+        //Get the properties for the selected command type, from readermetadata
+        $http.get(host + '/readermetadata')
+            .success(function(data, status, headers, config) {
+
+              var xmlMetadata;
+              if (window.DOMParser)
+              {
+                var parser = new DOMParser();
+                xmlMetadata = parser.parseFromString(data,"text/xml");
+              }
+              else // Internet Explorer
+              {
+                xmlMetadata = new ActiveXObject("Microsoft.XMLDOM");
+                xmlMetadata.async=false;
+                xmlMetadata.loadXML(data);
+              }
+
+              //get the xml response and extract the values to construct the command properties for selected command type
+
+              var commandMetadataXmlVector = xmlMetadata.getElementsByTagName("command");
+
+              for(var index = 0; index < commandMetadataXmlVector.length; index++) {
+
+                var propertiesXmlVector = commandMetadataXmlVector[index].getElementsByTagName("property");
+                var id = commandMetadataXmlVector[index].getElementsByTagName("id")[0].childNodes[0];
+                var readerID = commandMetadataXmlVector[index].getElementsByTagName("readerID")[0].childNodes[0];
+
+                if (readerID.nodeValue == readerType && id.nodeValue ==  $scope.commandWizardData.commandInstance.factoryID){
+
+                  //Create the properties object for this command
+                  $scope.commandWizardData.commandProperties = {
+                    "readerID": readerID.nodeValue,
+                    "id": id.nodeValue,
+                    "propertyCategoryList": []
+
+                  };
+
+                  //extract the properties
+                  for(var indexProp = 0; indexProp < propertiesXmlVector.length; indexProp++) {
+
+
+                    var name = propertiesXmlVector[indexProp].getElementsByTagName("name")[0].childNodes[0];
+                    var displayname = propertiesXmlVector[indexProp].getElementsByTagName("displayname")[0].childNodes[0];
+                    var defaultvalue = propertiesXmlVector[indexProp].getElementsByTagName("defaultvalue")[0].childNodes[0];
+                    var description = propertiesXmlVector[indexProp].getElementsByTagName("description")[0].childNodes[0];
+                    var type = propertiesXmlVector[indexProp].getElementsByTagName("type")[0].childNodes[0];
+                    var maxvalue = 0;
+                    var minvalue = 0;
+                    if (type.nodeValue == 'java.lang.Integer') {
+                      maxvalue = propertiesXmlVector[indexProp].getElementsByTagName("maxvalue")[0].childNodes[0];
+                      minvalue = propertiesXmlVector[indexProp].getElementsByTagName("minvalue")[0].childNodes[0];
+                    }
+                    var category = propertiesXmlVector[indexProp].getElementsByTagName("category")[0].childNodes[0];
+                    var writable = propertiesXmlVector[indexProp].getElementsByTagName("writable")[0].childNodes[0];
+                    var ordervalue = propertiesXmlVector[indexProp].getElementsByTagName("ordervalue")[0].childNodes[0];
+
+                    //check if current category already exists in propertyCategories
+                    var existingCategory = false;
+
+                    $scope.commandWizardData.commandProperties.propertyCategoryList.forEach(function (propertyCategory) {
+
+                      if (category.nodeValue == propertyCategory.category){
+                        existingCategory = true;
+                      }
+
+                    });
+
+                    if (!existingCategory){
+
+                      var propertyCategory = {
+                        "category": category.nodeValue,
+                        "properties": []
+                      };
+
+                      $scope.commandWizardData.commandProperties.propertyCategoryList.push(propertyCategory);
+                    }
+
+                    var propertyElement = {
+                      "name": name.nodeValue,
+                      "displayname": displayname.nodeValue,
+                      "description": description.nodeValue,
+                      "type": type.nodeValue,
+                      "maxvalue": maxvalue.nodeValue,
+                      "minvalue": minvalue.nodeValue,
+                      "category": category.nodeValue,
+                      "writable": writable.nodeValue,
+                      "ordervalue": ordervalue.nodeValue,
+                      "value": "",
+                      "defaultvalue": ""
+                    };
+
+                    //Set the default value for property
+
+                    if (type.nodeValue == 'java.lang.Integer'){
+                      propertyElement.value = angular.copy(parseInt(defaultvalue.nodeValue));
+                      propertyElement.defaultvalue = angular.copy(parseInt(defaultvalue.nodeValue));
+                    } else {
+                      propertyElement.value = angular.copy(defaultvalue.nodeValue);
+                      propertyElement.defaultvalue = angular.copy(defaultvalue.nodeValue);
+                    }
+
+                    //Add the property to appropriate property category list
+                    $scope.commandWizardData.commandProperties.propertyCategoryList.forEach(function (propertyCategory) {
+
+                      if (category.nodeValue == propertyCategory.category){
+
+                        propertyCategory.properties.push(angular.copy(propertyElement));
+
+                      }
+
+                    });
+
+                  }
+
+                  //If user selects a command instance (not the <New> option), then load the current values for every property
+                  if ($scope.commandWizardData.commandInstance.commandID != '<New>'){
+
+                    console.log("commandWizardData.commandInstance.commandID != '<New>'");
+
+
+                    //call the service to get properties of command instance
+                    $http.get(host + '/getproperties/' + $scope.commandWizardData.commandInstance.commandID)
+                        .success(function(data, status, headers, config) {
+
+                          var xmlCommandProperties;
+                          if (window.DOMParser)
+                          {
+                            var parser = new DOMParser();
+                            xmlCommandProperties = parser.parseFromString(data,"text/xml");
+                          }
+                          else // Internet Explorer
+                          {
+                            xmlCommandProperties = new ActiveXObject("Microsoft.XMLDOM");
+                            xmlCommandProperties.async=false;
+                            xmlCommandProperties.loadXML(data);
+                          }
+
+                          //get the xml response and extract the values for properties
+                          var propertiesXmlVector = xmlCommandProperties.getElementsByTagName("entry");
+
+                          for(var indexPropertyValue = 0; indexPropertyValue < propertiesXmlVector.length; indexPropertyValue++) {
+
+                            var key = propertiesXmlVector[indexPropertyValue].getElementsByTagName("key")[0].childNodes[0];
+                            var value = propertiesXmlVector[indexPropertyValue].getElementsByTagName("value")[0].childNodes[0];
+
+                            //Iterate the loaded properties and set this value when property key matches
+                            $scope.commandWizardData.commandProperties.propertyCategoryList.forEach(function (propertyCategory) {
+
+                              //Iterate al categories to find this property and set the value
+                              propertyCategory.properties.forEach(function (property) {
+
+                                if (property.name == key.nodeValue){
+
+                                  //Set the value for property
+
+                                  if (property.type == 'java.lang.Integer'){
+                                    property.value = angular.copy(parseInt(value.nodeValue));
+                                  } else {
+                                    property.value = angular.copy(value.nodeValue);
+                                  }
+
+                                }
+
+                              });
+
+
+                            });
+
+
+                          }
+
+                        }).
+                        error(function(data, status, headers, config) {
+                          console.log("error reading command instance properties");
+
+
+                          // called asynchronously if an error occurs
+                          // or server returns response with an error status.
+                        });
+
+                  }
+
+                }
+
+
+              }
+
+
+            })
+            .error(function(data, status, headers, config) {
+              console.log("error reading readermetadata for command wizard: command instance selection");
+
+              // called asynchronously if an error occurs
+              // or server returns response with an error status.
+            });
+
+      }
+
+      $scope.openSubmitJobDialog = function(){
+
+        ngDialog.openConfirm({template: 'submitJobDialogTmpl.html',
+
+          scope: $scope, //Pass the scope object if you need to access in the template
+
+          showClose: false,
+
+          closeByEscape: true,
+
+          closeByDocument: false
+
+        }).then(
+
+            function(value) {
+
+              //confirm operation
+              if (value == 'Submit'){
+                console.log("to submit");
+
+                //submit the command
+                submitJob();
+
+              }
+
+            },
+
+            function(value) {
+
+              //Cancel or do nothing
+              console.log("cancel");
+
+            }
+
+        );
+
+      };
+
+      var submitJob = function(){
+
+        for (var idxCat=0; idxCat < $scope.commandProperties.propertyCategoryList.length; idxCat++){
+
+          console.log("$scope.commandProperties.propertyCategoryList[idxCat]");
+          console.log($scope.commandProperties.propertyCategoryList[idxCat]);
+
+          for (var idxProp=0; idxProp < $scope.commandProperties.propertyCategoryList[idxCat].properties.length; idxProp++){
+
+            strCommandProperties += $scope.commandProperties.propertyCategoryList[idxCat].properties[idxProp].name + "="
+            + $scope.commandProperties.propertyCategoryList[idxCat].properties[idxProp].value + ";"
+          }
+
+
+        }
+
+        //Quit the last semicolon ;
+        if (strCommandProperties.length > 0){
+          strCommandProperties = strCommandProperties.substring(0, strCommandProperties.length - 1);
+        }
+
+        console.log("strCommandProperties");
+        console.log(strCommandProperties);
+
+        //Check if need to create command
+        if($scope.commandWizardData.commandInstance.commandID == '<New>'){
+
+          //Create command
+          console.log("going to create command");
+
+          //create command
+          $http.get(host + '/createcommand/' + $scope.selectedCommandType.factoryID + "/" + strCommandProperties)
+              .success(function(data, status, headers, config) {
+
+                console.log("success response creating command in wizard");
+
+                var xmlCreateCommandResponse;
+                if (window.DOMParser)
+                {
+                  var parser = new DOMParser();
+                  xmlCreateCommandResponse = parser.parseFromString(data,"text/xml");
+                }
+                else // Internet Explorer
+                {
+                  xmlCreateCommandResponse = new ActiveXObject("Microsoft.XMLDOM");
+                  xmlCreateCommandResponse.async=false;
+                  xmlCreateCommandResponse.loadXML(data);
+                }
+
+                //get the xml response and extract the values for properties
+                var createCommandMessage = xmlCreateCommandResponse.getElementsByTagName("message")[0].childNodes[0].nodeValue;
+
+                $scope.commandCreationResponseStatus.message = createCommandMessage;
+
+                if (createCommandMessage == 'Success') {
+                  console.log("success creating command by wizard");
+
+                  var commandID = xmlCreateCommandResponse.getElementsByTagName("commandID")[0].childNodes[0].nodeValue;
+
+                  continueExecutingCommand(commandID);
+
+                } else {
+                  var createCommandDescription = xmlCreateCommandResponse.getElementsByTagName("description")[0].childNodes[0].nodeValue;
+                  $scope.commandCreationResponseStatus.description = createCommandDescription;
+                  console.log("fail creating command by wizard");
+                  console.log(createCommandDescription);
+                }
+
+
+              }).
+              error(function(data, status, headers, config) {
+                console.log("error creating command in wizard");
+
+
+                // called asynchronously if an error occurs
+                // or server returns response with an error status.
+              });
+
+
+
+        } else {
+
+          console.log("NOT going to create command");
+          //Set properties for already existing command instance
+
+          console.log("going to set command properties: " + host + '/setproperties/' + $scope.selectedCommandInstance.commandID + '/' + strCommandProperties);
+
+          $http.get(host + '/setproperties/' + $scope.selectedCommandInstance.commandID + '/' + strCommandProperties)
+              .success(function(data, status, headers, config) {
+
+                var xmlSetCommandPropertiesResponse;
+                if (window.DOMParser)
+                {
+                  var parser = new DOMParser();
+                  xmlSetCommandPropertiesResponse = parser.parseFromString(data,"text/xml");
+                }
+                else // Internet Explorer
+                {
+                  xmlSetCommandPropertiesResponse = new ActiveXObject("Microsoft.XMLDOM");
+                  xmlSetCommandPropertiesResponse.async=false;
+                  xmlSetCommandPropertiesResponse.loadXML(data);
+                }
+
+
+                //get the xml response and extract the value
+                var message = xmlSetCommandPropertiesResponse.getElementsByTagName("message")[0].childNodes[0].nodeValue;
+
+                $scope.setCommandPropertiesResponseStatus.message = message;
+
+                if (message == 'Success') {
+                  console.log("success setting properties for command in wizard");
+
+                  //Can continue with next service call in wizard: execute command, but must ensure that asynchronous call
+                  //was made and successfully finished
+                  //canExecuteCommand = true;
+                  continueExecutingCommand($scope.selectedCommandInstance.commandID);
+
+
+                } else {
+                  var setCommandPropertiesDescription = xmlSetCommandPropertiesResponse.getElementsByTagName("description")[0].childNodes[0].nodeValue;
+                  $scope.setCommandPropertiesResponseStatus.description = setCommandPropertiesDescription;
+                  console.log("fail set command properties by wizard");
+                  console.log(setCommandPropertiesDescription);
+                }
+
+
+              })
+              .error(function(data, status, headers, config) {
+                console.log("error setting properties for existing command in wizard");
+
+                // called asynchronously if an error occurs
+                // or server returns response with an error status.
+              });
+
+
+        }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        $http.get(host + '/executecommand/' + session.sensor.elementId + "/" + session.sessionID + "/" + commandId + '/' + repeatInterval)
+            .success(function(data, status, headers, config) {
+
+              var xmlExecuteCommandResponse;
+              if (window.DOMParser)
+              {
+                var parser = new DOMParser();
+                xmlExecuteCommandResponse = parser.parseFromString(data,"text/xml");
+              }
+              else // Internet Explorer
+              {
+                xmlExecuteCommandResponse = new ActiveXObject("Microsoft.XMLDOM");
+                xmlExecuteCommandResponse.async=false;
+                xmlExecuteCommandResponse.loadXML(data);
+              }
+
+
+              //get the xml response and extract the value
+              var message = xmlExecuteCommandResponse.getElementsByTagName("message")[0].childNodes[0].nodeValue;
+
+              $scope.executeCommandResponseStatus.message = message;
+
+              if (message == 'Success') {
+                console.log("success executing command in wizard");
+
+                //If start session chosen, then start the session
+
+              } else {
+                var executeCommandDescription = xmlExecuteCommandResponse.getElementsByTagName("description")[0].childNodes[0].nodeValue;
+                $scope.executeCommandResponseStatus.description = executeCommandDescription;
+                console.log("fail executing command by wizard");
+                console.log(executeCommandDescription);
+              }
+
+
+            })
+            .error(function(data, status, headers, config) {
+              console.log("error setting properties for existing command in wizard");
+
+              // called asynchronously if an error occurs
+              // or server returns response with an error status.
+            });
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
