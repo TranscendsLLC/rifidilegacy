@@ -64,4 +64,27 @@ angular
       };
     })
 
+    .service('TreeViewService', function () {
+
+      var successMsg = null;
+
+      return {
+        repaintTreeView:function () {
+          //return successMsg;
+
+        }
+
+
+        /*
+        ,
+
+        setSuccessMessage:function (msg) {
+          successMsg = msg;
+        },
+        deleteNote:function (id) {
+        }
+        */
+      };
+    })
+
 ;

@@ -8,14 +8,14 @@
  * Controller of the rifidiApp
  */
 angular.module('rifidiApp')
-  .controller('CommandWizardCtrl', function ($scope, $http, $routeParams, $location, ngDialog, commonVariableService) {
+  .controller('CommandWizardCtrl', function ($rootScope, $scope, $http, $routeParams, $location, ngDialog, commonVariableService) {
 
 
-      $scope.getSuccessMessage = function () {
+      var getSuccessMessage = function () {
         return commonVariableService.getSuccessMessage();
       };
 
-      $scope.setSuccessMessage = function (msg) {
+      var setSuccessMessage = function (msg) {
         if (msg != '') {
           commonVariableService.setSuccessMessage(msg);
         }
@@ -472,7 +472,8 @@ angular.module('rifidiApp')
 
                   var commandID = xmlCreateCommandResponse.getElementsByTagName("commandID")[0].childNodes[0].nodeValue;
 
-                  $scope.operationSuccessMsg = "Success creating command: " + commandID;
+                  setSuccessMessage("Success creating command: " + commandID);
+                  $rootScope.operationSuccessMsg = getSuccessMessage();
 
                   continueExecutingCommand(commandID);
 
@@ -531,7 +532,16 @@ angular.module('rifidiApp')
                 if (message == 'Success') {
                   console.log("success setting properties for command in wizard");
 
-                  $scope.operationSuccessMsg = angular.copy($scope.operationSuccessMsg) + ". Success setting properties for command";
+                  if($rootScope.operationSuccessMsg != null){
+
+                    $rootScope.operationSuccessMsg = angular.copy($rootScope.operationSuccessMsg) + ". Success setting properties for command";
+
+                  } else {
+
+                    $rootScope.operationSuccessMsg = angular.copy($rootScope.operationSuccessMsg) + ". Success setting properties for command";
+                  }
+
+
 
 
                   //Can continue with next service call in wizard: execute command, but must ensure that asynchronous call
@@ -605,7 +615,7 @@ angular.module('rifidiApp')
                 if (message == 'Success') {
                   console.log("success executing command in wizard");
 
-                  $scope.operationSuccessMsg = angular.copy($scope.operationSuccessMsg) + ". Success executing command";
+                  $rootScope.operationSuccessMsg = angular.copy($rootScope.operationSuccessMsg) + ". Success executing command";
 
                 } else {
                   var executeCommandDescription = xmlExecuteCommandResponse.getElementsByTagName("description")[0].childNodes[0].nodeValue;

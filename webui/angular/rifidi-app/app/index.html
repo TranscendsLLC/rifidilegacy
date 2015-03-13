@@ -25,12 +25,12 @@
     <![endif]-->
 
     <!-- Add your site or application content here -->
-    <div class="container" ng-controller="MenuController">
+    <div class="container" >
         <nav class="navbar navbar-default navbar-fixed-top">
             <div class="container">
                 <div class="navbar-header">
 
-                    <a class="navbar-brand" href="#">Rifidi App</a>
+                    <a class="navbar-brand" href="#">Rifidi Web Console</a>
                 </div>
             </div>
         </nav>
@@ -43,6 +43,10 @@
 
             </div>
         </div>
+
+       <div ng-controller="MenuController">
+
+
        <div class="row">
            <div class="col-md-5">
 
@@ -112,6 +116,7 @@
                    <div class="panel-body">
 
                        <div ng-switch="elementTree.currentNode.elementType">
+
                            <div ng-switch-when="servers">
                                <div class="serversProperties">
                                    <button type="button" class="btn btn-default" aria-label="Left Align" data-ng-click="mode = 'server'">
@@ -159,6 +164,7 @@
                                    </div>
                                </div>
                            </div>
+
                            <div ng-switch-when="server">
 
                                <form class="form-horizontal" role="form" name="form" novalidate ng-controller="ServerWizardCtrl">
@@ -412,12 +418,72 @@
 
                                </form>
                            </div>
+
+                           <div ng-switch-when="commandInstance">
+
+                               <div class="form-group">
+
+                                   <!--
+                                   <h4>3. Command properties</h4>
+                                   -->
+                                   <form class="form-horizontal" role="form" name="form" novalidate>
+
+                                   <tabset>
+                                       <tab heading="{{propertyCategory.category}}" ng-repeat="propertyCategory in commandProperties.propertyCategoryList | orderBy:'category'">
+                                           <br/>
+
+                                           <div class="form-group" ng-repeat="property in propertyCategory.properties | orderBy:['ordervalue', 'displayname']">
+
+                                               <div class="col-sm-6">
+                                                   <label class="control-label" for="{{property.name}}">{{property.displayname}}</label>
+                                               </div>
+
+
+                                               <div class="col-sm-6" >
+
+                                                   <input aria-describedby="help{{property.name}}" id="{{property.name}}"
+                                                          name="{{property.name}}" ng-disabled="!property.writable" ng-readonly="!property.writable"
+                                                          type="{{property.htmlType}}" ng-value="property.value" ng-model="property.value" min="property.minvalue" max="property.maxvalue"
+                                                          class="form-control"
+                                                           />
+
+                                                   <div ng-show="form.$submitted || form.property.name.$touched" >
+
+                                                       <div ng-show="form.property.name.$error.required">
+
+                                                           {{property.name}} is required.
+
+                                                       </div>
+                                                   </div>
+
+                                                   <span id="help{{property.name}}" class="help-block">{{property.description}}</span>
+
+                                               </div>
+
+                                               <br>
+                                               <p>
+
+                                           </div>
+
+
+                                       </tab>
+                                   </tabset>
+
+                                   <input class="btn btn-primary" ng-click="openSaveCommandInstancePropertiesDialog()" ng-disabled="form.$invalid" type="submit" value="Save" />
+
+                                   </form>
+                               </div>
+
+                           </div>
+
                        </div>
                    </div>
 
                </div>
 
            </div>
+
+       </div>
 
        </div>
 
@@ -479,6 +545,7 @@
         <script src="scripts/controllers/serverWizard.js"></script>
         <script src="scripts/controllers/commandWizard.js"></script>
         <script src="scripts/controllers/menu.js"></script>
+<!--        <script src="scripts/controllers/common.js"></script>-->
 
 
         <!-- endbuild -->
