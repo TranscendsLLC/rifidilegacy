@@ -11,7 +11,17 @@
  * Controller of the rifidiApp
  */
 var module = angular.module('rifidiApp')
-  .controller('MenuController', function ($scope, $http, $location, ngDialog, TreeViewPainting) {
+  .controller('MenuController', function ($rootScope, $scope, $http, $location, ngDialog, TreeViewPainting, commonVariableService) {
+
+        var getSuccessMessage = function () {
+            return commonVariableService.getSuccessMessage();
+        };
+
+        var setSuccessMessage = function (msg) {
+            if (msg != '') {
+                commonVariableService.setSuccessMessage(msg);
+            }
+        };
 
         /*
         $scope.go = function ( path ) {
@@ -117,6 +127,65 @@ var module = angular.module('rifidiApp')
                       // or server returns response with an error status.
                   });
 
+
+          };
+
+          var deleteCommand = function(commandId){
+
+              console.log("deleteCommand called");
+
+              //call the rest operation to delete command
+              $http.get($scope.elementSelected.session.sensor.host + '/deletecommand/' + commandId)
+                  .success(function (data, status, headers, config) {
+
+                      var deleteCommandCommandResponse;
+                      if (window.DOMParser) {
+                          var parser = new DOMParser();
+                          deleteCommandCommandResponse = parser.parseFromString(data, "text/xml");
+                      }
+                      else // Internet Explorer
+                      {
+                          deleteCommandCommandResponse = new ActiveXObject("Microsoft.XMLDOM");
+                          deleteCommandCommandResponse.async = false;
+                          deleteCommandCommandResponse.loadXML(data);
+                      }
+
+                      //get the xml response and extract the message response
+                      var message = deleteCommandCommandResponse.getElementsByTagName("message")[0].childNodes[0].nodeValue;
+
+                      //$scope.setCommandPropertiesResponseStatus.message = message;
+
+                      if (message == 'Success') {
+                          console.log("success deleting command");
+
+                          $rootScope.operationSuccessMsg = "Success deleting command";
+
+                          //update scope success messsage
+                          TreeViewPainting.paintTreeView($scope);
+
+                      } else {
+                          var deleteCommandCommandDescription = deleteCommandCommandResponse.getElementsByTagName("description")[0].childNodes[0].nodeValue;
+
+                          console.log("fail deleting command");
+                          console.log(deleteCommandCommandDescription);
+
+                          //show modal dialog with error
+                          showErrorDialog('Error deleting command: ' + deleteCommandCommandDescription);
+
+                      }
+
+
+                  }).
+                  error(function (data, status, headers, config) {
+                      console.log("error deleting command");
+
+                      //show modal dialog with error
+                      showErrorDialog('Error deleting command');
+
+
+                      // called asynchronously if an error occurs
+                      // or server returns response with an error status.
+                  });
 
           };
 
@@ -404,6 +473,43 @@ var module = angular.module('rifidiApp')
 
           };
 
+        $scope.openDeleteCommandDialog = function() {
+
+            ngDialog.openConfirm({template: 'deleteCommandDialogTmpl.html',
+
+                scope: $scope, //Pass the scope object if you need to access in the template
+
+                showClose: false,
+
+                closeByEscape: true,
+
+                closeByDocument: false
+
+            }).then(
+
+                function(value) {
+
+                    //confirm operation
+                    if (value == 'Delete'){
+                        console.log("to delete");
+
+                        //call delete command operation
+                        deleteCommand($scope.elementSelected.elementId);
+                    }
+
+                },
+
+                function(value) {
+
+                    //Cancel or do nothing
+                    console.log("cancel");
+
+                }
+
+            );
+
+        };
+
 
           $scope.openDeleteSensorDialog = function() {
 
@@ -669,7 +775,11 @@ var module = angular.module('rifidiApp')
         var saveServerProperties = function(server) {
 
             console.log("saveServerProperties op success");
-            $scope.operationSuccessMsg = "Save server properties operation success";
+            setSuccessMessage("Save server properties operation successX");
+            //$scope.operationSuccessMsg = "Save server properties operation success";
+            $rootScope.operationSuccessMsg = getSuccessMessage();
+            console.log("$rootScope.operationSuccessMsg:");
+            console.log($rootScope.operationSuccessMsg);
             //$scope.$apply();
         }
 
@@ -689,957 +799,9 @@ var module = angular.module('rifidiApp')
 
           TreeViewPainting.paintTreeView($scope);
 
-              $http.get('scripts/controllers/components/menu/servers.json').
-                  success(function (data, status, headers, config) {
-                      console.log("funciono lectura servers ");
-                      $scope.servers = data;
 
-                      var partialElementList = [{
-                          "elementName": "Servers",
-                          "elementId": "servers",
-                          "elementType": "servers",
-                          "collapsed": true,
-                          "contextMenuId": "contextMenuServers",
-                          "iconClass":"server",
-                          "children": []
-                      }];
 
-                      data.forEach(function (server) {
 
-                          server.colapsed = true;
-                          server.elementName = server.displayName;
-                          server.elementId = "server";
-                          server.elementType = "server";
-                          server.iconClass = "server-disconnected";
-                          server.contextMenuId = "contextMenuServer";
-                          server.children = [];
-                          server.host = server.restProtocol + "://" + server.ipAddress + ":" + server.restPort;
-                          server.status = 'CONNECTING';
-
-                          partialElementList[0].children.push(server);
-
-                          //for each server make an asynchronous call to test whether ping operation returns success
-                          $http.get(server.restProtocol + "://" + server.ipAddress + ":" + server.restPort + '/ping')
-                              .success(function (data, status, headers, config) {
-
-                                  var pingResponseHost = headers('host');
-
-                                  var xmlPingTimestamp;
-                                  if (window.DOMParser) {
-                                      var parser = new DOMParser();
-                                      xmlPingTimestamp = parser.parseFromString(data, "text/xml");
-                                  }
-                                  else // Internet Explorer
-                                  {
-                                      xmlPingTimestamp = new ActiveXObject("Microsoft.XMLDOM");
-                                      xmlPingTimestamp.async = false;
-                                      xmlPingTimestamp.loadXML(data);
-                                  }
-
-                                  //get the xml response and extract the ping timestamp value
-                                  var timestampXmlVector = xmlPingTimestamp.getElementsByTagName("timestamp");
-
-                                  var serverTimestamp = timestampXmlVector[0].childNodes[0].nodeValue;
-
-                                  if (serverTimestamp) {
-                                      console.log("server ping, ip: " + pingResponseHost + ", timestamp: " + serverTimestamp);
-
-                                      //change server connecting status to connected
-
-                                      partialElementList[0].children.forEach(function (server) {
-                                          if (server.host == pingResponseHost) {
-
-                                              //change server status
-                                              server.status = 'CONNECTED';
-                                              server.iconClass = "server-connected";
-                                          }
-                                      });
-
-                                  }
-
-                              })
-                              .error(function (data, status, headers, config) {
-                                  console.log("error haciendo ping server.ipAddress: " + server.ipAddress);
-
-                                  //server.iconClass = "server";
-
-                                  // called asynchronously if an error occurs
-                                  // or server returns response with an error status.
-
-                                  //var pingResponseHost = headers('host');
-                                  //console.log("headers in error calling ping:");
-                                  //console.log(headers());
-
-                                  //console.log("data in error calling ping:");
-                                  //console.log(data);
-
-                                  //console.log("status in error calling ping:");
-                                  //console.log(status);
-
-                                  console.log("config.url in error calling ping:");
-                                  console.log(config.url);
-
-                                  partialElementList[0].children.forEach(function (server) {
-
-                                      //console.log("error calling ping operation, inside loop, server.host: "+ server.host + ", pingResponseHost: " + pingResponseHost);
-                                      /*
-                                       if (server.host == pingResponseHost){
-
-                                       console.log("going to change status to unable to connect for server: " + server.host);
-                                       //change server status
-                                       server.status = 'UNABLE TO CONNECT';
-                                       }
-                                       */
-                                  });
-
-                              });
-
-
-                          //for each server, add the sensor management element
-
-                          //sensor management element:
-                          var sensorManagementElement = {
-                              "host": server.host,
-                              "restProtocol": server.restProtocol,
-                              "ipAddress": server.ipAddress,
-                              "restPort": server.restPort,
-                              "elementName": "Sensor Management",
-                              "elementId": "sensorManagement",
-                              "elementType": "sensorManagement",
-                              "collapsed": true,
-                              "iconClass":"reader-cog",
-                              "contextMenuId": "contextMenuSensorManagement",
-                              "children": []
-                          };
-                          server.children.push(sensorManagementElement);
-
-                          //for each server, connect and query the list of sensors and place them under sensor management element
-                          $http.get(server.restProtocol + "://" + server.ipAddress + ":" + server.restPort + '/readers')
-                              .success(function (data, status, headers, config) {
-
-                                  var sensorsResponseHost = headers('host');
-
-                                  var xmlSensors;
-                                  if (window.DOMParser) {
-                                      var parser = new DOMParser();
-                                      xmlSensors = parser.parseFromString(data, "text/xml");
-                                  }
-                                  else // Internet Explorer
-                                  {
-                                      xmlSensors = new ActiveXObject("Microsoft.XMLDOM");
-                                      xmlSensors.async = false;
-                                      xmlSensors.loadXML(data);
-                                  }
-
-                                  //get the xml response and extract the values to construct the local sensor object
-                                  var sensorXmlVector = xmlSensors.getElementsByTagName("sensor");
-
-                                  for (var index = 0; index < sensorXmlVector.length; index++) {
-                                      var serviceID = sensorXmlVector[index].getElementsByTagName("serviceID")[0].childNodes[0];
-                                      var factoryID = sensorXmlVector[index].getElementsByTagName("factoryID")[0].childNodes[0];
-
-                                      //console.log("serviceID: " + serviceID.nodeValue);
-                                      //console.log("factoryID: " + factoryID.nodeValue);
-
-                                      var sensorElement = {
-                                          "elementName": serviceID.nodeValue,
-                                          "elementId": serviceID.nodeValue,
-                                          "elementType": "sensor",
-                                          "collapsed": true,
-                                          "factoryID": factoryID.nodeValue,
-                                          "contextMenuId": "contextMenuSensor",
-                                          "iconClass":"reader",
-                                          "allowCreateSession": false,
-                                          "children": []
-                                      };
-
-                                      //for this responseHost search which sensorManagementElement is associated with, and associate the sensorElement
-                                      //console.log("headers('host') from readers service: " + headers('host'));
-
-                                      partialElementList[0].children.forEach(function (server) {
-                                          if (server.host == sensorsResponseHost) {
-
-                                              //add this sensor to the server
-                                              sensorElement.host = server.host;
-                                              sensorElement.sensorManagementElement = server.children[0];
-                                              server.children[0].children.push(sensorElement);
-                                          }
-                                      });
-
-                                      //retrieve the sessions associated with this sensor element
-                                      $http.get(sensorsResponseHost + '/readerstatus/' + serviceID.nodeValue)
-                                          .success(function (data, status, headers, config) {
-
-                                              var sessionsResponseHost = headers('host');
-
-                                              //console.log("data for readerstatus from host: " + sessionsResponseHost + ": " + data);
-
-                                              var xmlSessions;
-                                              if (window.DOMParser) {
-                                                  var parser = new DOMParser();
-                                                  xmlSessions = parser.parseFromString(data, "text/xml");
-                                              }
-                                              else // Internet Explorer
-                                              {
-                                                  xmlSessions = new ActiveXObject("Microsoft.XMLDOM");
-                                                  xmlSessions.async = false;
-                                                  xmlSessions.loadXML(data);
-                                              }
-
-                                              //get the xml response and extract the values to construct the local session object
-
-                                              var responseServiceId = xmlSessions.getElementsByTagName("sensor")[0].getElementsByTagName("serviceID")[0].childNodes[0].nodeValue;
-                                              //console.log("responseServiceId: ");
-                                              //console.log(responseServiceId);
-
-                                              var sessionXmlVector = xmlSessions.getElementsByTagName("session");
-
-                                              var allowCreateSession = (sessionXmlVector.length == 0);
-
-                                              //search the reader with reader id = responseServiceId and assign allowCreateSession
-
-                                              server.children[0].children.forEach(function (sensor) {
-
-                                                  if (sensor.elementId == responseServiceId) {
-
-                                                      sensor.allowCreateSession = allowCreateSession;
-                                                  }
-
-                                              });
-
-
-                                              for (var index = 0; index < sessionXmlVector.length; index++) {
-                                                  var sessionID = sessionXmlVector[index].getElementsByTagName("ID")[0].childNodes[0];
-                                                  var sessionStatus = sessionXmlVector[index].getElementsByTagName("status")[0].childNodes[0];
-
-                                                  //console.log("sessionID: " + sessionID.nodeValue);
-                                                  //console.log("sessionStatus: " + sessionStatus.nodeValue);
-
-                                                  var sessionElement = {
-                                                      "sessionID": sessionID.nodeValue,
-                                                      "elementName": "session " + sessionID.nodeValue,
-                                                      "elementId": "session " + sessionID.nodeValue,
-                                                      "collapsed": true,
-                                                      "status": sessionStatus.nodeValue,
-                                                      "contextMenuId": "contextMenuSession",
-                                                      "children": []
-                                                  };
-
-                                                  //Assign the icon depending on status:
-                                                  if (sessionStatus.nodeValue == 'CREATED' || sessionStatus.nodeValue == 'CLOSED'){
-                                                      sessionElement.iconClass = 'link-red';
-                                                  } else if (sessionStatus.nodeValue == 'CONNECTING'){
-                                                      sessionElement.iconClass = 'link-yellow';
-                                                  }  else if (sessionStatus.nodeValue == 'PROCESSING'){
-                                                      sessionElement.iconClass = 'link-green';
-                                                  }
-
-
-
-                                                  //extract the executing commands form this session and append as childern element
-                                                  var executingCommandsXmlVector = xmlSessions.getElementsByTagName("executingcommand");
-
-                                                  for (var index = 0; index < executingCommandsXmlVector.length; index++) {
-                                                      var commandID = executingCommandsXmlVector[index].getElementsByTagName("commandID")[0].childNodes[0];
-                                                      var commandInterval = executingCommandsXmlVector[index].getElementsByTagName("interval")[0].childNodes[0];
-
-                                                      var commandElement = {
-                                                          "elementName": commandID.nodeValue,
-                                                          "elementId": commandID.nodeValue,
-                                                          "collapsed": true,
-                                                          "interval": commandInterval.nodeValue,
-                                                          "iconClass": 'script-gear',
-                                                          "children": []
-                                                      };
-
-                                                      sessionElement.children.push(commandElement);
-
-                                                  }
-
-
-                                                  //for this responseHost search which sensorElement is associated with, and associate the sensorElement
-                                                  //console.log("headers('host') from sessions service: " + headers('host'));
-
-                                                  partialElementList[0].children.forEach(function (server) {
-
-
-                                                      if (server.host == sessionsResponseHost) {
-
-                                                          //console.log("server.host == sessionsResponseHost:");
-                                                          //console.log(server.host);
-
-                                                          //console.log("XX server.host:");
-                                                          //console.log(server.host);
-
-                                                          //console.log("sessionsResponseHost:");
-                                                          //console.log(sessionsResponseHost);
-
-                                                          //responseServiceId is the service id that this response belongs to
-
-                                                          //search for this server, which sensor is going to hold the session
-
-                                                          server.children[0].children.forEach(function (sensor) {
-
-                                                              //console.log("iter sensor:");
-                                                              //console.log(sensor);
-                                                              /*
-                                                               console.log("sensor.elementId");
-                                                               console.log(sensor.elementId);
-                                                               console.log("responseServiceId");
-                                                               console.log(responseServiceId);
-                                                               console.log("-------------------------------------");
-                                                               */
-
-
-                                                              if (sensor.elementId == responseServiceId) {
-                                                                  /*
-                                                                   console.log("ZZ server.host:");
-                                                                   console.log(server.host);
-
-                                                                   console.log("sensor.elementId:");
-                                                                   console.log(sensor.elementId);
-
-                                                                   console.log("responseServiceId:");
-                                                                   console.log(responseServiceId);
-                                                                   */
-                                                                  sessionElement.sensor = sensor;
-                                                                  sensor.children.push(sessionElement);
-                                                              }
-
-                                                          });
-
-
-                                                          //add this session to the session list of this sensor
-                                                          //sensorElement.children.push(sessionElement);
-                                                          //server.children[0].children.push(sensorElement);
-                                                      }
-                                                  });
-
-
-                                              }
-
-
-                                          })
-                                          .error(function (data, status, headers, config) {
-                                              console.log("error leyendo sesiones serviceID.nodeValue: " + serviceID.nodeValue);
-
-                                              // called asynchronously if an error occurs
-                                              // or server returns response with an error status.
-                                          });
-
-
-                                      //this.apps[this.apps.length] = {id:localId.textContent, number:localNumber.textContent, status:tLocalStatus.textContent};
-                                  }
-
-
-                              })
-                              .error(function (data, status, headers, config) {
-                                  console.log("error leyendo sensores server.ipAddress: " + server.ipAddress);
-
-                                  // called asynchronously if an error occurs
-                                  // or server returns response with an error status.
-                              });
-
-                          //for each server, add the command management element
-                          //command management element:
-                          var commandManagementElement = {
-                              "host": server.ipAddress + ":" + server.restPort,
-                              "elementName": "Command Management",
-                              "elementId": "commandManagement",
-                              "collapsed": true,
-                              "iconClass": 'cog',
-                              "children": []
-                          };
-                          server.children.push(commandManagementElement);
-
-
-                          //call the readertypes operation
-                          $http.get(server.restProtocol + "://" + server.ipAddress + ":" + server.restPort + '/readertypes')
-                              .success(function (data, status, headers, config) {
-
-                                  var readerTypesResponseHost = headers('host');
-
-                                  var xmlReaderTypes;
-                                  if (window.DOMParser) {
-                                      var parser = new DOMParser();
-                                      xmlReaderTypes = parser.parseFromString(data, "text/xml");
-                                  }
-                                  else // Internet Explorer
-                                  {
-                                      xmlReaderTypes = new ActiveXObject("Microsoft.XMLDOM");
-                                      xmlReaderTypes.async = false;
-                                      xmlReaderTypes.loadXML(data);
-                                  }
-
-                                  //get the xml response and extract the values to construct the reader type object
-                                  var readerTypesXmlVector = xmlReaderTypes.getElementsByTagName("sensor");
-
-                                  for (var index = 0; index < readerTypesXmlVector.length; index++) {
-
-                                      var factoryID = readerTypesXmlVector[index].getElementsByTagName("factoryID")[0].childNodes[0];
-                                      var description = readerTypesXmlVector[index].getElementsByTagName("description")[0].childNodes[0];
-
-                                      //Add the reader type to the command management element
-
-                                      partialElementList[0].children.forEach(function (server) {
-
-                                          if (server.host == readerTypesResponseHost) {
-
-                                              //add the reader type under Command Management element
-
-                                              //define an empty command structure to hold the current command
-                                              var readerTypeElement = {
-                                                  "elementName": factoryID.nodeValue + " Commands",
-                                                  "elementId": factoryID.nodeValue + " Commands",
-                                                  "collapsed": true,
-                                                  "factoryID": factoryID.nodeValue,
-                                                  "description": description.nodeValue,
-                                                  "children": []
-                                              };
-
-                                              server.children[1].children.push(readerTypeElement);
-
-                                          }
-
-                                      });
-
-                                  }
-
-                                  //load the command types and place them under corresponding reader type
-
-                                  $http.get(server.restProtocol + "://" + server.ipAddress + ":" + server.restPort + '/commandtypes')
-                                      .success(function (data, status, headers, config) {
-
-                                          var commandTypesResponseHost = headers('host');
-
-                                          var xmlCommandTypes;
-                                          if (window.DOMParser) {
-                                              var parser = new DOMParser();
-                                              xmlCommandTypes = parser.parseFromString(data, "text/xml");
-                                          }
-                                          else // Internet Explorer
-                                          {
-                                              xmlCommandTypes = new ActiveXObject("Microsoft.XMLDOM");
-                                              xmlCommandTypes.async = false;
-                                              xmlCommandTypes.loadXML(data);
-                                          }
-
-                                          //get the xml response and extract the values to construct the local command type object
-                                          var commandTypeXmlVector = xmlCommandTypes.getElementsByTagName("command");
-
-
-                                          for (var index = 0; index < commandTypeXmlVector.length; index++) {
-
-                                              var factoryID = commandTypeXmlVector[index].getElementsByTagName("factoryID")[0].childNodes[0];
-                                              var description = commandTypeXmlVector[index].getElementsByTagName("description")[0].childNodes[0];
-                                              var readerFactoryID = commandTypeXmlVector[index].getElementsByTagName("readerFactoryID")[0].childNodes[0];
-
-                                              //Iterate the children of command management element associated to the server that is equals to the server
-                                              //that sends this response, and add the command type under appropriate reader type
-
-                                              partialElementList[0].children.forEach(function (server) {
-
-                                                  if (server.host == commandTypesResponseHost) {
-
-                                                      server.children[1].children.forEach(function (readerTypeElement) {
-
-                                                          //console.log("evaluating readerFactoryElement.readerFactoryID: " + readerTypeElement.readerFactoryID);
-
-                                                          if (readerTypeElement.factoryID == readerFactoryID.nodeValue) {
-
-                                                              //define a command type and add it to this reader type                                                    //add the factory id element to this readerFactoryElement
-                                                              var commandTypeElement = {
-                                                                  "elementName": factoryID.nodeValue,
-                                                                  "elementId": factoryID.nodeValue,
-                                                                  "collapsed": true,
-                                                                  "factoryID": factoryID.nodeValue,
-                                                                  "description": description.nodeValue,
-                                                                  "readerFactoryID": readerFactoryID.nodeValue,
-                                                                  "children": []
-
-                                                              }
-
-                                                              readerTypeElement.children.push(commandTypeElement);
-
-                                                          }
-
-                                                      });
-
-                                                  }
-                                              });
-
-                                          }
-
-                                          //call the commands service to load the commands associated with each command type
-
-                                          $http.get(server.restProtocol + "://" + server.ipAddress + ":" + server.restPort + '/commands')
-                                              .success(function (data, status, headers, config) {
-
-                                                  var commandsResponseHost = headers('host');
-
-                                                  var xmlCommands;
-                                                  if (window.DOMParser) {
-                                                      var parser = new DOMParser();
-                                                      xmlCommands = parser.parseFromString(data, "text/xml");
-                                                  }
-                                                  else // Internet Explorer
-                                                  {
-                                                      xmlCommands = new ActiveXObject("Microsoft.XMLDOM");
-                                                      xmlCommands.async = false;
-                                                      xmlCommands.loadXML(data);
-                                                  }
-
-                                                  //get the xml response and extract the values to construct the local command object
-                                                  var commandXmlVector = xmlCommands.getElementsByTagName("command");
-
-                                                  for (var index = 0; index < commandXmlVector.length; index++) {
-
-                                                      var commandID = commandXmlVector[index].getElementsByTagName("commandID")[0].childNodes[0];
-                                                      var factoryID = commandXmlVector[index].getElementsByTagName("factoryID")[0].childNodes[0];
-
-                                                      //Iterate the children of command factory id element associated to the server that is equals to the server
-                                                      //that sends this response, and if factoryID are equal, then associate the command to that command factory
-
-                                                      partialElementList[0].children.forEach(function (server) {
-
-                                                          if (server.host == commandsResponseHost) {
-
-                                                              //search for this server, if there exist a commandElement with this factoryID
-
-                                                              server.children[1].children.forEach(function (readerFactoryElement) {
-
-                                                                  readerFactoryElement.children.forEach(function (factoryElement) {
-
-                                                                      if (factoryElement.factoryID == factoryID.nodeValue) {
-
-                                                                          //define a command structure to hold the current command
-                                                                          var commandElement = {
-                                                                              "elementName": commandID.nodeValue,
-                                                                              "elementId": commandID.nodeValue,
-                                                                              "collapsed": true,
-                                                                              "commandID": commandID.nodeValue,
-                                                                              "factoryID": factoryID.nodeValue,
-                                                                              "children": []
-                                                                          };
-
-                                                                          factoryElement.children.push(commandElement);
-
-                                                                      }
-
-                                                                  });
-
-                                                              });
-
-                                                          }
-
-                                                      });
-
-                                                  }
-
-                                              }).
-                                              error(function (data, status, headers, config) {
-                                                  console.log("error reading commands");
-
-
-                                                  // called asynchronously if an error occurs
-                                                  // or server returns response with an error status.
-                                              });
-
-
-                                      }).
-                                      error(function (data, status, headers, config) {
-                                          console.log("error reading command types");
-
-
-                                          // called asynchronously if an error occurs
-                                          // or server returns response with an error status.
-                                      });
-
-
-                              }).
-                              error(function (data, status, headers, config) {
-                                  console.log("error reading reader types");
-
-
-                                  // called asynchronously if an error occurs
-                                  // or server returns response with an error status.
-                              });
-
-
-                          //aca iba
-
-
-                          //for each server, add the app management element
-                          //app management element:
-                          var appManagementElement = {
-                              "elementName": "App Management",
-                              "elementId": "App Management",
-                              "collapsed": true,
-                              "iconClass": "app-dev",
-                              "children": []
-                          };
-                          server.children.push(appManagementElement);
-
-                          //add application groups element
-
-                          var appGroupsElement = {
-                              "elementName": "App Groups",
-                              "elementId": "App Group",
-                              "collapsed": true,
-                              "iconClass": "appgroups",
-                              "children": []
-                          };
-
-                          appManagementElement.children.push(appGroupsElement);
-
-                          //load app groups
-
-                          //call apps command
-                          $http.get(server.restProtocol + "://" + server.ipAddress + ":" + server.restPort + '/apps')
-
-                              .success(function (data, status, headers, config) {
-
-                                  var appsResponseHost = headers('host');
-
-                                  var xmlApps;
-                                  if (window.DOMParser) {
-                                      var parser = new DOMParser();
-                                      xmlApps = parser.parseFromString(data, "text/xml");
-                                  }
-                                  else // Internet Explorer
-                                  {
-                                      xmlApps = new ActiveXObject("Microsoft.XMLDOM");
-                                      xmlApps.async = false;
-                                      xmlApps.loadXML(data);
-                                  }
-
-                                  //get the xml response and extract the values to construct the app groups
-                                  var appsXmlVector = xmlApps.getElementsByTagName("app");
-
-                                  for (var index = 0; index < appsXmlVector.length; index++) {
-
-                                      var id = appsXmlVector[index].getElementsByTagName("id")[0].childNodes[0];
-                                      var number = appsXmlVector[index].getElementsByTagName("number")[0].childNodes[0];
-                                      var status = appsXmlVector[index].getElementsByTagName("status")[0].childNodes[0];
-
-                                      var groupName = id.nodeValue.split(":")[0];
-                                      var appName = id.nodeValue.split(":")[1];
-
-                                      //Iterate the children of app groups element associated to the server that is equals to the server
-                                      //that sends this response, and if this app group does not exist under that structure, then create it
-
-                                      partialElementList[0].children.forEach(function (server) {
-
-                                          if (server.host == appsResponseHost) {
-
-                                              //search for this server, if there exist an appGroupElement with this groupName
-
-                                              var appGroupFound = false;
-
-                                              server.children[2].children[0].children.forEach(function (appGroupElement) {
-
-                                                  if (appGroupElement.groupName == groupName) {
-
-                                                      console.log("readerFactoryFound");
-
-                                                      appGroupFound = true;
-                                                      //TODO How to break here this loop (when appGroupFound == true)
-
-                                                  }
-
-                                              });
-
-                                              if (appGroupFound == false) {
-
-                                                  //create the appGroupElement and add it
-                                                  var appGroupElement = {
-                                                      "elementName": groupName,
-                                                      "elementId": groupName,
-                                                      "collapsed": true,
-                                                      "groupName": groupName,
-                                                      "readzoneAppId": "",
-                                                      "iconClass": "group",
-                                                      "children": []
-                                                  };
-
-                                                  //Add Apps element label
-                                                  var appsElement = {
-                                                      "elementName": "Apps",
-                                                      "elementId": "Apps",
-                                                      "collapsed": true,
-                                                      "groupName": groupName,
-                                                      "iconClass": "apps",
-                                                      "children": []
-                                                  };
-
-                                                  appGroupElement.children.push(appsElement);
-
-                                                  //Add Readzones element label
-                                                  var readZonesElement = {
-                                                      "elementName": "ReadZones",
-                                                      "elementId": "ReadZones",
-                                                      "collapsed": true,
-                                                      "groupName": groupName,
-                                                      "iconClass": "readzones",
-                                                      "children": []
-                                                  };
-
-                                                  appGroupElement.children.push(readZonesElement);
-
-                                                  server.children[2].children[0].children.push(angular.copy(appGroupElement));
-
-
-                                              }
-
-                                              //After adding the appGroup if it did not exist, we have to associate the current
-                                              //application to its corresponding app group
-
-                                              //iterate the apps elements
-
-                                              server.children[2].children[0].children.forEach(function (appGroupElement) {
-
-                                                  if (appGroupElement.groupName == groupName) {
-
-                                                      //add the app to this appGroup
-                                                      var appElement = {
-                                                          "elementName": appName,
-                                                          "elementId": appName,
-                                                          "collapsed": true,
-                                                          "groupName": groupName,
-                                                          "appName": appName,
-                                                          "number": number.nodeValue,
-                                                          "status": status.nodeValue,
-                                                          "iconClass": "app",
-                                                          "children": []
-
-                                                      }
-
-                                                      appGroupElement.children[0].children.push(appElement);
-
-                                                      //Add the application number to this application group in order to later add the associated read zones
-                                                      if (appGroupElement.readzoneAppId == "") {
-                                                          appGroupElement.readzoneAppId = appElement.number;
-                                                      }
-
-
-                                                  }
-
-                                              });
-
-
-                                          }
-                                      });
-
-                                  }
-
-                                  //add the readzones
-
-                                  //call readzones command
-                                  //iterate the app groups an call the readzones command
-
-
-                                  server.children[2].children[0].children.forEach(function (appGroupElement) {
-
-
-                                      $http.get(server.restProtocol + "://" + server.ipAddress + ":" + server.restPort + '/getReadZones/' + appGroupElement.readzoneAppId)
-
-                                          .success(function (data, status, headers, config) {
-
-                                              //console.log("config en getreadzones:");
-                                              //console.log(config);
-
-                                              var successReadzoneAppId = config.url.substring(config.url.lastIndexOf("/") + 1, config.url.length);
-                                              //console.log("successReadzoneAppId:" + successReadzoneAppId);
-
-                                              var readzonesResponseHost = headers('host');
-
-                                              var xmlReadzones;
-                                              if (window.DOMParser) {
-                                                  var parser = new DOMParser();
-                                                  xmlReadzones = parser.parseFromString(data, "text/xml");
-                                              }
-                                              else // Internet Explorer
-                                              {
-                                                  xmlReadzones = new ActiveXObject("Microsoft.XMLDOM");
-                                                  xmlReadzones.async = false;
-                                                  xmlReadzones.loadXML(data);
-                                              }
-
-                                              //get the xml response and extract the values to construct the readzone element
-                                              var readzonesXmlVector = xmlReadzones.getElementsByTagName("entry");
-
-
-                                              partialElementList[0].children.forEach(function (server) {
-
-                                                  if (server.host == readzonesResponseHost) {
-
-                                                      //iterate to find the app group where to add this readzone
-                                                      server.children[2].children[0].children.forEach(function (appGroupElement) {
-
-                                                          if (appGroupElement.readzoneAppId == successReadzoneAppId) {
-
-                                                              for (var index = 0; index < readzonesXmlVector.length; index++) {
-
-                                                                  var readzone = readzonesXmlVector[index].getElementsByTagName("value")[0].childNodes[0].nodeValue;
-
-                                                                  //create the readzoneElement and add it
-                                                                  var readzoneElement = {
-                                                                      "elementName": readzone,
-                                                                      "elementId": readzone,
-                                                                      "collapsed": true,
-                                                                      "readzone": readzone,
-                                                                      "iconClass": "readzone",
-                                                                      "children": []
-                                                                  };
-
-                                                                  appGroupElement.children[1].children.push(angular.copy(readzoneElement));
-                                                              }
-
-                                                          }
-
-                                                      });
-
-
-                                                  }
-
-                                              });
-
-
-                                          }).
-                                          error(function (data, status, headers, config) {
-                                              console.log("error reading readzones");
-
-
-                                              // called asynchronously if an error occurs
-                                              // or server returns response with an error status.
-                                          });
-
-                                  });
-
-
-                              }).
-                              error(function (data, status, headers, config) {
-                                  console.log("error reading apps");
-
-
-                                  // called asynchronously if an error occurs
-                                  // or server returns response with an error status.
-                              });
-
-
-                      });
-
-
-                      $scope.elementList = partialElementList;
-
-                      /*
-                       $scope.elementList = [
-                       { "elementName" : "Servers", "elementId" : "servers", "collapsed":true, "children" : [
-                       { "elementName" : "Server 1", "elementId" : "server",    "displayName": "Server1",
-                       "restProtocol" : "http",
-                       "ipAddress" : "127.0.0.1",
-                       "restPort" : "8111","collapsed":true, "children" : [
-
-                       ] },
-                       { "elementName" : "Server 2", "elementId" : "server",
-                       "displayName": "Server2-increible",
-                       "restProtocol" : "http",
-                       "ipAddress" : "127.0.0.1",
-                       "restPort" : "8111","collapsed":true, "children" : [
-                       { "elementName" : "Sensor Management", "elementId" : "sensorManagement","collapsed":true, "children" : [
-                       { "elementName" : "Sensor 1", "elementId" : "sensor","collapsed":true, "children" : [
-                       { "elementName" : "Session 1", "elementId" : "Session 1","collapsed":true, "children" : [
-                       { "elementName" : "Command 1", "elementId" : "Command 1", "children" : [
-
-                       ] },
-                       ] },
-                       ] },
-                       ] },
-                       { "elementName" : "App Management", "elementId" : "App Management","collapsed":true, "children" : [
-                       { "elementName" : "App Groups", "elementId" : "App Group","collapsed":true, "children" : [
-                       { "elementName" : "App Group 1", "elementId" : "App Group 1","collapsed":true, "children" : [
-                       { "elementName" : "Apps", "elementId" : "Apps","collapsed":true, "children" : [
-                       { "elementName" : "App 1", "elementId" : "App 1", "children" : [
-                       ] },
-                       { "elementName" : "App 2", "elementId" : "App 2", "children" : [
-                       ] },
-                       { "elementName" : "App 3", "elementId" : "App 3", "children" : [
-                       ] },
-                       ] },
-                       { "elementName" : "Read Zones", "elementId" : "Read Zones","collapsed":true, "children" : [
-                       { "elementName" : "Read Zone 1", "elementId" : "Read Zone 1", "children" : [
-                       ] },
-                       { "elementName" : "Read Zone 2", "elementId" : "Read Zone 2", "children" : [
-                       ] },
-                       { "elementName" : "Read Zone 3", "elementId" : "Read Zone 3", "children" : [
-                       ] },
-                       ] },
-                       ] },
-                       { "elementName" : "App Group 2", "elementId" : "App Group 2","collapsed":true, "children" : [
-                       { "elementName" : "Apps", "elementId" : "Apps","collapsed":true, "children" : [
-                       { "elementName" : "App 1", "elementId" : "App 1", "children" : [
-                       ] },
-                       { "elementName" : "App 2", "elementId" : "App 2", "children" : [
-                       ] },
-                       { "elementName" : "App 3", "elementId" : "App 3", "children" : [
-                       ] },
-                       ] },
-                       { "elementName" : "Read Zones", "elementId" : "Read Zones","collapsed":true, "children" : [
-                       { "elementName" : "Read Zone 1", "elementId" : "Read Zone 1", "children" : [
-                       ] },
-                       { "elementName" : "Read Zone 2", "elementId" : "Read Zone 2", "children" : [
-                       ] },
-                       { "elementName" : "Read Zone 3", "elementId" : "Read Zone 3", "children" : [
-                       ] },
-                       ] },
-                       ] },
-                       ] },
-                       ] },
-                       ] },
-                       ]},
-
-                       ];
-
-                       */
-
-
-                      /*
-                       for(var i=0; i<data.length; i++){
-                       var obj = data[i];
-                       console.log( "obj: " + obj );
-
-
-                       for(var key in obj){
-
-                       var attrName = key;
-                       var attrValue = obj[key];
-
-                       console.log( "attrName: " + attrName );
-                       console.log( "attrValue: " + attrValue );
-                       }
-
-
-
-                       }
-                       */
-
-                      /*
-
-                       data.forEach( function( item ) {
-                       console.log( "ite: " + item );
-                       });
-
-                       */
-                      // this callback will be called asynchronously
-                      // when the response is available
-                  }).
-                  error(function (data, status, headers, config) {
-                      console.log("error leyendo servidores ");
-
-
-                      // called asynchronously if an error occurs
-                      // or server returns response with an error status.
-                  });
 
           //}
 
@@ -1909,10 +1071,232 @@ var module = angular.module('rifidiApp')
 
 
 
+                      //if selected element is commandInstance, then load the properties for this command instance
+
+                  } else if ($scope.elementSelected.elementType == 'commandInstance'){
+
+                      console.log("element type commandInstance selected");
+                      //load properties for this command type
+
+
+                      //$scope.commandWizardData.commandInstance = selectedCommandInstance;
+                      var host = angular.copy($scope.elementSelected.session.sensor.sensorManagementElement.host);
+                      var readerType = angular.copy($scope.elementSelected.session.sensor.factoryID);
+                      var commandType = 'LLRP-Configure'; //xxx cambiar al verdadero tipo
+                      var commandId = angular.copy($scope.elementSelected.elementId);
+
+                      console.log("readerType:");
+                      console.log(readerType);
+                      console.log("commandId:");
+                      console.log(commandId);
+
+                      //Get the properties for the selected command type, from readermetadata
+                      $http.get(host + '/readermetadata')
+                          .success(function(data, status, headers, config) {
+
+                              console.log("success calling: " + host + '/readermetadata');
+
+                              var xmlMetadata;
+                              if (window.DOMParser)
+                              {
+                                  var parser = new DOMParser();
+                                  xmlMetadata = parser.parseFromString(data,"text/xml");
+                              }
+                              else // Internet Explorer
+                              {
+                                  xmlMetadata = new ActiveXObject("Microsoft.XMLDOM");
+                                  xmlMetadata.async=false;
+                                  xmlMetadata.loadXML(data);
+                              }
+
+                              //get the xml response and extract the values to construct the command properties for selected command type
+
+                              var commandMetadataXmlVector = xmlMetadata.getElementsByTagName("command");
+
+                              for(var index = 0; index < commandMetadataXmlVector.length; index++) {
+
+                                  var propertiesXmlVector = commandMetadataXmlVector[index].getElementsByTagName("property");
+                                  var id = commandMetadataXmlVector[index].getElementsByTagName("id")[0].childNodes[0];
+                                  var readerID = commandMetadataXmlVector[index].getElementsByTagName("readerID")[0].childNodes[0];
+
+                                  if (readerID.nodeValue == readerType && id.nodeValue ==  commandType){
+
+                                      //Create the properties object for this command
+                                      $scope.commandProperties = {
+                                          "readerID": readerID.nodeValue,
+                                          "id": id.nodeValue,
+                                          "propertyCategoryList": []
+
+                                      };
+
+                                      //extract the properties
+                                      for(var indexProp = 0; indexProp < propertiesXmlVector.length; indexProp++) {
+
+
+                                          var name = propertiesXmlVector[indexProp].getElementsByTagName("name")[0].childNodes[0];
+                                          var displayname = propertiesXmlVector[indexProp].getElementsByTagName("displayname")[0].childNodes[0];
+                                          var defaultvalue = {};
+                                          if (propertiesXmlVector[indexProp].getElementsByTagName("defaultvalue").length > 0){
+                                              defaultvalue = propertiesXmlVector[indexProp].getElementsByTagName("defaultvalue")[0].childNodes[0];
+                                          }
+
+                                          var description = propertiesXmlVector[indexProp].getElementsByTagName("description")[0].childNodes[0];
+                                          var type = propertiesXmlVector[indexProp].getElementsByTagName("type")[0].childNodes[0];
+                                          var maxvalue = 0;
+                                          var minvalue = 0;
+                                          if (type.nodeValue == 'java.lang.Integer') {
+                                              maxvalue = propertiesXmlVector[indexProp].getElementsByTagName("maxvalue")[0].childNodes[0];
+                                              minvalue = propertiesXmlVector[indexProp].getElementsByTagName("minvalue")[0].childNodes[0];
+                                          }
+                                          var category = propertiesXmlVector[indexProp].getElementsByTagName("category")[0].childNodes[0];
+                                          var writable = propertiesXmlVector[indexProp].getElementsByTagName("writable")[0].childNodes[0];
+                                          var ordervalue = propertiesXmlVector[indexProp].getElementsByTagName("ordervalue")[0].childNodes[0];
+
+                                          //check if current category already exists in propertyCategories
+                                          var existingCategory = false;
+
+                                          $scope.commandProperties.propertyCategoryList.forEach(function (propertyCategory) {
+
+                                              if (category.nodeValue == propertyCategory.category){
+                                                  existingCategory = true;
+                                              }
+
+                                          });
+
+                                          if (!existingCategory){
+
+                                              var propertyCategory = {
+                                                  "category": category.nodeValue,
+                                                  "properties": []
+                                              };
+
+                                              $scope.commandProperties.propertyCategoryList.push(propertyCategory);
+                                          }
+
+                                          var propertyElement = {
+                                              "name": name.nodeValue,
+                                              "displayname": displayname.nodeValue,
+                                              "description": description.nodeValue,
+                                              "type": type.nodeValue,
+                                              "maxvalue": maxvalue.nodeValue,
+                                              "minvalue": minvalue.nodeValue,
+                                              "category": category.nodeValue,
+                                              "writable": writable.nodeValue,
+                                              "ordervalue": ordervalue.nodeValue,
+                                              "value": ""
+                                              //,
+                                              //"defaultvalue": ""
+                                          };
+
+                                          //Set the default value for property
+/*
+                                          if (type.nodeValue == 'java.lang.Integer'){
+                                              propertyElement.value = angular.copy(parseInt(defaultvalue.nodeValue));
+                                              propertyElement.defaultvalue = angular.copy(parseInt(defaultvalue.nodeValue));
+                                          } else {
+                                              propertyElement.value = angular.copy(defaultvalue.nodeValue);
+                                              propertyElement.defaultvalue = angular.copy(defaultvalue.nodeValue);
+                                          }
+*/
+                                          //Add the property to appropriate property category list
+                                          $scope.commandProperties.propertyCategoryList.forEach(function (propertyCategory) {
+
+                                              if (category.nodeValue == propertyCategory.category){
+
+                                                  propertyCategory.properties.push(angular.copy(propertyElement));
+
+                                              }
+
+                                          });
+
+                                      }
+
+                                      //Load the current values for every property
+
+                                          //call the service to get properties of command instance
+                                          $http.get(host + '/getproperties/' + commandId)
+                                              .success(function(data, status, headers, config) {
+
+                                                  var xmlCommandProperties;
+                                                  if (window.DOMParser)
+                                                  {
+                                                      var parser = new DOMParser();
+                                                      xmlCommandProperties = parser.parseFromString(data,"text/xml");
+                                                  }
+                                                  else // Internet Explorer
+                                                  {
+                                                      xmlCommandProperties = new ActiveXObject("Microsoft.XMLDOM");
+                                                      xmlCommandProperties.async=false;
+                                                      xmlCommandProperties.loadXML(data);
+                                                  }
+
+                                                  //get the xml response and extract the values for properties
+                                                  var propertiesXmlVector = xmlCommandProperties.getElementsByTagName("entry");
+
+                                                  for(var indexPropertyValue = 0; indexPropertyValue < propertiesXmlVector.length; indexPropertyValue++) {
+
+                                                      var key = propertiesXmlVector[indexPropertyValue].getElementsByTagName("key")[0].childNodes[0];
+                                                      var value = propertiesXmlVector[indexPropertyValue].getElementsByTagName("value")[0].childNodes[0];
+
+                                                      //Iterate the loaded properties and set this value when property key matches
+                                                      $scope.commandProperties.propertyCategoryList.forEach(function (propertyCategory) {
+
+                                                          //Iterate al categories to find this property and set the value
+                                                          propertyCategory.properties.forEach(function (property) {
+
+                                                              if (property.name == key.nodeValue){
+
+                                                                  //Set the value for property
+
+                                                                  if (property.type == 'java.lang.Integer'){
+                                                                      property.value = angular.copy(parseInt(value.nodeValue));
+                                                                      property.htmlType = 'number';
+
+                                                                  } else {
+                                                                      property.value = angular.copy(value.nodeValue);
+                                                                      property.htmlType = 'text';
+                                                                  }
+
+                                                              }
+
+                                                          });
+
+
+                                                      });
+
+
+                                                  }
+
+                                              }).
+                                              error(function(data, status, headers, config) {
+                                                  console.log("error reading command instance properties");
+
+
+                                                  // called asynchronously if an error occurs
+                                                  // or server returns response with an error status.
+                                              });
+
+                                  }
+
+
+                              }
+
+
+                          })
+                          .error(function(data, status, headers, config) {
+                              console.log("error reading readermetadata for command wizard: command instance selection");
+
+                              // called asynchronously if an error occurs
+                              // or server returns response with an error status.
+                          });
+
+
+
+
                   }
 
                   //console.log("set 2 propertyType: " + $scope.propertyType);
-                  $scope.operationSuccessMsg = null;
+                  $rootScope.operationSuccessMsg = null;
 
 
 
@@ -2041,6 +1425,44 @@ var module = angular.module('rifidiApp')
 
         }
 
+        $scope.openSaveCommandInstancePropertiesDialog = function(){
+
+            ngDialog.openConfirm({template: 'saveCommandInstancePropertiesDialogTmpl.html',
+
+                scope: $scope, //Pass the scope object if you need to access in the template
+
+                showClose: false,
+
+                closeByEscape: true,
+
+                closeByDocument: false
+
+            }).then(
+
+                function(value) {
+
+                    //confirm operation
+                    if (value == 'Save'){
+                        console.log("to save");
+
+                        //call save sensor properties operation
+                        saveCommandInstanceProperties($scope.elementTree.currentNode);
+
+                    }
+
+                },
+
+                function(value) {
+
+                    //Cancel or do nothing
+                    console.log("cancel");
+
+                }
+
+            );
+
+        };
+
 
 
   });
@@ -2082,15 +1504,12 @@ module.service('TreeViewPainting', function($http) {
              $http.get('scripts/controllers/components/menu/servers.json').
                  success(function (data, status, headers, config) {
                      console.log("funciono lectura servers ");
-
-                     //this._scope = "";
-                     this._scope = scope;
-                     //this._scope.servers = [];
-                     this._scope.servers = data;
+                     scope.servers = data;
 
                      var partialElementList = [{
                          "elementName": "Servers",
                          "elementId": "servers",
+                         "elementType": "servers",
                          "collapsed": true,
                          "contextMenuId": "contextMenuServers",
                          "iconClass":"server",
@@ -2102,6 +1521,7 @@ module.service('TreeViewPainting', function($http) {
                          server.colapsed = true;
                          server.elementName = server.displayName;
                          server.elementId = "server";
+                         server.elementType = "server";
                          server.iconClass = "server-disconnected";
                          server.contextMenuId = "contextMenuServer";
                          server.children = [];
@@ -2197,6 +1617,7 @@ module.service('TreeViewPainting', function($http) {
                              "restPort": server.restPort,
                              "elementName": "Sensor Management",
                              "elementId": "sensorManagement",
+                             "elementType": "sensorManagement",
                              "collapsed": true,
                              "iconClass":"reader-cog",
                              "contextMenuId": "contextMenuSensorManagement",
@@ -2235,9 +1656,12 @@ module.service('TreeViewPainting', function($http) {
                                      var sensorElement = {
                                          "elementName": serviceID.nodeValue,
                                          "elementId": serviceID.nodeValue,
+                                         "elementType": "sensor",
                                          "collapsed": true,
+                                         "factoryID": factoryID.nodeValue,
                                          "contextMenuId": "contextMenuSensor",
                                          "iconClass":"reader",
+                                         "allowCreateSession": false,
                                          "children": []
                                      };
 
@@ -2249,6 +1673,7 @@ module.service('TreeViewPainting', function($http) {
 
                                              //add this sensor to the server
                                              sensorElement.host = server.host;
+                                             sensorElement.sensorManagementElement = server.children[0];
                                              server.children[0].children.push(sensorElement);
                                          }
                                      });
@@ -2281,6 +1706,20 @@ module.service('TreeViewPainting', function($http) {
 
                                              var sessionXmlVector = xmlSessions.getElementsByTagName("session");
 
+                                             var allowCreateSession = (sessionXmlVector.length == 0);
+
+                                             //search the reader with reader id = responseServiceId and assign allowCreateSession
+
+                                             server.children[0].children.forEach(function (sensor) {
+
+                                                 if (sensor.elementId == responseServiceId) {
+
+                                                     sensor.allowCreateSession = allowCreateSession;
+                                                 }
+
+                                             });
+
+
                                              for (var index = 0; index < sessionXmlVector.length; index++) {
                                                  var sessionID = sessionXmlVector[index].getElementsByTagName("ID")[0].childNodes[0];
                                                  var sessionStatus = sessionXmlVector[index].getElementsByTagName("status")[0].childNodes[0];
@@ -2289,6 +1728,7 @@ module.service('TreeViewPainting', function($http) {
                                                  //console.log("sessionStatus: " + sessionStatus.nodeValue);
 
                                                  var sessionElement = {
+                                                     "sessionID": sessionID.nodeValue,
                                                      "elementName": "session " + sessionID.nodeValue,
                                                      "elementId": "session " + sessionID.nodeValue,
                                                      "collapsed": true,
@@ -2321,6 +1761,10 @@ module.service('TreeViewPainting', function($http) {
                                                          "collapsed": true,
                                                          "interval": commandInterval.nodeValue,
                                                          "iconClass": 'script-gear',
+                                                         "session": sessionElement,
+                                                         "elementType": "commandInstance",
+                                                         "contextMenuId": "contextMenuCommand",
+                                                         "commandType": "LLRP-Configure", //change it to get the real comand type
                                                          "children": []
                                                      };
 
@@ -2374,6 +1818,7 @@ module.service('TreeViewPainting', function($http) {
                                                                   console.log("responseServiceId:");
                                                                   console.log(responseServiceId);
                                                                   */
+                                                                 sessionElement.sensor = sensor;
                                                                  sensor.children.push(sessionElement);
                                                              }
 
@@ -2590,6 +2035,7 @@ module.service('TreeViewPainting', function($http) {
                                                                              "collapsed": true,
                                                                              "commandID": commandID.nodeValue,
                                                                              "factoryID": factoryID.nodeValue,
+                                                                             "elementType": "commandInstance",
                                                                              "children": []
                                                                          };
 
@@ -2901,7 +2347,7 @@ module.service('TreeViewPainting', function($http) {
                      });
 
 
-                     _scope.elementList = partialElementList;
+                     scope.elementList = partialElementList;
 
                      /*
                       $scope.elementList = [
