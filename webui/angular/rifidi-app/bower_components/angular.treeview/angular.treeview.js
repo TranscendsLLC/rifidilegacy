@@ -70,6 +70,11 @@
 					'<li><a href="#/commandWizard"><i class="submit-job">&nbsp;&nbsp;&nbsp;&nbsp;Submit Job</i></a></li>'+
 					'</ul>';
 
+				//command menu
+				var menuCommand = '<ul id="contextMenuCommand" class="dropdown-menu">'+
+					'<li><a ng-click="openDeleteCommandDialog()"><i class="script-delete">&nbsp;&nbsp;&nbsp;&nbsp;Delete Command</i></a></li>'+
+					'</ul>';
+
 				//servers menu
 				var menuServers = '<ul id="contextMenuServers" class="dropdown-menu">'+
 					'<li><a href ="#/serverWizard"><i class="addserver">&nbsp;&nbsp;&nbsp;&nbsp;Add server</i></a></li>'+
@@ -93,6 +98,7 @@
 						menuSensor +
 						menuSession +
 						menuServers
+						+ menuCommand
 					;
 
 
