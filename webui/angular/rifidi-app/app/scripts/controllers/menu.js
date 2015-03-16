@@ -1082,7 +1082,7 @@ var module = angular.module('rifidiApp')
                       //$scope.commandWizardData.commandInstance = selectedCommandInstance;
                       var host = angular.copy($scope.elementSelected.session.sensor.sensorManagementElement.host);
                       var readerType = angular.copy($scope.elementSelected.session.sensor.factoryID);
-                      var commandType = 'LLRP-Configure'; //xxx cambiar al verdadero tipo
+                      var commandType = angular.copy($scope.elementSelected.commandType);
                       var commandId = angular.copy($scope.elementSelected.elementId);
 
                       console.log("readerType:");
@@ -1445,8 +1445,8 @@ var module = angular.module('rifidiApp')
                     if (value == 'Save'){
                         console.log("to save");
 
-                        //call save sensor properties operation
-                        saveCommandInstanceProperties($scope.elementTree.currentNode);
+                        //call save command properties operation
+                        saveCommandInstanceProperties($scope.elementTree.currentNode, $scope.commandProperties);
 
                     }
 
@@ -1462,6 +1462,92 @@ var module = angular.module('rifidiApp')
             );
 
         };
+
+        var saveCommandInstanceProperties = function(commandElement, commandProperties){
+
+            console.log("commandElement:");
+            console.log(commandElement);
+            console.log("commandProperties:");
+            console.log(commandProperties);
+
+            //call update command properties
+
+            var strCommandProperties = "";
+
+            for (var idxCat=0; idxCat < $scope.commandProperties.propertyCategoryList.length; idxCat++){
+
+                //console.log("$scope.commandProperties.propertyCategoryList[idxCat]");
+                //console.log($scope.commandProperties.propertyCategoryList[idxCat]);
+
+                for (var idxProp=0; idxProp < $scope.commandProperties.propertyCategoryList[idxCat].properties.length; idxProp++){
+
+                    strCommandProperties += $scope.commandProperties.propertyCategoryList[idxCat].properties[idxProp].name + "="
+                    + $scope.commandProperties.propertyCategoryList[idxCat].properties[idxProp].value + ";"
+                }
+
+            }
+
+            //Quit the last semicolon ;
+            if (strCommandProperties.length > 0){
+                strCommandProperties = strCommandProperties.substring(0, strCommandProperties.length - 1);
+            }
+
+            console.log("strCommandProperties");
+            console.log(strCommandProperties);
+
+                //console.log("going to set command properties: " + host + '/setproperties/' + $scope.selectedCommandInstance.commandID + '/' + strCommandProperties);
+                $scope.setCommandPropertiesResponseStatus = {};
+
+                $http.get(commandElement.session.sensor.host + '/setproperties/' + commandElement.elementId + '/' + strCommandProperties)
+                    .success(function(data, status, headers, config) {
+
+                        var xmlSetCommandPropertiesResponse;
+                        if (window.DOMParser)
+                        {
+                            var parser = new DOMParser();
+                            xmlSetCommandPropertiesResponse = parser.parseFromString(data,"text/xml");
+                        }
+                        else // Internet Explorer
+                        {
+                            xmlSetCommandPropertiesResponse = new ActiveXObject("Microsoft.XMLDOM");
+                            xmlSetCommandPropertiesResponse.async=false;
+                            xmlSetCommandPropertiesResponse.loadXML(data);
+                        }
+
+
+                        //get the xml response and extract the value
+                        var message = xmlSetCommandPropertiesResponse.getElementsByTagName("message")[0].childNodes[0].nodeValue;
+
+                        $scope.setCommandPropertiesResponseStatus.message = message;
+
+                        if (message == 'Success') {
+                            console.log("success setting properties for command");
+
+                                $rootScope.operationSuccessMsg = "Success setting properties for command";
+
+                        } else {
+                            var setCommandPropertiesDescription = xmlSetCommandPropertiesResponse.getElementsByTagName("description")[0].childNodes[0].nodeValue;
+                            $scope.setCommandPropertiesResponseStatus.description = setCommandPropertiesDescription;
+                            console.log("fail set command properties");
+                            console.log(setCommandPropertiesDescription);
+
+                            showErrorDialog('Error setting properties for command: ' + setCommandPropertiesDescription);
+                        }
+
+
+                    })
+                    .error(function(data, status, headers, config) {
+                        console.log("error setting properties for existing command");
+
+                        showErrorDialog('Error setting properties for command');
+
+                        // called asynchronously if an error occurs
+                        // or server returns response with an error status.
+                    });
+
+
+
+        }
 
 
 
@@ -1753,6 +1839,7 @@ module.service('TreeViewPainting', function($http) {
 
                                                  for (var index = 0; index < executingCommandsXmlVector.length; index++) {
                                                      var commandID = executingCommandsXmlVector[index].getElementsByTagName("commandID")[0].childNodes[0];
+                                                     var factoryID = executingCommandsXmlVector[index].getElementsByTagName("factoryID")[0].childNodes[0];
                                                      var commandInterval = executingCommandsXmlVector[index].getElementsByTagName("interval")[0].childNodes[0];
 
                                                      var commandElement = {
@@ -1764,7 +1851,7 @@ module.service('TreeViewPainting', function($http) {
                                                          "session": sessionElement,
                                                          "elementType": "commandInstance",
                                                          "contextMenuId": "contextMenuCommand",
-                                                         "commandType": "LLRP-Configure", //change it to get the real comand type
+                                                         "commandType": factoryID.nodeValue,
                                                          "children": []
                                                      };
 
