@@ -356,16 +356,6 @@
                                </button>
                            </div>
 
-
-                           <div ng-switch-when="sensorxx">
-                               <ul class="nav nav-tabs">
-                                   <li role="presentation" class="active">Home</li>
-                                   <li role="presentation">Profile</li>
-                                   <li role="presentation">Messages</li>
-                               </ul>
-                           </div>
-
-
                            <div ng-switch-when="sensor">
 
                                <form class="form-horizontal" role="form" name="form" novalidate>
@@ -419,13 +409,10 @@
                                </form>
                            </div>
 
-                           <div ng-switch-when="commandInstance">
+                           <div ng-switch-when="commandInstance_sensor">
 
                                <div class="form-group">
 
-                                   <!--
-                                   <h4>3. Command properties</h4>
-                                   -->
                                    <form class="form-horizontal" role="form" name="form" novalidate>
 
                                    <tabset>
@@ -470,6 +457,87 @@
                                    </tabset>
 
                                    <input class="btn btn-primary" ng-click="openSaveCommandInstancePropertiesDialog()" ng-disabled="form.$invalid" type="submit" value="Save" />
+
+                                   </form>
+                               </div>
+
+                           </div>
+
+                           <div ng-switch-when="commandType">
+
+                                   <div class="form-group">
+                                       <div class="col-sm-4">
+                                           <label class="control-label" for="readerType">Compatible Reader Type</label>
+                                       </div>
+                                       <div class="col-sm-6">
+                                           <label class="control-label" id="readerType" >{{elementSelected.readerFactoryID}}</label>
+
+
+                                       </div>
+                                   </div>
+
+                                   <div class="form-group">
+                                       <div class="col-sm-4">
+                                           <label class="control-label" for="description">Description</label>
+                                       </div>
+                                       <div class="col-sm-6">
+                                           <label class="control-label" id="description" >{{elementSelected.description}}</label>
+
+
+                                       </div>
+                                   </div>
+
+
+                           </div>
+
+                           <div ng-switch-when="commandInstance_commandManagement">
+
+                               <div class="form-group">
+
+                                   <form class="form-horizontal" role="form" name="form" novalidate>
+
+                                       <tabset>
+                                           <tab heading="{{propertyCategory.category}}" ng-repeat="propertyCategory in commandProperties.propertyCategoryList | orderBy:'category'">
+                                               <br/>
+
+                                               <div class="form-group" ng-repeat="property in propertyCategory.properties | orderBy:['ordervalue', 'displayname']">
+
+                                                   <div class="col-sm-6">
+                                                       <label class="control-label" for="{{property.name}}">{{property.displayname}}</label>
+                                                   </div>
+
+
+                                                   <div class="col-sm-6" >
+
+                                                       <input aria-describedby="help{{property.name}}" id="{{property.name}}"
+                                                              name="{{property.name}}" ng-disabled="!property.writable" ng-readonly="!property.writable"
+                                                              type="{{property.htmlType}}" ng-value="property.value" ng-model="property.value" min="property.minvalue" max="property.maxvalue"
+                                                              class="form-control"
+                                                               />
+
+                                                       <div ng-show="form.$submitted || form.property.name.$touched" >
+
+                                                           <div ng-show="form.property.name.$error.required">
+
+                                                               {{property.name}} is required.
+
+                                                           </div>
+                                                       </div>
+
+                                                       <span id="help{{property.name}}" class="help-block">{{property.description}}</span>
+
+                                                   </div>
+
+                                                   <br>
+                                                   <p>
+
+                                               </div>
+
+
+                                           </tab>
+                                       </tabset>
+
+                                       <input class="btn btn-primary" ng-click="openSaveCommandInstancePropertiesDialog(commandProperties, elementSelected.host, elementSelected.commandID)" ng-disabled="form.$invalid" type="submit" value="Save" />
 
                                    </form>
                                </div>

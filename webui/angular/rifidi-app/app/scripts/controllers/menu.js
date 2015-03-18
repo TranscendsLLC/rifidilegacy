@@ -510,6 +510,43 @@ var module = angular.module('rifidiApp')
 
         };
 
+        $scope.openDeleteJobDialog = function() {
+
+            ngDialog.openConfirm({template: 'deleteJobDialogTmpl.html',
+
+                scope: $scope, //Pass the scope object if you need to access in the template
+
+                showClose: false,
+
+                closeByEscape: true,
+
+                closeByDocument: false
+
+            }).then(
+
+                function(value) {
+
+                    //confirm operation
+                    if (value == 'Delete'){
+                        console.log("to delete");
+
+                        //call delete command operation
+                        deleteJob($scope.elementSelected.elementId);
+                    }
+
+                },
+
+                function(value) {
+
+                    //Cancel or do nothing
+                    console.log("cancel");
+
+                }
+
+            );
+
+        };
+
 
           $scope.openDeleteSensorDialog = function() {
 
@@ -1073,9 +1110,9 @@ var module = angular.module('rifidiApp')
 
                       //if selected element is commandInstance, then load the properties for this command instance
 
-                  } else if ($scope.elementSelected.elementType == 'commandInstance'){
+                  } else if ($scope.elementSelected.elementType == 'commandInstance_sensor'){
 
-                      console.log("element type commandInstance selected");
+                      console.log("element type commandInstance_sensor selected");
                       //load properties for this command type
 
 
@@ -1084,6 +1121,228 @@ var module = angular.module('rifidiApp')
                       var readerType = angular.copy($scope.elementSelected.session.sensor.factoryID);
                       var commandType = angular.copy($scope.elementSelected.commandType);
                       var commandId = angular.copy($scope.elementSelected.elementId);
+
+                      console.log("readerType:");
+                      console.log(readerType);
+                      console.log("commandId:");
+                      console.log(commandId);
+
+                      //Get the properties for the selected command type, from readermetadata
+                      $http.get(host + '/readermetadata')
+                          .success(function(data, status, headers, config) {
+
+                              console.log("success calling: " + host + '/readermetadata');
+
+                              var xmlMetadata;
+                              if (window.DOMParser)
+                              {
+                                  var parser = new DOMParser();
+                                  xmlMetadata = parser.parseFromString(data,"text/xml");
+                              }
+                              else // Internet Explorer
+                              {
+                                  xmlMetadata = new ActiveXObject("Microsoft.XMLDOM");
+                                  xmlMetadata.async=false;
+                                  xmlMetadata.loadXML(data);
+                              }
+
+                              //get the xml response and extract the values to construct the command properties for selected command type
+
+                              var commandMetadataXmlVector = xmlMetadata.getElementsByTagName("command");
+
+                              for(var index = 0; index < commandMetadataXmlVector.length; index++) {
+
+                                  var propertiesXmlVector = commandMetadataXmlVector[index].getElementsByTagName("property");
+                                  var id = commandMetadataXmlVector[index].getElementsByTagName("id")[0].childNodes[0];
+                                  var readerID = commandMetadataXmlVector[index].getElementsByTagName("readerID")[0].childNodes[0];
+
+                                  if (readerID.nodeValue == readerType && id.nodeValue ==  commandType){
+
+                                      //console.log("created properties object" );
+
+                                      //Create the properties object for this command
+                                      $scope.commandProperties = {
+                                          "readerID": readerID.nodeValue,
+                                          "id": id.nodeValue,
+                                          "propertyCategoryList": []
+
+                                      };
+
+                                      //extract the properties
+                                      for(var indexProp = 0; indexProp < propertiesXmlVector.length; indexProp++) {
+
+                                          var name = propertiesXmlVector[indexProp].getElementsByTagName("name")[0].childNodes[0];
+                                          var displayname = propertiesXmlVector[indexProp].getElementsByTagName("displayname")[0].childNodes[0];
+                                          var defaultvalue = {};
+                                          if (propertiesXmlVector[indexProp].getElementsByTagName("defaultvalue").length > 0){
+                                              defaultvalue = propertiesXmlVector[indexProp].getElementsByTagName("defaultvalue")[0].childNodes[0];
+                                          }
+
+                                          var description = propertiesXmlVector[indexProp].getElementsByTagName("description")[0].childNodes[0];
+                                          var type = propertiesXmlVector[indexProp].getElementsByTagName("type")[0].childNodes[0];
+                                          var maxvalue = 0;
+                                          var minvalue = 0;
+                                          if (type.nodeValue == 'java.lang.Integer') {
+                                              maxvalue = propertiesXmlVector[indexProp].getElementsByTagName("maxvalue")[0].childNodes[0];
+                                              minvalue = propertiesXmlVector[indexProp].getElementsByTagName("minvalue")[0].childNodes[0];
+                                          }
+                                          var category = propertiesXmlVector[indexProp].getElementsByTagName("category")[0].childNodes[0];
+                                          var writable = propertiesXmlVector[indexProp].getElementsByTagName("writable")[0].childNodes[0];
+                                          var ordervalue = propertiesXmlVector[indexProp].getElementsByTagName("ordervalue")[0].childNodes[0];
+
+                                          //check if current category already exists in propertyCategories
+                                          var existingCategory = false;
+
+                                          $scope.commandProperties.propertyCategoryList.forEach(function (propertyCategory) {
+
+                                              if (category.nodeValue == propertyCategory.category){
+                                                  existingCategory = true;
+                                              }
+
+                                          });
+
+                                          if (!existingCategory){
+
+                                              var propertyCategory = {
+                                                  "category": category.nodeValue,
+                                                  "properties": []
+                                              };
+
+                                              $scope.commandProperties.propertyCategoryList.push(propertyCategory);
+                                          }
+
+                                          var propertyElement = {
+                                              "name": name.nodeValue,
+                                              "displayname": displayname.nodeValue,
+                                              "description": description.nodeValue,
+                                              "type": type.nodeValue,
+                                              "maxvalue": maxvalue.nodeValue,
+                                              "minvalue": minvalue.nodeValue,
+                                              "category": category.nodeValue,
+                                              "writable": writable.nodeValue,
+                                              "ordervalue": ordervalue.nodeValue,
+                                              "value": ""
+                                              //,
+                                              //"defaultvalue": ""
+                                          };
+
+                                          //console.log("propertyElement:");
+                                          //console.log(propertyElement);
+
+                                          //Set the default value for property
+/*
+                                          if (type.nodeValue == 'java.lang.Integer'){
+                                              propertyElement.value = angular.copy(parseInt(defaultvalue.nodeValue));
+                                              propertyElement.defaultvalue = angular.copy(parseInt(defaultvalue.nodeValue));
+                                          } else {
+                                              propertyElement.value = angular.copy(defaultvalue.nodeValue);
+                                              propertyElement.defaultvalue = angular.copy(defaultvalue.nodeValue);
+                                          }
+*/
+                                          //Add the property to appropriate property category list
+                                          $scope.commandProperties.propertyCategoryList.forEach(function (propertyCategory) {
+
+                                              if (category.nodeValue == propertyCategory.category){
+
+                                                  propertyCategory.properties.push(angular.copy(propertyElement));
+
+                                              }
+
+                                          });
+
+                                      }
+
+                                      //Load the current values for every property
+
+                                          //call the service to get properties of command instance
+                                          $http.get(host + '/getproperties/' + commandId)
+                                              .success(function(data, status, headers, config) {
+
+                                                  var xmlCommandProperties;
+                                                  if (window.DOMParser)
+                                                  {
+                                                      var parser = new DOMParser();
+                                                      xmlCommandProperties = parser.parseFromString(data,"text/xml");
+                                                  }
+                                                  else // Internet Explorer
+                                                  {
+                                                      xmlCommandProperties = new ActiveXObject("Microsoft.XMLDOM");
+                                                      xmlCommandProperties.async=false;
+                                                      xmlCommandProperties.loadXML(data);
+                                                  }
+
+                                                  //get the xml response and extract the values for properties
+                                                  var propertiesXmlVector = xmlCommandProperties.getElementsByTagName("entry");
+
+                                                  for(var indexPropertyValue = 0; indexPropertyValue < propertiesXmlVector.length; indexPropertyValue++) {
+
+                                                      var key = propertiesXmlVector[indexPropertyValue].getElementsByTagName("key")[0].childNodes[0];
+                                                      var value = propertiesXmlVector[indexPropertyValue].getElementsByTagName("value")[0].childNodes[0];
+
+                                                      //Iterate the loaded properties and set this value when property key matches
+                                                      $scope.commandProperties.propertyCategoryList.forEach(function (propertyCategory) {
+
+                                                          //Iterate al categories to find this property and set the value
+                                                          propertyCategory.properties.forEach(function (property) {
+
+                                                              if (property.name == key.nodeValue){
+
+                                                                  //Set the value for property
+
+                                                                  if (property.type == 'java.lang.Integer'){
+                                                                      property.value = angular.copy(parseInt(value.nodeValue));
+                                                                      property.htmlType = 'number';
+
+                                                                  } else {
+                                                                      property.value = angular.copy(value.nodeValue);
+                                                                      property.htmlType = 'text';
+                                                                  }
+
+                                                              }
+
+                                                          });
+
+
+                                                      });
+
+
+                                                  }
+
+                                              }).
+                                              error(function(data, status, headers, config) {
+                                                  console.log("error reading command instance properties");
+
+
+                                                  // called asynchronously if an error occurs
+                                                  // or server returns response with an error status.
+                                              });
+
+                                  }
+
+
+                              }
+
+
+                          })
+                          .error(function(data, status, headers, config) {
+                              console.log("error reading readermetadata for command wizard: command instance selection");
+
+                              // called asynchronously if an error occurs
+                              // or server returns response with an error status.
+                          });
+
+
+                  } else if ($scope.elementSelected.elementType == 'commandInstance_commandManagement'){
+
+                      console.log("element type commandInstance selected");
+                      //load properties for this command type
+
+
+                      //$scope.commandWizardData.commandInstance = selectedCommandInstance;
+                      var host = angular.copy($scope.elementSelected.host);
+                      var readerType = angular.copy($scope.elementSelected.factoryElement.readerTypeElement.factoryID);
+                      var commandType = angular.copy($scope.elementSelected.factoryID);
+                      var commandId = angular.copy($scope.elementSelected.commandID);
 
                       console.log("readerType:");
                       console.log(readerType);
@@ -1189,15 +1448,15 @@ var module = angular.module('rifidiApp')
                                           };
 
                                           //Set the default value for property
-/*
-                                          if (type.nodeValue == 'java.lang.Integer'){
-                                              propertyElement.value = angular.copy(parseInt(defaultvalue.nodeValue));
-                                              propertyElement.defaultvalue = angular.copy(parseInt(defaultvalue.nodeValue));
-                                          } else {
-                                              propertyElement.value = angular.copy(defaultvalue.nodeValue);
-                                              propertyElement.defaultvalue = angular.copy(defaultvalue.nodeValue);
-                                          }
-*/
+                                          /*
+                                           if (type.nodeValue == 'java.lang.Integer'){
+                                           propertyElement.value = angular.copy(parseInt(defaultvalue.nodeValue));
+                                           propertyElement.defaultvalue = angular.copy(parseInt(defaultvalue.nodeValue));
+                                           } else {
+                                           propertyElement.value = angular.copy(defaultvalue.nodeValue);
+                                           propertyElement.defaultvalue = angular.copy(defaultvalue.nodeValue);
+                                           }
+                                           */
                                           //Add the property to appropriate property category list
                                           $scope.commandProperties.propertyCategoryList.forEach(function (propertyCategory) {
 
@@ -1213,68 +1472,68 @@ var module = angular.module('rifidiApp')
 
                                       //Load the current values for every property
 
-                                          //call the service to get properties of command instance
-                                          $http.get(host + '/getproperties/' + commandId)
-                                              .success(function(data, status, headers, config) {
+                                      //call the service to get properties of command instance
+                                      $http.get(host + '/getproperties/' + commandId)
+                                          .success(function(data, status, headers, config) {
 
-                                                  var xmlCommandProperties;
-                                                  if (window.DOMParser)
-                                                  {
-                                                      var parser = new DOMParser();
-                                                      xmlCommandProperties = parser.parseFromString(data,"text/xml");
-                                                  }
-                                                  else // Internet Explorer
-                                                  {
-                                                      xmlCommandProperties = new ActiveXObject("Microsoft.XMLDOM");
-                                                      xmlCommandProperties.async=false;
-                                                      xmlCommandProperties.loadXML(data);
-                                                  }
+                                              var xmlCommandProperties;
+                                              if (window.DOMParser)
+                                              {
+                                                  var parser = new DOMParser();
+                                                  xmlCommandProperties = parser.parseFromString(data,"text/xml");
+                                              }
+                                              else // Internet Explorer
+                                              {
+                                                  xmlCommandProperties = new ActiveXObject("Microsoft.XMLDOM");
+                                                  xmlCommandProperties.async=false;
+                                                  xmlCommandProperties.loadXML(data);
+                                              }
 
-                                                  //get the xml response and extract the values for properties
-                                                  var propertiesXmlVector = xmlCommandProperties.getElementsByTagName("entry");
+                                              //get the xml response and extract the values for properties
+                                              var propertiesXmlVector = xmlCommandProperties.getElementsByTagName("entry");
 
-                                                  for(var indexPropertyValue = 0; indexPropertyValue < propertiesXmlVector.length; indexPropertyValue++) {
+                                              for(var indexPropertyValue = 0; indexPropertyValue < propertiesXmlVector.length; indexPropertyValue++) {
 
-                                                      var key = propertiesXmlVector[indexPropertyValue].getElementsByTagName("key")[0].childNodes[0];
-                                                      var value = propertiesXmlVector[indexPropertyValue].getElementsByTagName("value")[0].childNodes[0];
+                                                  var key = propertiesXmlVector[indexPropertyValue].getElementsByTagName("key")[0].childNodes[0];
+                                                  var value = propertiesXmlVector[indexPropertyValue].getElementsByTagName("value")[0].childNodes[0];
 
-                                                      //Iterate the loaded properties and set this value when property key matches
-                                                      $scope.commandProperties.propertyCategoryList.forEach(function (propertyCategory) {
+                                                  //Iterate the loaded properties and set this value when property key matches
+                                                  $scope.commandProperties.propertyCategoryList.forEach(function (propertyCategory) {
 
-                                                          //Iterate al categories to find this property and set the value
-                                                          propertyCategory.properties.forEach(function (property) {
+                                                      //Iterate al categories to find this property and set the value
+                                                      propertyCategory.properties.forEach(function (property) {
 
-                                                              if (property.name == key.nodeValue){
+                                                          if (property.name == key.nodeValue){
 
-                                                                  //Set the value for property
+                                                              //Set the value for property
 
-                                                                  if (property.type == 'java.lang.Integer'){
-                                                                      property.value = angular.copy(parseInt(value.nodeValue));
-                                                                      property.htmlType = 'number';
+                                                              if (property.type == 'java.lang.Integer'){
+                                                                  property.value = angular.copy(parseInt(value.nodeValue));
+                                                                  property.htmlType = 'number';
 
-                                                                  } else {
-                                                                      property.value = angular.copy(value.nodeValue);
-                                                                      property.htmlType = 'text';
-                                                                  }
-
+                                                              } else {
+                                                                  property.value = angular.copy(value.nodeValue);
+                                                                  property.htmlType = 'text';
                                                               }
 
-                                                          });
-
+                                                          }
 
                                                       });
 
 
-                                                  }
-
-                                              }).
-                                              error(function(data, status, headers, config) {
-                                                  console.log("error reading command instance properties");
+                                                  });
 
 
-                                                  // called asynchronously if an error occurs
-                                                  // or server returns response with an error status.
-                                              });
+                                              }
+
+                                          }).
+                                          error(function(data, status, headers, config) {
+                                              console.log("error reading command instance properties");
+
+
+                                              // called asynchronously if an error occurs
+                                              // or server returns response with an error status.
+                                          });
 
                                   }
 
@@ -1425,7 +1684,10 @@ var module = angular.module('rifidiApp')
 
         }
 
-        $scope.openSaveCommandInstancePropertiesDialog = function(){
+        $scope.openSaveCommandInstancePropertiesDialog = function(commandProperties, host, commandId){
+
+            console.log("commandProperties:");
+            console.log(commandProperties);
 
             ngDialog.openConfirm({template: 'saveCommandInstancePropertiesDialogTmpl.html',
 
@@ -1446,7 +1708,7 @@ var module = angular.module('rifidiApp')
                         console.log("to save");
 
                         //call save command properties operation
-                        saveCommandInstanceProperties($scope.elementTree.currentNode, $scope.commandProperties);
+                        saveCommandInstanceProperties(commandProperties, host, commandId);
 
                     }
 
@@ -1463,10 +1725,10 @@ var module = angular.module('rifidiApp')
 
         };
 
-        var saveCommandInstanceProperties = function(commandElement, commandProperties){
+        var saveCommandInstanceProperties = function(commandProperties, host, commandId){
 
-            console.log("commandElement:");
-            console.log(commandElement);
+           // console.log("commandElement:");
+           // console.log(commandElement);
             console.log("commandProperties:");
             console.log(commandProperties);
 
@@ -1474,15 +1736,15 @@ var module = angular.module('rifidiApp')
 
             var strCommandProperties = "";
 
-            for (var idxCat=0; idxCat < $scope.commandProperties.propertyCategoryList.length; idxCat++){
+            for (var idxCat=0; idxCat < commandProperties.propertyCategoryList.length; idxCat++){
 
                 //console.log("$scope.commandProperties.propertyCategoryList[idxCat]");
                 //console.log($scope.commandProperties.propertyCategoryList[idxCat]);
 
-                for (var idxProp=0; idxProp < $scope.commandProperties.propertyCategoryList[idxCat].properties.length; idxProp++){
+                for (var idxProp=0; idxProp < commandProperties.propertyCategoryList[idxCat].properties.length; idxProp++){
 
-                    strCommandProperties += $scope.commandProperties.propertyCategoryList[idxCat].properties[idxProp].name + "="
-                    + $scope.commandProperties.propertyCategoryList[idxCat].properties[idxProp].value + ";"
+                    strCommandProperties += commandProperties.propertyCategoryList[idxCat].properties[idxProp].name + "="
+                    + commandProperties.propertyCategoryList[idxCat].properties[idxProp].value + ";"
                 }
 
             }
@@ -1498,7 +1760,7 @@ var module = angular.module('rifidiApp')
                 //console.log("going to set command properties: " + host + '/setproperties/' + $scope.selectedCommandInstance.commandID + '/' + strCommandProperties);
                 $scope.setCommandPropertiesResponseStatus = {};
 
-                $http.get(commandElement.session.sensor.host + '/setproperties/' + commandElement.elementId + '/' + strCommandProperties)
+                $http.get(host + '/setproperties/' + commandId + '/' + strCommandProperties)
                     .success(function(data, status, headers, config) {
 
                         var xmlSetCommandPropertiesResponse;
@@ -1849,8 +2111,8 @@ module.service('TreeViewPainting', function($http) {
                                                          "interval": commandInterval.nodeValue,
                                                          "iconClass": 'script-gear',
                                                          "session": sessionElement,
-                                                         "elementType": "commandInstance",
-                                                         "contextMenuId": "contextMenuCommand",
+                                                         "elementType": "commandInstance_sensor",
+                                                         "contextMenuId": "contextMenuCommand_sensor",
                                                          "commandType": factoryID.nodeValue,
                                                          "children": []
                                                      };
@@ -1946,7 +2208,7 @@ module.service('TreeViewPainting', function($http) {
                          //for each server, add the command management element
                          //command management element:
                          var commandManagementElement = {
-                             "host": server.ipAddress + ":" + server.restPort,
+                             "host": server.host,
                              "elementName": "Command Management",
                              "elementId": "commandManagement",
                              "collapsed": true,
@@ -1997,6 +2259,8 @@ module.service('TreeViewPainting', function($http) {
                                                  "collapsed": true,
                                                  "factoryID": factoryID.nodeValue,
                                                  "description": description.nodeValue,
+                                                 "iconClass":"reader-cog",
+                                                 "host": server.host,
                                                  "children": []
                                              };
 
@@ -2057,7 +2321,11 @@ module.service('TreeViewPainting', function($http) {
                                                                  "collapsed": true,
                                                                  "factoryID": factoryID.nodeValue,
                                                                  "description": description.nodeValue,
+                                                                 "iconClass":"folder",
                                                                  "readerFactoryID": readerFactoryID.nodeValue,
+                                                                 "elementType": "commandType",
+                                                                 "host": server.host,
+                                                                 "readerTypeElement": readerTypeElement,
                                                                  "children": []
 
                                                              }
@@ -2122,7 +2390,11 @@ module.service('TreeViewPainting', function($http) {
                                                                              "collapsed": true,
                                                                              "commandID": commandID.nodeValue,
                                                                              "factoryID": factoryID.nodeValue,
-                                                                             "elementType": "commandInstance",
+                                                                             "elementType": "commandInstance_commandManagement",
+                                                                             "iconClass":"cog",
+                                                                             "host": server.host,
+                                                                             "contextMenuId": "contextMenuCommand_commandManagement",
+                                                                             "factoryElement": factoryElement,
                                                                              "children": []
                                                                          };
 
@@ -2168,10 +2440,6 @@ module.service('TreeViewPainting', function($http) {
                                  // called asynchronously if an error occurs
                                  // or server returns response with an error status.
                              });
-
-
-                         //aca iba
-
 
                          //for each server, add the app management element
                          //app management element:

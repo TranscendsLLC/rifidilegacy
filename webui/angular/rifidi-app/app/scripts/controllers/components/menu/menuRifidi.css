@@ -252,3 +252,9 @@ div[data-tree-model] li .script-delete {
     background-image: url("/images/script_delete.png");
     background-repeat: no-repeat;
 }
+
+div[data-tree-model] li .folder {
+    padding: 1px 10px;
+    background-image: url("/images/folder.png");
+    background-repeat: no-repeat;
+}
