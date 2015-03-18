@@ -70,8 +70,13 @@
 					'<li><a href="#/commandWizard"><i class="submit-job">&nbsp;&nbsp;&nbsp;&nbsp;Submit Job</i></a></li>'+
 					'</ul>';
 
-				//command menu
-				var menuCommand = '<ul id="contextMenuCommand" class="dropdown-menu">'+
+				//command menu for sensor
+				var menuCommand_Sensor = '<ul id="contextMenuCommand_sensor" class="dropdown-menu">'+
+					'<li><a ng-click="openDeleteJobDialog()"><i class="script-delete">&nbsp;&nbsp;&nbsp;&nbsp;Delete Job</i></a></li>'+
+					'</ul>';
+
+				//command menu for command management
+				var menuCommand_commandManagement = '<ul id="contextMenuCommand_commandManagement" class="dropdown-menu">'+
 					'<li><a ng-click="openDeleteCommandDialog()"><i class="script-delete">&nbsp;&nbsp;&nbsp;&nbsp;Delete Command</i></a></li>'+
 					'</ul>';
 
@@ -89,7 +94,7 @@
 							'<i class="expanded" data-ng-show="node.' + nodeChildren + '.length && !node.collapsed" data-ng-click="' + treeId + '.selectNodeHead(node)"></i>' +
 							'<i class="normal" data-ng-hide="node.' + nodeChildren + '.length"></i>' +
 							'<i class="{{node.iconClass}}"></i> ' +
-							'<span context="{{node.contextMenuId}}" data-ng-class="node.selected" data-ng-click="' + treeId + '.selectNodeLabel(node)">{{node.' + nodeLabel + '}}</span>' +
+							'<span context="{{node.contextMenuId}}"  data-ng-class="node.selected" data-ng-click="' + treeId + '.selectNodeLabel(node)">{{node.' + nodeLabel + '}}</span>' +
 							'<div data-ng-hide="node.collapsed" data-tree-id="' + treeId + '" data-tree-model="node.' + nodeChildren + '" data-node-id=' + nodeId + ' data-node-label=' + nodeLabel + ' data-node-children=' + nodeChildren + '></div>' +
 						'</li>' +
 					'</ul>' +
@@ -98,7 +103,8 @@
 						menuSensor +
 						menuSession +
 						menuServers
-						+ menuCommand
+						+ menuCommand_Sensor
+					    + menuCommand_commandManagement
 					;
 
 
