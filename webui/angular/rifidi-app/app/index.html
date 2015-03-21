@@ -30,7 +30,7 @@
             <div class="container">
                 <div class="navbar-header">
 
-                    <a class="navbar-brand" href="#">Rifidi Web Console</a>
+                    <a class="navbar-brand" href="#">Rifidi Web Administration Dashboard</a>
                 </div>
             </div>
         </nav>
@@ -544,6 +544,92 @@
 
                            </div>
 
+                           <div ng-switch-when="appGroup">
+
+                               <div ng-show="getPropertiesErrorMsg">
+                                   {{getPropertiesErrorMsg}}
+                               </div>
+
+                               <form class="form-horizontal" role="form" name="form" novalidate>
+
+                                   <div class="form-group" ng-repeat="property in appGroupProperties.properties | orderBy:['key']">
+
+                                       <div class="col-sm-6">
+                                           <label class="control-label" for="{{property.key}}">{{property.key}}</label>
+                                       </div>
+
+
+                                       <div class="col-sm-6" >
+
+                                           <input aria-describedby="help{{property.key}}" id="{{property.key}}"
+                                                  name="{{property.key}}" type="text" ng-value="property.value" ng-model="property.value"
+                                                  class="form-control"
+                                           />
+
+                                           <div ng-show="form.$submitted || form.property.name.$touched" >
+
+                                               <div ng-show="form.property.key.$error.required">
+
+                                                   {{property.key}} is required.
+
+                                               </div>
+                                           </div>
+
+                                       </div>
+
+                                       <br>
+                                       <p>
+
+                                   </div>
+
+                                   <input class="btn btn-primary" ng-hide="getPropertiesErrorMsg" ng-click="openSaveAppGroupPropertiesDialog()" ng-disabled="form.$invalid" type="submit" value="Save" />
+
+                               </form>
+                           </div>
+
+                           <div ng-switch-when="app">
+
+                               <div ng-show="getPropertiesErrorMsg">
+                                   {{getPropertiesErrorMsg}}
+                               </div>
+
+                               <form class="form-horizontal" role="form" name="form" novalidate>
+
+                                   <div class="form-group" ng-repeat="property in appProperties.properties | orderBy:['key']">
+
+                                       <div class="col-sm-6">
+                                           <label class="control-label" for="{{property.key}}">{{property.key}}</label>
+                                       </div>
+
+
+                                       <div class="col-sm-6" >
+
+                                           <input aria-describedby="help{{property.key}}" id="{{property.key}}"
+                                                  name="{{property.key}}" type="text" ng-value="property.value" ng-model="property.value"
+                                                  class="form-control"
+                                                   />
+
+                                           <div ng-show="form.$submitted || form.property.key.$touched" >
+
+                                               <div ng-show="form.property.key.$error.required">
+
+                                                   {{property.key}} is required.
+
+                                               </div>
+                                           </div>
+
+                                       </div>
+
+                                       <br>
+                                       <p>
+
+                                   </div>
+
+                                   <input class="btn btn-primary" ng-hide="getPropertiesErrorMsg" ng-click="openSaveAppPropertiesDialog()" ng-disabled="form.$invalid" type="submit" value="Save" />
+
+                               </form>
+                           </div>
+
                        </div>
                    </div>
 
@@ -599,6 +685,8 @@
     <script src="bower_components/lodash/dist/lodash.compat.js"></script>
     <script src="bower_components/angular-wizard/dist/angular-wizard.js"></script>
     <script src="bower_components/ngDialog/js/ngDialog.js"></script>
+    <script src="bower_components/angular-mocks/angular-mocks.js"></script>
+    <script src="bower_components/ng-contextmenu/dist/ng-contextmenu.js"></script>
     <!-- endbower -->
     <!-- endbuild -->
 
@@ -613,7 +701,10 @@
         <script src="scripts/controllers/serverWizard.js"></script>
         <script src="scripts/controllers/commandWizard.js"></script>
         <script src="scripts/controllers/menu.js"></script>
-<!--        <script src="scripts/controllers/common.js"></script>-->
+
+
+
+    <!--        <script src="scripts/controllers/common.js"></script>-->
 
 
         <!-- endbuild -->

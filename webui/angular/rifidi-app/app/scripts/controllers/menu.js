@@ -473,6 +473,81 @@ var module = angular.module('rifidiApp')
 
           };
 
+
+        $scope.openSaveServerConfigDialog = function() {
+
+            ngDialog.openConfirm({template: 'saveServerConfigDialogTmpl.html',
+
+                scope: $scope, //Pass the scope object if you need to access in the template
+
+                showClose: false,
+
+                closeByEscape: true,
+
+                closeByDocument: false
+
+            }).then(
+
+                function(value) {
+
+                    //confirm operation
+                    if (value == 'Save'){
+                        console.log("to save");
+
+                        //call save server config operation
+                        saveServerConfig();
+                    }
+
+                },
+
+                function(value) {
+
+                    //Cancel or do nothing
+                    console.log("cancel");
+
+                }
+
+            );
+
+        };
+
+        $scope.openSaveAllServersConfigDialog = function() {
+
+            ngDialog.openConfirm({template: 'saveAllServersConfigDialogTmpl.html',
+
+                scope: $scope, //Pass the scope object if you need to access in the template
+
+                showClose: false,
+
+                closeByEscape: true,
+
+                closeByDocument: false
+
+            }).then(
+
+                function(value) {
+
+                    //confirm operation
+                    if (value == 'Save'){
+                        console.log("to save");
+
+                        //call save server config operation
+                        saveAllServersConfig();
+                    }
+
+                },
+
+                function(value) {
+
+                    //Cancel or do nothing
+                    console.log("cancel");
+
+                }
+
+            );
+
+        };
+
         $scope.openDeleteCommandDialog = function() {
 
             ngDialog.openConfirm({template: 'deleteCommandDialogTmpl.html',
@@ -812,7 +887,7 @@ var module = angular.module('rifidiApp')
         var saveServerProperties = function(server) {
 
             console.log("saveServerProperties op success");
-            setSuccessMessage("Save server properties operation successX");
+            setSuccessMessage("Save server properties operation success");
             //$scope.operationSuccessMsg = "Save server properties operation success";
             $rootScope.operationSuccessMsg = getSuccessMessage();
             console.log("$rootScope.operationSuccessMsg:");
@@ -820,15 +895,145 @@ var module = angular.module('rifidiApp')
             //$scope.$apply();
         }
 
-          $scope.saveServer = function(){
-              console.log("saveServer");
+        var saveServerConfig = function(){
+              console.log("saveServerConfig");
               console.log("$scope.elementSelected");
               console.log($scope.elementSelected);
-              console.log("$scope.elementTree.currentNode");
-              console.log($scope.elementTree.currentNode);
-              console.log("show alert dialog to confirm");
+
+            //call the save operation on selected server
+            $http.get($scope.elementSelected.host + '/save')
+                .success(function (data, status, headers, config) {
+
+                    var saveCommandResponse;
+                    if (window.DOMParser) {
+                        var parser = new DOMParser();
+                        saveCommandResponse = parser.parseFromString(data, "text/xml");
+                    }
+                    else // Internet Explorer
+                    {
+                        saveCommandResponse = new ActiveXObject("Microsoft.XMLDOM");
+                        saveCommandResponse.async = false;
+                        saveCommandResponse.loadXML(data);
+                    }
+
+                    //get the xml response and extract the message response
+                    var message = saveCommandResponse.getElementsByTagName("message")[0].childNodes[0].nodeValue;
+
+                    if (message == 'Success') {
+                        console.log("success saving server config");
+
+                        setSuccessMessage("Save server config operation success");
+                        //$scope.operationSuccessMsg = "Save server properties operation success";
+                        $rootScope.operationSuccessMsg = getSuccessMessage();
+
+                        TreeViewPainting.paintTreeView($scope);
+
+                    } else {
+                        var saveServerConfigCommandDescription = saveCommandResponse.getElementsByTagName("description")[0].childNodes[0].nodeValue;
+                        console.log("fail saving server config");
+                        console.log(saveServerConfigCommandDescription);
+
+                        //show modal dialog with error
+                        showErrorDialog('Error saving server config: ' + saveServerConfigCommandDescription);
+
+                    }
+
+
+                }).
+                error(function (data, status, headers, config) {
+                    console.log("error saving server config");
+
+                    //show modal dialog with error
+                    showErrorDialog('Error saving server config');
+
+
+                    // called asynchronously if an error occurs
+                    // or server returns response with an error status.
+                });
 
           }
+
+
+
+        var saveAllServersConfig = function(){
+            console.log("saveAllServersConfig");
+            console.log("$scope.elementSelected");
+            console.log($scope.elementSelected);
+
+            //call the save operation on every server
+
+            $scope.elementList[0].children.forEach(function (server) {
+
+                console.log("server");
+                console.log(server);
+
+                //call save server only if status is connected
+                if (server.status == 'CONNECTED') {
+
+                    $http.get(server.host + '/save')
+                        .success(function (data, status, headers, config) {
+
+                            var saveHost = headers('host');
+
+                            var saveCommandResponse;
+                            if (window.DOMParser) {
+                                var parser = new DOMParser();
+                                saveCommandResponse = parser.parseFromString(data, "text/xml");
+                            }
+                            else // Internet Explorer
+                            {
+                                saveCommandResponse = new ActiveXObject("Microsoft.XMLDOM");
+                                saveCommandResponse.async = false;
+                                saveCommandResponse.loadXML(data);
+                            }
+
+                            //get the xml response and extract the message response
+                            var message = saveCommandResponse.getElementsByTagName("message")[0].childNodes[0].nodeValue;
+
+                            if (message == 'Success') {
+                                console.log("success saving server config for server: " + saveHost);
+
+                                setSuccessMessage( (getSuccessMessage() != null ? getSuccessMessage() : "") + "Save server config operation success for server: " + saveHost );
+                                //$scope.operationSuccessMsg = "Save server properties operation success";
+                                $rootScope.operationSuccessMsg = getSuccessMessage();
+
+                                TreeViewPainting.paintTreeView($scope);
+
+                            } else {
+                                var saveServerConfigCommandDescription = saveCommandResponse.getElementsByTagName("description")[0].childNodes[0].nodeValue;
+                                console.log("fail saving server config for server: " + saveHost);
+                                console.log(saveServerConfigCommandDescription);
+
+                                //show modal dialog with error
+                                showErrorDialog("Error saving server config for server: " + saveHost + saveServerConfigCommandDescription);
+
+                            }
+
+
+                        }).
+                        error(function (data, status, headers, config) {
+
+                            var saveHost = headers('host');
+
+                            console.log("error saving server config for server: " + saveHost);
+
+                            //show modal dialog with error
+                            showErrorDialog("Error saving server config for server: " + saveHost);
+
+
+                            // called asynchronously if an error occurs
+                            // or server returns response with an error status.
+                        });
+
+                } else {
+
+                    console.log("not saving config for server " + server.host + " due to disconnected state");
+                }
+
+            });
+
+
+        }
 
           //$scope.refreshMenuTreeView;
 
@@ -1552,10 +1757,177 @@ var module = angular.module('rifidiApp')
 
 
 
+                  } else if ($scope.elementSelected.elementType === 'appGroup'){
+
+                     //load the app group properties
+                     console.log("appGroup selected");
+
+                     $scope.appGroupProperties = null;
+
+                     //get the app id of the first app below this app group
+                     var appId = $scope.elementSelected.children[0].children[0].number;
+
+                      //call getGroupProperties operation
+                      var host = angular.copy($scope.elementSelected.host);
+
+
+                      $http.get(host + '/getGroupProperties/' + appId)
+                          .success(function(data, status, headers, config) {
+
+                              var xmlGroupProperties;
+                              if (window.DOMParser)
+                              {
+                                  var parser = new DOMParser();
+                                  xmlGroupProperties = parser.parseFromString(data,"text/xml");
+                              }
+                              else // Internet Explorer
+                              {
+                                  xmlGroupProperties = new ActiveXObject("Microsoft.XMLDOM");
+                                  xmlGroupProperties.async=false;
+                                  xmlGroupProperties.loadXML(data);
+                              }
+
+                              //get the xml response and extract the message response
+                              if (xmlGroupProperties.getElementsByTagName("message").length > 0) {
+
+                                  //the message tag appears in fail messages
+                                  var message = xmlGroupProperties.getElementsByTagName("message")[0].childNodes[0].nodeValue;
+
+                                  if (message == 'Fail') {
+                                      console.log("fail getting app group properties");
+                                      var description = xmlGroupProperties.getElementsByTagName("description")[0].childNodes[0].nodeValue;
+                                      $scope.getPropertiesErrorMsg = description;
+
+                                  }
+                              } else {
+
+                                  //success return of properties
+
+                                  //get the xml response and extract the values for properties
+                                  var propertiesXmlVector = xmlGroupProperties.getElementsByTagName("entry");
+
+
+                                  $scope.appGroupProperties = {
+                                      "host": host,
+                                      "appId": appId,
+                                      "properties": []
+                                  }
+
+
+                                  for(var indexPropertyValue = 0; indexPropertyValue < propertiesXmlVector.length; indexPropertyValue++) {
+
+                                      var key = propertiesXmlVector[indexPropertyValue].getElementsByTagName("key")[0].childNodes[0].nodeValue;
+                                      var value = propertiesXmlVector[indexPropertyValue].getElementsByTagName("value")[0].childNodes[0].nodeValue;
+
+                                      var propertyElement = {
+                                          "key": key,
+                                          "value": value
+                                      }
+
+                                      $scope.appGroupProperties.properties.push(propertyElement);
+
+                                  }
+
+                              }
+
+                          }).
+                          error(function(data, status, headers, config) {
+                              console.log("error reading app group properties");
+
+
+                              // called asynchronously if an error occurs
+                              // or server returns response with an error status.
+                          });
+
+
+                  } else if ($scope.elementSelected.elementType === 'app'){
+
+                      //load the app  properties
+                      console.log("app selected");
+
+                      $scope.appProperties = null;
+
+                      //get the app id of the first app below this app group
+                      var appId = $scope.elementSelected.number;
+
+                      //call getAppProperties operation
+                      var host = angular.copy($scope.elementSelected.host);
+
+
+                      $http.get(host + '/getAppProperties/' + appId)
+                          .success(function(data, status, headers, config) {
+
+                              var xmlAppProperties;
+                              if (window.DOMParser)
+                              {
+                                  var parser = new DOMParser();
+                                  xmlAppProperties = parser.parseFromString(data,"text/xml");
+                              }
+                              else // Internet Explorer
+                              {
+                                  xmlAppProperties = new ActiveXObject("Microsoft.XMLDOM");
+                                  xmlAppProperties.async=false;
+                                  xmlAppProperties.loadXML(data);
+                              }
+
+                              //get the xml response and extract the message response
+                              if (xmlAppProperties.getElementsByTagName("message").length > 0) {
+
+                                  //the message tag appears in fail messages
+                                  var message = xmlAppProperties.getElementsByTagName("message")[0].childNodes[0].nodeValue;
+
+                                  if (message == 'Fail') {
+                                      console.log("fail getting app properties");
+                                      var description = xmlAppProperties.getElementsByTagName("description")[0].childNodes[0].nodeValue;
+                                      $scope.getPropertiesErrorMsg = description;
+
+                                  }
+                              } else {
+
+                                  //success return of properties
+
+                                  //get the xml response and extract the values for properties
+                                  var propertiesXmlVector = xmlAppProperties.getElementsByTagName("entry");
+
+
+                                  $scope.appProperties = {
+                                      "host": host,
+                                      "appId": appId,
+                                      "properties": []
+                                  }
+
+
+                                  for(var indexPropertyValue = 0; indexPropertyValue < propertiesXmlVector.length; indexPropertyValue++) {
+
+                                      var key = propertiesXmlVector[indexPropertyValue].getElementsByTagName("key")[0].childNodes[0].nodeValue;
+                                      var value = propertiesXmlVector[indexPropertyValue].getElementsByTagName("value")[0].childNodes[0].nodeValue;
+
+                                      var propertyElement = {
+                                          "key": key,
+                                          "value": value
+                                      }
+
+                                      $scope.appProperties.properties.push(propertyElement);
+
+                                  }
+
+                              }
+
+                          }).
+                          error(function(data, status, headers, config) {
+                              console.log("error reading app properties");
+
+
+                              // called asynchronously if an error occurs
+                              // or server returns response with an error status.
+                          });
+
+
                   }
 
                   //console.log("set 2 propertyType: " + $scope.propertyType);
                   $rootScope.operationSuccessMsg = null;
+                  $scope.getPropertiesErrorMsg = null;
 
 
 
@@ -1684,6 +2056,83 @@ var module = angular.module('rifidiApp')
 
         }
 
+        $scope.openSaveAppGroupPropertiesDialog = function(){
+
+            ngDialog.openConfirm({template: 'saveAppGroupPropertiesDialogTmpl.html',
+
+                scope: $scope, //Pass the scope object if you need to access in the template
+
+                showClose: false,
+
+                closeByEscape: true,
+
+                closeByDocument: false
+
+            }).then(
+
+                function(value) {
+
+                    //confirm operation
+                    if (value == 'Save'){
+                        console.log("to save");
+
+                        //call save sensor properties operation
+                        saveAppGroupProperties($scope.appGroupProperties);
+
+                    }
+
+                },
+
+                function(value) {
+
+                    //Cancel or do nothing
+                    console.log("cancel");
+
+                }
+
+            );
+
+        };
+
+        $scope.openSaveAppPropertiesDialog = function(){
+
+            ngDialog.openConfirm({template: 'saveAppPropertiesDialogTmpl.html',
+
+                scope: $scope, //Pass the scope object if you need to access in the template
+
+                showClose: false,
+
+                closeByEscape: true,
+
+                closeByDocument: false
+
+            }).then(
+
+                function(value) {
+
+                    //confirm operation
+                    if (value == 'Save'){
+                        console.log("to save");
+
+                        //call save sensor properties operation
+                        saveAppProperties($scope.appProperties);
+
+                    }
+
+                },
+
+                function(value) {
+
+                    //Cancel or do nothing
+                    console.log("cancel");
+
+                }
+
+            );
+
+        };
+
+
         $scope.openSaveCommandInstancePropertiesDialog = function(commandProperties, host, commandId){
 
             console.log("commandProperties:");
@@ -1806,6 +2255,160 @@ var module = angular.module('rifidiApp')
                         // called asynchronously if an error occurs
                         // or server returns response with an error status.
                     });
+
+
+
+        }
+
+        var saveAppGroupProperties = function(appGroupProperties){
+
+            // console.log("commandElement:");
+            // console.log(commandElement);
+            console.log("appGroupProperties:");
+            console.log(appGroupProperties);
+
+            //call update command properties
+
+            var strAppGroupProperties = "";
+
+            for (var idxProp=0; idxProp < appGroupProperties.properties.length; idxProp++){
+
+                strAppGroupProperties += appGroupProperties.properties[idxProp].key + "="
+                + appGroupProperties.properties[idxProp].value + ";"
+            }
+
+            //Quit the last semicolon ;
+            if (strAppGroupProperties.length > 0){
+                strAppGroupProperties = strAppGroupProperties.substring(0, strAppGroupProperties.length - 1);
+            }
+
+            console.log("strAppGroupProperties");
+            console.log(strAppGroupProperties);
+
+            $scope.setAppGroupPropertiesResponseStatus = {};
+
+            $http.get(appGroupProperties.host + '/setGroupProperties/' + appGroupProperties.appId + '/' + encodeURIComponent(strAppGroupProperties))
+                .success(function(data, status, headers, config) {
+
+                    var xmlSetAppGroupPropertiesResponse;
+                    if (window.DOMParser)
+                    {
+                        var parser = new DOMParser();
+                        xmlSetAppGroupPropertiesResponse = parser.parseFromString(data,"text/xml");
+                    }
+                    else // Internet Explorer
+                    {
+                        xmlSetAppGroupPropertiesResponse = new ActiveXObject("Microsoft.XMLDOM");
+                        xmlSetAppGroupPropertiesResponse.async=false;
+                        xmlSetAppGroupPropertiesResponse.loadXML(data);
+                    }
+
+
+                    //get the xml response and extract the value
+                    var message = xmlSetAppGroupPropertiesResponse.getElementsByTagName("message")[0].childNodes[0].nodeValue;
+
+                    $scope.setAppGroupPropertiesResponseStatus.message = message;
+
+                    if (message == 'Success') {
+                        console.log("success setting properties for app group");
+
+                        $rootScope.operationSuccessMsg = "Success setting properties for app group";
+
+                    } else {
+                        var setAppGroupPropertiesDescription = xmlSetAppGroupPropertiesResponse.getElementsByTagName("description")[0].childNodes[0].nodeValue;
+                        $scope.setAppGroupPropertiesResponseStatus.description = setAppGroupPropertiesDescription;
+                        console.log("fail set app group properties");
+                        console.log(setAppGroupPropertiesDescription);
+
+                        showErrorDialog('Error setting properties for app group: ' + setAppGroupPropertiesDescription);
+                    }
+
+
+                })
+                .error(function(data, status, headers, config) {
+                    console.log("error setting properties for app group");
+
+                    showErrorDialog('Error setting properties for app group');
+
+                    // called asynchronously if an error occurs
+                    // or server returns response with an error status.
+                });
+
+
+
+        }
+
+        var saveAppProperties = function(appProperties){
+
+            console.log("appProperties:");
+            console.log(appProperties);
+
+            //call update app properties
+
+            var strAppProperties = "";
+
+            for (var idxProp=0; idxProp < appProperties.properties.length; idxProp++){
+
+                strAppProperties += appProperties.properties[idxProp].key + "="
+                + appProperties.properties[idxProp].value + ";"
+            }
+
+            //Quit the last semicolon ;
+            if (strAppProperties.length > 0){
+                strAppProperties = strAppProperties.substring(0, strAppProperties.length - 1);
+            }
+
+            console.log("strAppProperties");
+            console.log(strAppProperties);
+
+            $scope.setAppPropertiesResponseStatus = {};
+
+            $http.get(appProperties.host + '/setAppProperties/' + appProperties.appId + '/' + encodeURIComponent(strAppProperties))
+                .success(function(data, status, headers, config) {
+
+                    var xmlSetAppPropertiesResponse;
+                    if (window.DOMParser)
+                    {
+                        var parser = new DOMParser();
+                        xmlSetAppPropertiesResponse = parser.parseFromString(data,"text/xml");
+                    }
+                    else // Internet Explorer
+                    {
+                        xmlSetAppPropertiesResponse = new ActiveXObject("Microsoft.XMLDOM");
+                        xmlSetAppPropertiesResponse.async=false;
+                        xmlSetAppPropertiesResponse.loadXML(data);
+                    }
+
+
+                    //get the xml response and extract the value
+                    var message = xmlSetAppPropertiesResponse.getElementsByTagName("message")[0].childNodes[0].nodeValue;
+
+                    $scope.setAppPropertiesResponseStatus.message = message;
+
+                    if (message == 'Success') {
+                        console.log("success setting properties for app");
+
+                        $rootScope.operationSuccessMsg = "Success setting properties for app";
+
+                    } else {
+                        var setAppPropertiesDescription = xmlSetAppPropertiesResponse.getElementsByTagName("description")[0].childNodes[0].nodeValue;
+                        $scope.setAppPropertiesResponseStatus.description = setAppPropertiesDescription;
+                        console.log("fail set app properties");
+                        console.log(setAppPropertiesDescription);
+
+                        showErrorDialog('Error setting properties for app: ' + setAppPropertiesDescription);
+                    }
+
+
+                })
+                .error(function(data, status, headers, config) {
+                    console.log("error setting properties for app");
+
+                    showErrorDialog('Error setting properties for app');
+
+                    // called asynchronously if an error occurs
+                    // or server returns response with an error status.
+                });
 
 
 
@@ -1955,6 +2558,7 @@ module.service('TreeViewPainting', function($http) {
                              });
 
 
+                         //start sensor management
                          //for each server, add the sensor management element
 
                          //sensor management element:
@@ -2205,6 +2809,11 @@ module.service('TreeViewPainting', function($http) {
                                  // or server returns response with an error status.
                              });
 
+                         //end sensor management
+
+
+                         //start command management
+
                          //for each server, add the command management element
                          //command management element:
                          var commandManagementElement = {
@@ -2441,6 +3050,12 @@ module.service('TreeViewPainting', function($http) {
                                  // or server returns response with an error status.
                              });
 
+                         //end command management
+
+
+
+                         //start app management
+
                          //for each server, add the app management element
                          //app management element:
                          var appManagementElement = {
@@ -2530,7 +3145,9 @@ module.service('TreeViewPainting', function($http) {
                                                      "collapsed": true,
                                                      "groupName": groupName,
                                                      "readzoneAppId": "",
+                                                     "elementType":"appGroup",
                                                      "iconClass": "group",
+                                                     "host":server.host,
                                                      "children": []
                                                  };
 
@@ -2541,6 +3158,7 @@ module.service('TreeViewPainting', function($http) {
                                                      "collapsed": true,
                                                      "groupName": groupName,
                                                      "iconClass": "apps",
+                                                     "host": server.host,
                                                      "children": []
                                                  };
 
@@ -2553,6 +3171,7 @@ module.service('TreeViewPainting', function($http) {
                                                      "collapsed": true,
                                                      "groupName": groupName,
                                                      "iconClass": "readzones",
+                                                     "host": server.host,
                                                      "children": []
                                                  };
 
@@ -2582,6 +3201,8 @@ module.service('TreeViewPainting', function($http) {
                                                          "number": number.nodeValue,
                                                          "status": status.nodeValue,
                                                          "iconClass": "app",
+                                                         "elementType": "app",
+                                                         "host": appGroupElement.host,
                                                          "children": []
 
                                                      }
