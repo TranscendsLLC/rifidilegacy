@@ -46,7 +46,7 @@
 
 	  			//server menu
 				var menuServer = '<ul id="contextMenuServer" class="dropdown-menu">'+
-					'<li><a ng-click="saveServer()"><i class="saveserver">&nbsp;&nbsp;&nbsp;&nbsp;Save server config</i></a></li>'+
+					'<li><a ng-click="openSaveServerConfigDialog()"><i class="saveserver">&nbsp;&nbsp;&nbsp;&nbsp;Save server config</i></a></li>'+
 					'<li><a ng-click="openDeleteServerDialog()"><i class="deleteserver">&nbsp;&nbsp;&nbsp;&nbsp;Delete server</i></a></li>'+
 					'<li class="divider"></li>'+
 					'</ul>';
@@ -83,7 +83,7 @@
 				//servers menu
 				var menuServers = '<ul id="contextMenuServers" class="dropdown-menu">'+
 					'<li><a href ="#/serverWizard"><i class="addserver">&nbsp;&nbsp;&nbsp;&nbsp;Add server</i></a></li>'+
-					'<li><a ng-click ="saveAllServers()"><i class="saveservers">&nbsp;&nbsp;&nbsp;&nbsp;Save all servers config</i></a></li>'+
+					'<li><a ng-click ="openSaveAllServersConfigDialog()"><i class="saveservers">&nbsp;&nbsp;&nbsp;&nbsp;Save all servers config</i></a></li>'+
 					'</ul>';
 
 				//tree template
@@ -94,7 +94,7 @@
 							'<i class="expanded" data-ng-show="node.' + nodeChildren + '.length && !node.collapsed" data-ng-click="' + treeId + '.selectNodeHead(node)"></i>' +
 							'<i class="normal" data-ng-hide="node.' + nodeChildren + '.length"></i>' +
 							'<i class="{{node.iconClass}}"></i> ' +
-							'<span context="{{node.contextMenuId}}"  data-ng-class="node.selected" data-ng-click="' + treeId + '.selectNodeLabel(node)">{{node.' + nodeLabel + '}}</span>' +
+							'<span context="{{node.contextMenuId}}" data-ng-class="node.selected" data-ng-click="' + treeId + '.selectNodeLabel(node)">{{node.' + nodeLabel + '}}</span>' +
 							'<div data-ng-hide="node.collapsed" data-tree-id="' + treeId + '" data-tree-model="node.' + nodeChildren + '" data-node-id=' + nodeId + ' data-node-label=' + nodeLabel + ' data-node-children=' + nodeChildren + '></div>' +
 						'</li>' +
 					'</ul>' +

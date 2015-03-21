@@ -19,6 +19,7 @@ angular
     'ui.bootstrap',
     'mgo-angular-wizard',
     'directive.contextMenu',
+    'ngContextMenu',
     'ngDialog'
   ])
   .config(function ($routeProvider) {
