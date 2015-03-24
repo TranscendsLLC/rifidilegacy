@@ -23,11 +23,11 @@ var module = angular.module('rifidiApp')
             }
         };
 
-        /*
+
         $scope.go = function ( path ) {
             $location.path( path );
         };
-        */
+
 
         $scope.elementSelected={};
         $scope.temporaryNode = {
@@ -130,12 +130,69 @@ var module = angular.module('rifidiApp')
 
           };
 
+        var deleteReadZone = function(){
+            console.log("deleteReadZone called");
+
+            var host = angular.copy($scope.elementSelected.host);
+            var appId = angular.copy($scope.elementSelected.appId);
+            var readZone = angular.copy($scope.elementSelected.readzone);
+
+            //call the rest operation to delete sensor
+            $http.get(host + '/deleteReadZone/' + appId + "/" + readZone)
+                .success(function (data, status, headers, config) {
+
+                    var deleteReadZoneCommandResponse;
+                    if (window.DOMParser) {
+                        var parser = new DOMParser();
+                        deleteReadZoneCommandResponse = parser.parseFromString(data, "text/xml");
+                    }
+                    else // Internet Explorer
+                    {
+                        deleteReadZoneCommandResponse = new ActiveXObject("Microsoft.XMLDOM");
+                        deleteReadZoneCommandResponse.async = false;
+                        deleteReadZoneCommandResponse.loadXML(data);
+                    }
+
+                    //get the xml response and extract the message response
+                    var message = deleteReadZoneCommandResponse.getElementsByTagName("message")[0].childNodes[0].nodeValue;
+
+
+                    if (message == 'Success') {
+                        console.log("success deleting read zone");
+                        TreeViewPainting.paintTreeView($scope);
+
+                    } else {
+                        var deleteReadZoneCommandDescription = deleteReadZoneCommandResponse.getElementsByTagName("description")[0].childNodes[0].nodeValue;
+                        console.log("fail deleting read zone");
+                        console.log(deleteReadZoneCommandDescription);
+
+                        //show modal dialog with error
+                        showErrorDialog('Error deleting read zone: ' + deleteReadZoneCommandDescription);
+
+                    }
+
+
+                }).
+                error(function (data, status, headers, config) {
+                    console.log("error deleting read zone");
+
+                    //show modal dialog with error
+                    showErrorDialog('Error deleting read zone');
+
+
+                    // called asynchronously if an error occurs
+                    // or server returns response with an error status.
+                });
+
+
+        };
+
           var deleteCommand = function(commandId){
 
               console.log("deleteCommand called");
 
               //call the rest operation to delete command
-              $http.get($scope.elementSelected.session.sensor.host + '/deletecommand/' + commandId)
+              $http.get($scope.elementSelected.host + '/deletecommand/' + commandId)
                   .success(function (data, status, headers, config) {
 
                       var deleteCommandCommandResponse;
@@ -472,6 +529,120 @@ var module = angular.module('rifidiApp')
               );
 
           };
+
+        $scope.openStartAppDialog = function() {
+
+            ngDialog.openConfirm({template: 'startAppDialogTmpl.html',
+
+                scope: $scope, //Pass the scope object if you need to access in the template
+
+                showClose: false,
+
+                closeByEscape: true,
+
+                closeByDocument: false
+
+            }).then(
+
+                function(value) {
+
+                    //confirm operation
+                    if (value == 'Start'){
+                        console.log("to start");
+
+                        //call start app operation
+                        startApp();
+                    }
+
+                },
+
+                function(value) {
+
+                    //Cancel or do nothing
+                    console.log("cancel");
+
+                }
+
+            );
+
+        };
+
+        $scope.openStopAppDialog = function() {
+
+            ngDialog.openConfirm({template: 'stopAppDialogTmpl.html',
+
+                scope: $scope, //Pass the scope object if you need to access in the template
+
+                showClose: false,
+
+                closeByEscape: true,
+
+                closeByDocument: false
+
+            }).then(
+
+                function(value) {
+
+                    //confirm operation
+                    if (value == 'Stop'){
+                        console.log("to stop");
+
+                        //call start app operation
+                        stopApp();
+                    }
+
+                },
+
+                function(value) {
+
+                    //Cancel or do nothing
+                    console.log("cancel");
+
+                }
+
+            );
+
+        };
+
+        $scope.openDeleteReadZoneDialog = function() {
+
+            ngDialog.openConfirm({template: 'deleteReadZoneDialogTmpl.html',
+
+                scope: $scope, //Pass the scope object if you need to access in the template
+
+                showClose: false,
+
+                closeByEscape: true,
+
+                closeByDocument: false
+
+            }).then(
+
+                function(value) {
+
+                    //confirm operation
+                    if (value == 'Delete'){
+                        console.log("to delete");
+
+                        //call delete readzone operation
+                        deleteReadZone();
+
+                    }
+
+                },
+
+                function(value) {
+
+                    //Cancel or do nothing
+                    console.log("cancel");
+
+                }
+
+            );
+
+        };
+
+
 
 
         $scope.openSaveServerConfigDialog = function() {
@@ -1060,6 +1231,9 @@ var module = angular.module('rifidiApp')
           ];
 
           $scope.$watch( 'elementTree.currentNode', function( newObj, oldObj ) {
+
+              $scope.go("/");
+
               console.log($scope.elementTree.currentNode);
               console.log("newObj:");
               console.log(newObj);
@@ -1757,6 +1931,236 @@ var module = angular.module('rifidiApp')
 
 
 
+                  } else if ($scope.elementSelected.elementType === 'commandType'){
+
+                      $scope.commandWizardData = {};
+                      $scope.commandWizardData.commandProperties = {};
+
+                      var host = angular.copy($scope.elementSelected.host);
+                      var readerType = angular.copy($scope.elementSelected.readerFactoryID);
+                      var factoryID = angular.copy($scope.elementSelected.factoryID);
+
+                      //$scope.commandWizardData.commandInstance = selectedCommandInstance;
+
+                      //Get the properties for the selected command type, from readermetadata
+                      $http.get(host + '/readermetadata')
+                          .success(function(data, status, headers, config) {
+
+                              var xmlMetadata;
+                              if (window.DOMParser)
+                              {
+                                  var parser = new DOMParser();
+                                  xmlMetadata = parser.parseFromString(data,"text/xml");
+                              }
+                              else // Internet Explorer
+                              {
+                                  xmlMetadata = new ActiveXObject("Microsoft.XMLDOM");
+                                  xmlMetadata.async=false;
+                                  xmlMetadata.loadXML(data);
+                              }
+
+                              //get the xml response and extract the values to construct the command properties for selected command type
+
+                              var commandMetadataXmlVector = xmlMetadata.getElementsByTagName("command");
+
+                              for(var index = 0; index < commandMetadataXmlVector.length; index++) {
+
+                                  var propertiesXmlVector = commandMetadataXmlVector[index].getElementsByTagName("property");
+                                  var id = commandMetadataXmlVector[index].getElementsByTagName("id")[0].childNodes[0];
+                                  var readerID = commandMetadataXmlVector[index].getElementsByTagName("readerID")[0].childNodes[0];
+
+                                  if (readerID.nodeValue == readerType && id.nodeValue ==  factoryID){
+
+                                      //Create the properties object for this command
+                                      $scope.commandWizardData.commandProperties = {
+                                          "readerID": readerID.nodeValue,
+                                          "id": id.nodeValue,
+                                          "propertyCategoryList": []
+
+                                      };
+
+                                      //extract the properties
+                                      for(var indexProp = 0; indexProp < propertiesXmlVector.length; indexProp++) {
+
+
+                                          var name = propertiesXmlVector[indexProp].getElementsByTagName("name")[0].childNodes[0];
+                                          var displayname = propertiesXmlVector[indexProp].getElementsByTagName("displayname")[0].childNodes[0];
+                                          var defaultvalue = {};
+                                          if (propertiesXmlVector[indexProp].getElementsByTagName("defaultvalue").length > 0){
+                                              defaultvalue = propertiesXmlVector[indexProp].getElementsByTagName("defaultvalue")[0].childNodes[0];
+                                          }
+
+                                          var description = propertiesXmlVector[indexProp].getElementsByTagName("description")[0].childNodes[0];
+                                          var type = propertiesXmlVector[indexProp].getElementsByTagName("type")[0].childNodes[0];
+                                          var maxvalue = 0;
+                                          var minvalue = 0;
+                                          if (type.nodeValue == 'java.lang.Integer') {
+                                              maxvalue = propertiesXmlVector[indexProp].getElementsByTagName("maxvalue")[0].childNodes[0];
+                                              minvalue = propertiesXmlVector[indexProp].getElementsByTagName("minvalue")[0].childNodes[0];
+                                          }
+                                          var category = propertiesXmlVector[indexProp].getElementsByTagName("category")[0].childNodes[0];
+                                          var writable = propertiesXmlVector[indexProp].getElementsByTagName("writable")[0].childNodes[0];
+                                          var ordervalue = propertiesXmlVector[indexProp].getElementsByTagName("ordervalue")[0].childNodes[0];
+
+                                          //check if current category already exists in propertyCategories
+                                          var existingCategory = false;
+
+                                          $scope.commandWizardData.commandProperties.propertyCategoryList.forEach(function (propertyCategory) {
+
+                                              if (category.nodeValue == propertyCategory.category){
+                                                  existingCategory = true;
+                                              }
+
+                                          });
+
+                                          if (!existingCategory){
+
+                                              var propertyCategory = {
+                                                  "category": category.nodeValue,
+                                                  "properties": []
+                                              };
+
+                                              $scope.commandWizardData.commandProperties.propertyCategoryList.push(propertyCategory);
+                                          }
+
+                                          var propertyElement = {
+                                              "name": name.nodeValue,
+                                              "displayname": displayname.nodeValue,
+                                              "description": description.nodeValue,
+                                              "type": type.nodeValue,
+                                              "maxvalue": maxvalue.nodeValue,
+                                              "minvalue": minvalue.nodeValue,
+                                              "category": category.nodeValue,
+                                              "writable": writable.nodeValue,
+                                              "ordervalue": ordervalue.nodeValue,
+                                              "value": "",
+                                              "defaultvalue": ""
+                                          };
+
+                                          //Set the default value for property
+
+                                          if (type.nodeValue == 'java.lang.Integer'){
+                                              propertyElement.value = angular.copy(parseInt(defaultvalue.nodeValue));
+                                              propertyElement.defaultvalue = angular.copy(parseInt(defaultvalue.nodeValue));
+                                          } else {
+                                              propertyElement.value = angular.copy(defaultvalue.nodeValue);
+                                              propertyElement.defaultvalue = angular.copy(defaultvalue.nodeValue);
+                                          }
+
+                                          //Add the property to appropriate property category list
+                                          $scope.commandWizardData.commandProperties.propertyCategoryList.forEach(function (propertyCategory) {
+
+                                              if (category.nodeValue == propertyCategory.category){
+
+                                                  propertyCategory.properties.push(angular.copy(propertyElement));
+
+                                              }
+
+                                          });
+
+                                      }
+
+
+
+                                  }
+
+
+                              }
+
+
+                          })
+                          .error(function(data, status, headers, config) {
+                              console.log("error reading readermetadata for command wizard: command instance selection");
+
+                              // called asynchronously if an error occurs
+                              // or server returns response with an error status.
+                          });
+
+
+
+                      /*
+
+                      //load the command instances for selected command type
+                      console.log("commandType selected");
+
+                      //call getGroupProperties operation
+                      var host = angular.copy($scope.elementSelected.host);
+                      var selectedFactoryID = angular.copy($scope.elementSelected.factoryID);
+                      var readerType = angular.copy($scope.elementSelected.readerFactoryID);
+
+                      console.log("host");
+                      console.log(host);
+                      console.log("selectedFactoryID");
+                      console.log(selectedFactoryID);
+
+                      //clear command instances list
+                      $scope.commandWizardData = {};
+                      $scope.commandWizardData.commandInstances = [];
+
+                      //load the command instances for selected command type
+                      $http.get(host + '/commands')
+                          .success(function(data, status, headers, config) {
+
+                              var xmlCommands;
+                              if (window.DOMParser)
+                              {
+                                  var parser = new DOMParser();
+                                  xmlCommands = parser.parseFromString(data,"text/xml");
+                              }
+                              else // Internet Explorer
+                              {
+                                  xmlCommands = new ActiveXObject("Microsoft.XMLDOM");
+                                  xmlCommands.async=false;
+                                  xmlCommands.loadXML(data);
+                              }
+
+                              //get the xml response and extract the values to construct the local command object
+                              var commandXmlVector = xmlCommands.getElementsByTagName("command");
+
+                              for(var index = 0; index < commandXmlVector.length; index++) {
+
+                                  var commandID = commandXmlVector[index].getElementsByTagName("commandID")[0].childNodes[0];
+                                  var factoryID = commandXmlVector[index].getElementsByTagName("factoryID")[0].childNodes[0];
+
+                                  if (factoryID.nodeValue == selectedFactoryID){
+
+                                      //Add the command instance
+                                      var commandInstanceElement = {
+                                          "commandID": commandID.nodeValue,
+                                          "factoryID": factoryID.nodeValue,
+                                          "readerType": readerType,
+                                          "host": host
+                                      }
+
+                                      $scope.commandWizardData.commandInstances.push(commandInstanceElement);
+                                  }
+
+                              }
+
+                              //Add the New command instance label
+                              var commandInstanceNewElement = {
+                                  "commandID": "<New>",
+                                  "factoryID": selectedFactoryID,
+                                  "readerType": readerType,
+                                  "host": host
+                              }
+
+                              $scope.commandWizardData.commandInstances.push(commandInstanceNewElement);
+
+                              console.log("$scope.commandWizardData.commandInstances");
+                              console.log($scope.commandWizardData.commandInstances);
+
+                          })
+                          .error(function(data, status, headers, config) {
+                              console.log("error reading command instances for create command wizard");
+
+                              // called asynchronously if an error occurs
+                              // or server returns response with an error status.
+                          });
+
+                          */
+
+
                   } else if ($scope.elementSelected.elementType === 'appGroup'){
 
                      //load the app group properties
@@ -2411,6 +2815,118 @@ var module = angular.module('rifidiApp')
                 });
 
 
+
+        }
+
+        var startApp = function() {
+
+            console.log("startApp");
+
+            var host = $scope.elementSelected.host;
+            var appId = $scope.elementSelected.number;
+
+            $http.get(host + '/startapp/' + appId)
+                .success(function(data, status, headers, config) {
+
+
+                    var xmlStartApp;
+                    if (window.DOMParser)
+                    {
+                        var parser = new DOMParser();
+                        xmlStartApp = parser.parseFromString(data,"text/xml");
+                    }
+                    else // Internet Explorer
+                    {
+                        xmlStartApp = new ActiveXObject("Microsoft.XMLDOM");
+                        xmlStartApp.async=false;
+                        xmlStartApp.loadXML(data);
+                    }
+
+                    //get the xml response and extract the values
+                    var startAppMessage = xmlStartApp.getElementsByTagName("message")[0].childNodes[0].nodeValue;
+
+                    //$scope.commandWizardData.commandCreationResponseStatus.message = createCommandMessage;
+
+                    if (startAppMessage == 'Success') {
+                        console.log("success starting app");
+
+                        //refresh tree view
+                        TreeViewPainting.paintTreeView($scope);
+
+                        setSuccessMessage("Success starting app");
+                        $rootScope.operationSuccessMsg = getSuccessMessage();
+
+                    } else {
+                        var startAppCommandDescription = xmlStartApp.getElementsByTagName("description")[0].childNodes[0].nodeValue;
+                        //$scope.commandWizardData.commandCreationResponseStatus.description = createCommandDescription;
+                        console.log("fail starting app");
+                        console.log(startAppCommandDescription);
+                        showErrorDialog('Error starting app: ' + startAppCommandDescription);
+                    }
+
+                })
+                .error(function(data, status, headers, config) {
+                    console.log("error staring app");
+
+                    // called asynchronously if an error occurs
+                    // or server returns response with an error status.
+                });
+
+        };
+
+
+        var stopApp = function() {
+
+            console.log("stopApp");
+
+            var host = $scope.elementSelected.host;
+            var appId = $scope.elementSelected.number;
+
+            $http.get(host + '/stopapp/' + appId)
+                .success(function(data, status, headers, config) {
+
+
+                    var xmlStopApp;
+                    if (window.DOMParser)
+                    {
+                        var parser = new DOMParser();
+                        xmlStopApp = parser.parseFromString(data,"text/xml");
+                    }
+                    else // Internet Explorer
+                    {
+                        xmlStopApp = new ActiveXObject("Microsoft.XMLDOM");
+                        xmlStopApp.async=false;
+                        xmlStopApp.loadXML(data);
+                    }
+
+                    //get the xml response and extract the values
+                    var stopAppMessage = xmlStopApp.getElementsByTagName("message")[0].childNodes[0].nodeValue;
+
+                    //$scope.commandWizardData.commandCreationResponseStatus.message = createCommandMessage;
+
+                    if (stopAppMessage == 'Success') {
+                        console.log("success stopping app");
+
+                        setSuccessMessage("Success stopping app");
+                        $rootScope.operationSuccessMsg = getSuccessMessage();
+
+                        //refresh tree view
+                        TreeViewPainting.paintTreeView($scope);
+
+                    } else {
+                        var stopAppCommandDescription = xmlStopApp.getElementsByTagName("description")[0].childNodes[0].nodeValue;
+                        console.log("fail stopping app");
+                        console.log(stopAppCommandDescription);
+                        showErrorDialog('Error stopping app: ' + stopAppCommandDescription);
+                    }
+
+                })
+                .error(function(data, status, headers, config) {
+                    console.log("error stopping app");
+
+                    // called asynchronously if an error occurs
+                    // or server returns response with an error status.
+                });
 
         }
 
@@ -3202,6 +3718,7 @@ module.service('TreeViewPainting', function($http) {
                                                          "status": status.nodeValue,
                                                          "iconClass": "app",
                                                          "elementType": "app",
+                                                         "contextMenuId": "contextMenuApp",
                                                          "host": appGroupElement.host,
                                                          "children": []
 
@@ -3282,6 +3799,9 @@ module.service('TreeViewPainting', function($http) {
                                                                      "collapsed": true,
                                                                      "readzone": readzone,
                                                                      "iconClass": "readzone",
+                                                                     "appId": appGroupElement.readzoneAppId,
+                                                                     "contextMenuId": "contextMenuReadZone",
+                                                                     "host": appGroupElement.host,
                                                                      "children": []
                                                                  };
 

@@ -67,7 +67,7 @@
 					'<li><a ng-click="openDeleteSessionDialog()"><i class="linkdelete">&nbsp;&nbsp;&nbsp;&nbsp;Delete Session</i></a></li>'+
 					'<li><a ng-click="startSession()"><i class="linkstart">&nbsp;&nbsp;&nbsp;&nbsp;Start Session</i></a></li>'+
 					'<li><a ng-click="stopSession()"><i class="linkstop">&nbsp;&nbsp;&nbsp;&nbsp;Stop Session</i></a></li>'+
-					'<li><a href="#/commandWizard"><i class="submit-job">&nbsp;&nbsp;&nbsp;&nbsp;Submit Job</i></a></li>'+
+					'<li><a href="#/jobSubmissionWizard"><i class="submit-job">&nbsp;&nbsp;&nbsp;&nbsp;Submit Job</i></a></li>'+
 					'</ul>';
 
 				//command menu for sensor
@@ -77,13 +77,34 @@
 
 				//command menu for command management
 				var menuCommand_commandManagement = '<ul id="contextMenuCommand_commandManagement" class="dropdown-menu">'+
-					'<li><a ng-click="openDeleteCommandDialog()"><i class="script-delete">&nbsp;&nbsp;&nbsp;&nbsp;Delete Command</i></a></li>'+
+					'<li><a ng-click="openDeleteCommandDialog()"><i class="script-delete">&nbsp;&nbsp;&nbsp;&nbsp;Delete Command Template</i></a></li>'+
+					'</ul>';
+
+				//readzone menu
+				var menuReadZone = '<ul id="contextMenuReadZone" class="dropdown-menu">'+
+					'<li><a ng-click="openDeleteReadZoneDialog()"><i class="script-delete">&nbsp;&nbsp;&nbsp;&nbsp;Delete Read Zone</i></a></li>'+
+					'</ul>';
+
+				//command type menu for command management
+				var menuCommandType_commandManagement = '<ul id="contextMenuCommandType_commandManagement" class="dropdown-menu">'+
+					'<li><a href="#/createCommandWizard"><i class="submit-job">&nbsp;&nbsp;&nbsp;&nbsp;Create Command Template</i></a></li>'+
+					'</ul>';
+
+				//app menu
+				var menuApp = '<ul id="contextMenuApp" class="dropdown-menu">'+
+					'<li><a ng-click="openStartAppDialog()"><i class="linkstart">&nbsp;&nbsp;&nbsp;&nbsp;Start App</i></a></li>'+
+					'<li><a ng-click="openStopAppDialog()"><i class="linkstop">&nbsp;&nbsp;&nbsp;&nbsp;Stop App</i></a></li>'+
 					'</ul>';
 
 				//servers menu
 				var menuServers = '<ul id="contextMenuServers" class="dropdown-menu">'+
 					'<li><a href ="#/serverWizard"><i class="addserver">&nbsp;&nbsp;&nbsp;&nbsp;Add server</i></a></li>'+
 					'<li><a ng-click ="openSaveAllServersConfigDialog()"><i class="saveservers">&nbsp;&nbsp;&nbsp;&nbsp;Save all servers config</i></a></li>'+
+					'<li><a ng-click="openDeleteCommandDialog()"><i class="script-delete">&nbsp;&nbsp;&nbsp;&nbsp;--test-Delete Command Template</i></a></li>'+
+					'<li><a href="#/createCommandWizard"><i class="submit-job">&nbsp;&nbsp;&nbsp;&nbsp;--test-Create Command Template</i></a></li>'+
+					'<li><a ng-click="openStartAppDialog()"><i class="linkstart">&nbsp;&nbsp;&nbsp;&nbsp;--test-Start App</i></a></li>'+
+					'<li><a ng-click="openStopAppDialog()"><i class="linkstop">&nbsp;&nbsp;&nbsp;&nbsp;--test-Stop App</i></a></li>'+
+					'<li><a ng-click="openDeleteReadZoneDialog()"><i class="script-delete">&nbsp;&nbsp;&nbsp;&nbsp;--test-Delete Read Zone</i></a></li>'+
 					'</ul>';
 
 				//tree template
@@ -105,6 +126,8 @@
 						menuServers
 						+ menuCommand_Sensor
 					    + menuCommand_commandManagement
+					    + menuApp
+						+ menuReadZone
 					;
 
 

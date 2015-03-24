@@ -19,7 +19,7 @@ angular
     'ui.bootstrap',
     'mgo-angular-wizard',
     'directive.contextMenu',
-    'ngContextMenu',
+    //'ngContextMenu',
     'ngDialog'
   ])
   .config(function ($routeProvider) {
@@ -36,14 +36,18 @@ angular
         templateUrl: 'views/sensorWizard.html',
         controller: 'SensorWizardCtrl'
       })
-      .when('/commandWizard', {
-        templateUrl: 'views/commandWizard.html',
-        controller: 'CommandWizardCtrl'
+      .when('/jobSubmissionWizard', {
+        templateUrl: 'views/jobSubmissionWizard.html',
+        controller: 'JobSubmissionWizardCtrl'
       })
       .when('/serverWizard', {
         templateUrl: 'views/serverWizard.html',
         controller: 'ServerWizardCtrl'
       })
+        .when('/createCommandWizard', {
+          templateUrl: 'views/createCommandWizard.html',
+          controller: 'CreateCommandWizardCtrl'
+        })
       .otherwise({
         redirectTo: '/'
       });
