@@ -630,6 +630,49 @@
                                </form>
                            </div>
 
+                           <div ng-switch-when="readZone">
+
+                               <div ng-show="getPropertiesErrorMsg">
+                                   {{getPropertiesErrorMsg}}
+                               </div>
+
+                               <form class="form-horizontal" role="form" name="form" novalidate>
+
+                                   <div class="form-group" ng-repeat="property in readzoneProperties.properties | orderBy:['key']">
+
+                                       <div class="col-sm-6">
+                                           <label class="control-label" for="{{property.key}}">{{property.key}}</label>
+                                       </div>
+
+
+                                       <div class="col-sm-6" >
+
+                                           <input aria-describedby="help{{property.key}}" id="{{property.key}}"
+                                                  name="{{property.key}}" type="text" ng-value="property.value" ng-model="property.value"
+                                                  class="form-control"
+                                                   />
+
+                                           <div ng-show="form.$submitted || form.property.key.$touched" >
+
+                                               <div ng-show="form.property.key.$error.required">
+
+                                                   {{property.key}} is required.
+
+                                               </div>
+                                           </div>
+
+                                       </div>
+
+                                       <br>
+                                       <p>
+
+                                   </div>
+
+                                   <input class="btn btn-primary" ng-hide="getPropertiesErrorMsg" ng-click="openSaveReadzonePropertiesDialog()" ng-disabled="form.$invalid" type="submit" value="Save" />
+
+                               </form>
+                           </div>
+
                        </div>
                    </div>
 

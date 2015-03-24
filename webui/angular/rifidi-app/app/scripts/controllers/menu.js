@@ -2327,6 +2327,154 @@ var module = angular.module('rifidiApp')
                           });
 
 
+                  } else if ($scope.elementSelected.elementType === 'readZone'){
+
+                      //load the app  properties
+                      console.log("readZone selected");
+
+                      $scope.readzoneProperties = null;
+
+                      //get the app id
+                      var appId = $scope.elementSelected.appId;
+
+                      var readzone = angular.copy($scope.elementSelected.readzone);
+
+                      //call getReadZoneProperties operation
+                      var host = angular.copy($scope.elementSelected.host);
+
+                      $http.get(host + '/getReadZoneProperties/' + appId + "/" + readzone)
+                          .success(function(data, status, headers, config) {
+
+                              var xmlReadzoneProperties;
+                              if (window.DOMParser)
+                              {
+                                  var parser = new DOMParser();
+                                  xmlReadzoneProperties = parser.parseFromString(data,"text/xml");
+                              }
+                              else // Internet Explorer
+                              {
+                                  xmlReadzoneProperties = new ActiveXObject("Microsoft.XMLDOM");
+                                  xmlReadzoneProperties.async=false;
+                                  xmlReadzoneProperties.loadXML(data);
+                              }
+
+                              //get the xml response and extract the message response
+                              if (xmlReadzoneProperties.getElementsByTagName("message").length > 0) {
+
+                                  //the message tag appears in fail messages
+                                  var message = xmlReadzoneProperties.getElementsByTagName("message")[0].childNodes[0].nodeValue;
+
+                                  if (message == 'Fail') {
+                                      console.log("fail getting readzone properties");
+                                      var description = xmlReadzoneProperties.getElementsByTagName("description")[0].childNodes[0].nodeValue;
+                                      $scope.getPropertiesErrorMsg = description;
+
+                                  }
+                              } else {
+
+                                  //success return of properties
+
+                                  //get the xml response and extract the values for properties
+                                  var propertiesXmlVector = xmlReadzoneProperties.getElementsByTagName("entry");
+
+                                  $scope.readzoneProperties = {
+                                      "host": host,
+                                      "appId": appId,
+                                      "readzone": readzone,
+                                      "properties": []
+                                  }
+
+
+                                  for(var indexPropertyValue = 0; indexPropertyValue < propertiesXmlVector.length; indexPropertyValue++) {
+
+                                      var key = propertiesXmlVector[indexPropertyValue].getElementsByTagName("key")[0].childNodes[0].nodeValue;
+                                      var value = "";
+
+                                      if ( propertiesXmlVector[indexPropertyValue].getElementsByTagName("value")[0].childNodes.length > 0 ){
+                                          value = propertiesXmlVector[indexPropertyValue].getElementsByTagName("value")[0].childNodes[0].nodeValue;
+                                      }
+
+                                      var propertyElement = {
+                                          "key": key,
+                                          "value": value
+                                      }
+
+                                      $scope.readzoneProperties.properties.push(propertyElement);
+
+                                  }
+                                  //As readzones have four fixed properties: readerID antennas tagPattern matchPattern,
+                                  //make sure if a readzone does not have a property, add it with empty value to UI
+                                  var readerIDFound = false;
+                                  var antennasFound = false;
+                                  var tagPatternFound = false;
+                                  var matchPatternFound = false;
+
+                                  $scope.readzoneProperties.properties.forEach(function (property) {
+
+                                      if (property.key == 'readerID') {
+                                          readerIDFound = true;
+                                      } else if (property.key == 'antennas') {
+                                          antennasFound = true;
+                                      } else if (property.key == 'tagPattern') {
+                                          tagPatternFound = true;
+                                      } else if (property.key == 'matchPattern') {
+                                          matchPatternFound = true;
+                                      }
+
+                                  });
+
+                                  //where property was not found, add it with empty value
+                                  if (!readerIDFound){
+
+                                      var propertyElement = {
+                                          "key": 'readerID',
+                                          "value": ''
+                                      }
+
+                                      $scope.readzoneProperties.properties.push(propertyElement);
+                                  }
+
+                                  if (!antennasFound){
+
+                                      var propertyElement = {
+                                          "key": 'antennas',
+                                          "value": ''
+                                      }
+
+                                      $scope.readzoneProperties.properties.push(propertyElement);
+                                  }
+
+                                  if (!tagPatternFound){
+
+                                      var propertyElement = {
+                                          "key": 'tagPattern',
+                                          "value": ''
+                                      }
+
+                                      $scope.readzoneProperties.properties.push(propertyElement);
+                                  }
+
+                                  if (!matchPatternFound){
+
+                                      var propertyElement = {
+                                          "key": 'matchPattern',
+                                          "value": ''
+                                      }
+
+                                      $scope.readzoneProperties.properties.push(propertyElement);
+                                  }
+
+                              }
+
+                          }).
+                          error(function(data, status, headers, config) {
+                              console.log("error reading readzone properties");
+
+                              // called asynchronously if an error occurs
+                              // or server returns response with an error status.
+                          });
+
+
                   }
 
                   //console.log("set 2 propertyType: " + $scope.propertyType);
@@ -2377,6 +2525,44 @@ var module = angular.module('rifidiApp')
                     }
 
                 );
+
+        };
+
+        $scope.openSaveReadzonePropertiesDialog = function(){
+
+            ngDialog.openConfirm({template: 'saveReadzonePropertiesDialogTmpl.html',
+
+                scope: $scope, //Pass the scope object if you need to access in the template
+
+                showClose: false,
+
+                closeByEscape: true,
+
+                closeByDocument: false
+
+            }).then(
+
+                function(value) {
+
+                    //confirm operation
+                    if (value == 'Save'){
+                        console.log("to save");
+
+                        //call save sensor properties operation
+                        saveReadzoneProperties($scope.readzoneProperties);
+
+                    }
+
+                },
+
+                function(value) {
+
+                    //Cancel or do nothing
+                    console.log("cancel");
+
+                }
+
+            );
 
         };
 
@@ -2816,7 +3002,95 @@ var module = angular.module('rifidiApp')
 
 
 
-        }
+        };
+
+
+        var saveReadzoneProperties = function(readzoneProperties){
+
+            console.log("readzoneProperties:");
+            console.log(readzoneProperties);
+
+            var host = readzoneProperties.host;
+            var appId = readzoneProperties.appId;
+            var readzone = readzoneProperties.readzone;
+
+            //call set readzone properties
+
+            var strReadzoneProperties = "";
+
+            for (var idxProp=0; idxProp < readzoneProperties.properties.length; idxProp++){
+
+                var key = readzoneProperties.properties[idxProp].key;
+                var value = readzoneProperties.properties[idxProp].value;
+
+                //add property only if value is not empty
+                if ( value != "" ) {
+
+                    strReadzoneProperties += key + "=" + value + ";"
+                }
+            }
+
+            //Quit the last semicolon ;
+            if (strReadzoneProperties.length > 0){
+                strReadzoneProperties = strReadzoneProperties.substring(0, strReadzoneProperties.length - 1);
+            }
+
+            console.log("strReadzoneProperties");
+            console.log(strReadzoneProperties);
+
+            $scope.setReadzonePropertiesResponseStatus = {};
+
+            $http.get(host + '/setReadZoneProperties/' + appId + '/' + readzone + '/' + encodeURIComponent(strReadzoneProperties))
+                .success(function(data, status, headers, config) {
+
+                    var xmlSetReadzonePropertiesResponse;
+                    if (window.DOMParser)
+                    {
+                        var parser = new DOMParser();
+                        xmlSetReadzonePropertiesResponse = parser.parseFromString(data,"text/xml");
+                    }
+                    else // Internet Explorer
+                    {
+                        xmlSetReadzonePropertiesResponse = new ActiveXObject("Microsoft.XMLDOM");
+                        xmlSetReadzonePropertiesResponse.async=false;
+                        xmlSetReadzonePropertiesResponse.loadXML(data);
+                    }
+
+
+                    //get the xml response and extract the value
+                    var message = xmlSetReadzonePropertiesResponse.getElementsByTagName("message")[0].childNodes[0].nodeValue;
+
+                    $scope.setReadzonePropertiesResponseStatus.message = message;
+
+                    if (message == 'Success') {
+                        console.log("success setting properties for readzone");
+
+                        $rootScope.operationSuccessMsg = "Success setting properties for readzone";
+
+                    } else {
+                        var setReadzonePropertiesDescription = xmlSetReadzonePropertiesResponse.getElementsByTagName("description")[0].childNodes[0].nodeValue;
+                        $scope.setReadzonePropertiesResponseStatus.description = setReadzonePropertiesDescription;
+                        console.log("fail setting readzone properties");
+                        console.log(setReadzonePropertiesDescription);
+
+                        showErrorDialog('Error setting properties for readzone: ' + setReadzonePropertiesDescription);
+                    }
+
+
+                })
+                .error(function(data, status, headers, config) {
+                    console.log("error setting properties for readzone");
+
+                    showErrorDialog('Error setting properties for readzone');
+
+                    // called asynchronously if an error occurs
+                    // or server returns response with an error status.
+                });
+
+
+
+        };
+
 
         var startApp = function() {
 
@@ -3802,6 +4076,7 @@ module.service('TreeViewPainting', function($http) {
                                                                      "appId": appGroupElement.readzoneAppId,
                                                                      "contextMenuId": "contextMenuReadZone",
                                                                      "host": appGroupElement.host,
+                                                                     "elementType": "readZone",
                                                                      "children": []
                                                                  };
 
