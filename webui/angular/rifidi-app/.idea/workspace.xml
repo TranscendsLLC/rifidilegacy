@@ -24,11 +24,21 @@
   </component>
   <component name="FileEditorManager">
     <leaf>
-      <file leaf-file-name="menu.js" pinned="false" current-in-tab="false">
+      <file leaf-file-name="menu.js" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/app/scripts/controllers/menu.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="-1.1785715" vertical-offset="9011" max-vertical-offset="67558">
-              <caret line="532" column="33" selection-start-line="532" selection-start-column="15" selection-end-line="532" selection-end-column="33" />
+            <state vertical-scroll-proportion="0.50953203" vertical-offset="52117" max-vertical-offset="72233">
+              <caret line="3083" column="74" selection-start-line="3083" selection-start-column="74" selection-end-line="3083" selection-end-column="74" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="saveReadzonePropertiesDialogTmpl.html" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/app/saveReadzonePropertiesDialogTmpl.html">
+          <provider selected="true" editor-type-id="text-editor">
+            <state vertical-scroll-proportion="-1.3076923" vertical-offset="0" max-vertical-offset="323">
+              <caret line="2" column="61" selection-start-line="2" selection-start-column="61" selection-end-line="2" selection-end-column="61" />
               <folding />
             </state>
           </provider>
@@ -64,10 +74,10 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="angular.treeview.js" pinned="false" current-in-tab="true">
+      <file leaf-file-name="angular.treeview.js" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/bower_components/angular.treeview/angular.treeview.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.18544194" vertical-offset="1134" max-vertical-offset="2652">
+            <state vertical-scroll-proportion="-3.8214285" vertical-offset="1134" max-vertical-offset="2652">
               <caret line="95" column="47" selection-start-line="95" selection-start-column="47" selection-end-line="95" selection-end-column="47" />
               <folding />
             </state>
@@ -80,18 +90,6 @@
             <state vertical-scroll-proportion="0.0" vertical-offset="62" max-vertical-offset="1717">
               <caret line="21" column="6" selection-start-line="21" selection-start-column="6" selection-end-line="21" selection-end-column="6" />
               <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="createCommandWizard.html" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/app/views/createCommandWizard.html">
-          <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="-15.038462" vertical-offset="510" max-vertical-offset="1887">
-              <caret line="53" column="86" selection-start-line="53" selection-start-column="61" selection-end-line="53" selection-end-column="86" />
-              <folding>
-                <marker date="1427159581155" expanded="true" signature="553:2054" placeholder="..." />
-              </folding>
             </state>
           </provider>
         </entry>
@@ -116,11 +114,11 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="createCommandDialogTmpl.html" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/app/createCommandDialogTmpl.html">
+      <file leaf-file-name="index.html" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/app/index.html">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="-1.3076923" vertical-offset="0" max-vertical-offset="323">
-              <caret line="2" column="77" selection-start-line="2" selection-start-column="77" selection-end-line="2" selection-end-column="77" />
+            <state vertical-scroll-proportion="-17.038462" vertical-offset="10947" max-vertical-offset="12954">
+              <caret line="670" column="140" selection-start-line="670" selection-start-column="108" selection-end-line="670" selection-end-column="140" />
               <folding />
             </state>
           </provider>
@@ -131,7 +129,6 @@
   <component name="IdeDocumentHistory">
     <option name="CHANGED_PATHS">
       <list>
-        <option value="$PROJECT_DIR$/app/scripts/controllers/components/wizardRifidi/wizardRifidi.js" />
         <option value="$PROJECT_DIR$/app/scripts/controllers/components/wizardRifidi/wizardRifidi.css" />
         <option value="$PROJECT_DIR$/app/scripts/controllers/sensorWizardCtrl.js" />
         <option value="$PROJECT_DIR$/bower_components/angular.treeview/css/angular.treeview.css" />
@@ -172,7 +169,6 @@
         <option value="$PROJECT_DIR$/app/saveAppPropertiesDialogTmpl.html" />
         <option value="$PROJECT_DIR$/app/deleteCommandDialogTmpl.html" />
         <option value="$PROJECT_DIR$/app/scripts/controllers/JobSubmissionWizard.js" />
-        <option value="$PROJECT_DIR$/app/index.html" />
         <option value="$PROJECT_DIR$/app/views/createCommandWizard.html" />
         <option value="$PROJECT_DIR$/app/createCommandDialogTmpl.html" />
         <option value="$PROJECT_DIR$/app/scripts/controllers/CreateCommandWizard.js" />
@@ -180,8 +176,10 @@
         <option value="$PROJECT_DIR$/app/deleteReadZoneDialogTmpl.html" />
         <option value="$PROJECT_DIR$/app/startAppDialogTmpl.html" />
         <option value="$PROJECT_DIR$/app/stopAppDialogTmpl.html" />
-        <option value="$PROJECT_DIR$/app/scripts/controllers/menu.js" />
         <option value="$PROJECT_DIR$/bower_components/angular.treeview/angular.treeview.js" />
+        <option value="$PROJECT_DIR$/app/index.html" />
+        <option value="$PROJECT_DIR$/app/saveReadzonePropertiesDialogTmpl.html" />
+        <option value="$PROJECT_DIR$/app/scripts/controllers/menu.js" />
       </list>
     </option>
   </component>
@@ -240,60 +238,6 @@
             </PATH_ELEMENT>
             <PATH_ELEMENT>
               <option name="myItemId" value="rifidi-app" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-          </PATH>
-          <PATH>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="rifidi-app" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="rifidi-app" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="bower_components" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-          </PATH>
-          <PATH>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="rifidi-app" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="rifidi-app" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="bower_components" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="ng-contextmenu" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-          </PATH>
-          <PATH>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="rifidi-app" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="rifidi-app" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="bower_components" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="ng-contextmenu" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="dist" />
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
           </PATH>
@@ -541,13 +485,6 @@
     <watches-manager />
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/app/styles/main.css">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="946" max-vertical-offset="1598">
-          <caret line="86" column="8" selection-start-line="86" selection-start-column="8" selection-end-line="86" selection-end-column="8" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/app/base.html">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0" vertical-offset="153" max-vertical-offset="255">
@@ -830,23 +767,12 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/app/index.html">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="-16.192308" vertical-offset="11530" max-vertical-offset="12223">
-          <caret line="703" column="54" selection-start-line="703" selection-start-column="54" selection-end-line="703" selection-end-column="54" />
-          <folding>
-            <marker date="1427209807871" expanded="true" signature="-1:-1" placeholder="..." />
-            <marker date="1427209807871" expanded="true" signature="-1:-1" placeholder="..." />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/app/views/createCommandWizard.html">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="-15.038462" vertical-offset="510" max-vertical-offset="1887">
           <caret line="53" column="86" selection-start-line="53" selection-start-column="61" selection-end-line="53" selection-end-column="86" />
           <folding>
-            <marker date="1427159581155" expanded="true" signature="553:2054" placeholder="..." />
+            <marker date="1427159581155" expanded="true" signature="-1:-1" placeholder="..." />
           </folding>
         </state>
       </provider>
@@ -907,18 +833,34 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/app/scripts/controllers/menu.js">
+    <entry file="file://$PROJECT_DIR$/bower_components/angular.treeview/angular.treeview.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="-1.1785715" vertical-offset="9011" max-vertical-offset="67558">
-          <caret line="532" column="33" selection-start-line="532" selection-start-column="15" selection-end-line="532" selection-end-column="33" />
+        <state vertical-scroll-proportion="-3.8214285" vertical-offset="1134" max-vertical-offset="2652">
+          <caret line="95" column="47" selection-start-line="95" selection-start-column="47" selection-end-line="95" selection-end-column="47" />
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/bower_components/angular.treeview/angular.treeview.js">
+    <entry file="file://$PROJECT_DIR$/app/index.html">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.18544194" vertical-offset="1134" max-vertical-offset="2652">
-          <caret line="95" column="47" selection-start-line="95" selection-start-column="47" selection-end-line="95" selection-end-column="47" />
+        <state vertical-scroll-proportion="-17.038462" vertical-offset="10947" max-vertical-offset="12954">
+          <caret line="670" column="140" selection-start-line="670" selection-start-column="108" selection-end-line="670" selection-end-column="140" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/saveReadzonePropertiesDialogTmpl.html">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="-1.3076923" vertical-offset="0" max-vertical-offset="323">
+          <caret line="2" column="61" selection-start-line="2" selection-start-column="61" selection-end-line="2" selection-end-column="61" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/scripts/controllers/menu.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.50953203" vertical-offset="52117" max-vertical-offset="72233">
+          <caret line="3083" column="74" selection-start-line="3083" selection-start-column="74" selection-end-line="3083" selection-end-column="74" />
           <folding />
         </state>
       </provider>
