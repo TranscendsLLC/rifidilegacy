@@ -44,11 +44,15 @@ angular
         templateUrl: 'views/serverWizard.html',
         controller: 'ServerWizardCtrl'
       })
-        .when('/createCommandWizard', {
-          templateUrl: 'views/createCommandWizard.html',
-          controller: 'CreateCommandWizardCtrl'
-        })
-      .otherwise({
+      .when('/createCommandWizard', {
+        templateUrl: 'views/createCommandWizard.html',
+        controller: 'CreateCommandWizardCtrl'
+      })
+      .when('/createReadzoneWizard', {
+        templateUrl: 'views/createReadzoneWizard.html',
+        controller: 'CreateReadzoneWizardCtrl'
+      })
+    .otherwise({
         redirectTo: '/'
       });
   })

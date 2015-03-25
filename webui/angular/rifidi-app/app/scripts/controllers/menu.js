@@ -3962,8 +3962,13 @@ module.service('TreeViewPainting', function($http) {
                                                      "groupName": groupName,
                                                      "iconClass": "readzones",
                                                      "host": server.host,
+                                                     "appId": "",
+                                                     "contextMenuId": "contextMenuReadZones",
+                                                     "elementType": "readZones",
                                                      "children": []
                                                  };
+
+                                                 //readZonesElement.appId = appGroupElement.readzoneAppId;
 
                                                  appGroupElement.children.push(readZonesElement);
 
@@ -4003,6 +4008,11 @@ module.service('TreeViewPainting', function($http) {
                                                      //Add the application number to this application group in order to later add the associated read zones
                                                      if (appGroupElement.readzoneAppId == "") {
                                                          appGroupElement.readzoneAppId = appElement.number;
+                                                     }
+
+                                                     //Add the application id to the readzones element
+                                                     if ( appGroupElement.children[1].appId == ""){
+                                                         appGroupElement.children[1].appId = appElement.number;;
                                                      }
 
 

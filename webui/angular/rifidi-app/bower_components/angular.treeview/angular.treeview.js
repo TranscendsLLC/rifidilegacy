@@ -85,6 +85,11 @@
 					'<li><a ng-click="openDeleteReadZoneDialog()"><i class="script-delete">&nbsp;&nbsp;&nbsp;&nbsp;Delete Read Zone</i></a></li>'+
 					'</ul>';
 
+				//readzones menu
+				var menuReadZones = '<ul id="contextMenuReadZones" class="dropdown-menu">'+
+					'<li><a href="#/createReadzoneWizard"><i class="submit-job">&nbsp;&nbsp;&nbsp;&nbsp;Add Read Zone</i></a></li>'+
+					'</ul>';
+
 				//command type menu for command management
 				var menuCommandType_commandManagement = '<ul id="contextMenuCommandType_commandManagement" class="dropdown-menu">'+
 					'<li><a href="#/createCommandWizard"><i class="submit-job">&nbsp;&nbsp;&nbsp;&nbsp;Create Command Template</i></a></li>'+
@@ -105,6 +110,7 @@
 					'<li><a ng-click="openStartAppDialog()"><i class="linkstart">&nbsp;&nbsp;&nbsp;&nbsp;--test-Start App</i></a></li>'+
 					'<li><a ng-click="openStopAppDialog()"><i class="linkstop">&nbsp;&nbsp;&nbsp;&nbsp;--test-Stop App</i></a></li>'+
 					'<li><a ng-click="openDeleteReadZoneDialog()"><i class="script-delete">&nbsp;&nbsp;&nbsp;&nbsp;--test-Delete Read Zone</i></a></li>'+
+					'<li><a href="#/createReadzoneWizard"><i class="submit-job">&nbsp;&nbsp;&nbsp;&nbsp;--test-Add Read Zone</i></a></li>'+
 					'</ul>';
 
 				//tree template
@@ -128,6 +134,7 @@
 					    + menuCommand_commandManagement
 					    + menuApp
 						+ menuReadZone
+						+ menuReadZones
 					;
 
 
