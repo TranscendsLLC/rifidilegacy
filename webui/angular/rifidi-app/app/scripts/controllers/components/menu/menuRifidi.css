@@ -214,7 +214,6 @@ div[data-tree-model] li .disabledLink {
     cursor: not-allowed;
     pointer-events: none;
     text-decoration: line-through;
-
 }
 
 div[data-tree-model] li .saveserver {
