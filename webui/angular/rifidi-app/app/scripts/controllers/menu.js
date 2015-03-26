@@ -2329,7 +2329,7 @@ var module = angular.module('rifidiApp')
 
                   } else if ($scope.elementSelected.elementType === 'readZone'){
 
-                      //load the app  properties
+                      //load the app properties
                       console.log("readZone selected");
 
                       $scope.readzoneProperties = null;

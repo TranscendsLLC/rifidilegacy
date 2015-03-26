@@ -117,79 +117,86 @@ angular.module('rifidiApp')
 
       };
 
-      var createCommand = function() {
+      var createReadzone = function() {
 
-        var strCommandProperties = "";
+        var host = $scope.readzoneProperties.host;
+        var appId = $scope.readzoneProperties.appId;
+        var readzone = $scope.readzoneProperties.readzone;
 
-        for (var idxCat = 0; idxCat < $scope.commandWizardData.commandProperties.propertyCategoryList.length; idxCat++) {
+        //call create readzone properties
 
-          for (var idxProp = 0; idxProp < $scope.commandWizardData.commandProperties.propertyCategoryList[idxCat].properties.length; idxProp++) {
+        var strReadzoneProperties = "";
 
-            strCommandProperties += $scope.commandWizardData.commandProperties.propertyCategoryList[idxCat].properties[idxProp].name + "="
-            + $scope.commandWizardData.commandProperties.propertyCategoryList[idxCat].properties[idxProp].value + ";"
+        for (var idxProp=0; idxProp < $scope.readzoneProperties.properties.length; idxProp++){
+
+          var key = $scope.readzoneProperties.properties[idxProp].key;
+          var value = $scope.readzoneProperties.properties[idxProp].value;
+
+          //add property only if value is not empty
+          if ( value != "" ) {
+
+            strReadzoneProperties += key + "=" + value + ";"
           }
-
         }
 
         //Quit the last semicolon ;
-        if (strCommandProperties.length > 0) {
-          strCommandProperties = strCommandProperties.substring(0, strCommandProperties.length - 1);
+        if (strReadzoneProperties.length > 0){
+          strReadzoneProperties = strReadzoneProperties.substring(0, strReadzoneProperties.length - 1);
         }
 
-        console.log("strCommandProperties");
-        console.log(strCommandProperties);
+        console.log("strReadzoneProperties");
+        console.log(strReadzoneProperties);
 
-        //Create command
-        console.log("going to create command");
-        $scope.commandWizardData.commandCreationResponseStatus = {};
+        //Create readzone
+        console.log("going to create readzone");
+        //$scope.commandWizardData.commandCreationResponseStatus = {};
 
-        //create command
-        $http.get($scope.elementSelected.host + '/createcommand/' + $scope.elementSelected.factoryID + "/" + strCommandProperties)
+        //create readzone
+        $http.get(host + '/addReadZone/' + appId + '/' + readzone + '/' + strReadzoneProperties)
             .success(function (data, status, headers, config) {
 
-              console.log("success response creating command in wizard");
+              console.log("success response adding readzone");
 
-              var xmlCreateCommandResponse;
+              var xmlAddReadzoneResponse;
               if (window.DOMParser) {
                 var parser = new DOMParser();
-                xmlCreateCommandResponse = parser.parseFromString(data, "text/xml");
+                xmlAddReadzoneResponse = parser.parseFromString(data, "text/xml");
               }
               else // Internet Explorer
               {
-                xmlCreateCommandResponse = new ActiveXObject("Microsoft.XMLDOM");
-                xmlCreateCommandResponse.async = false;
-                xmlCreateCommandResponse.loadXML(data);
+                xmlAddReadzoneResponse = new ActiveXObject("Microsoft.XMLDOM");
+                xmlAddReadzoneResponse.async = false;
+                xmlAddReadzoneResponse.loadXML(data);
               }
 
               //get the xml response and extract the values for properties
-              var createCommandMessage = xmlCreateCommandResponse.getElementsByTagName("message")[0].childNodes[0].nodeValue;
+              var addReadzoneCommandMessage = xmlAddReadzoneResponse.getElementsByTagName("message")[0].childNodes[0].nodeValue;
 
-              $scope.commandWizardData.commandCreationResponseStatus.message = createCommandMessage;
+              //$scope.commandWizardData.commandCreationResponseStatus.message = createCommandMessage;
 
-              if (createCommandMessage == 'Success') {
-                console.log("success creating command by wizard");
+              if (addReadzoneCommandMessage == 'Success') {
+                console.log("success adding readzone");
 
-                var commandID = xmlCreateCommandResponse.getElementsByTagName("commandID")[0].childNodes[0].nodeValue;
-
-                setSuccessMessage("Success creating command: " + commandID);
+                setSuccessMessage("Success adding readzone");
                 $rootScope.operationSuccessMsg = getSuccessMessage();
 
                 //continueExecutingCommand(commandID);
 
               } else {
-                var createCommandDescription = xmlCreateCommandResponse.getElementsByTagName("description")[0].childNodes[0].nodeValue;
-                $scope.commandWizardData.commandCreationResponseStatus.description = createCommandDescription;
-                console.log("fail creating command by wizard");
-                console.log(createCommandDescription);
-                showErrorDialog('Error creating command: ' + createCommandDescription);
+
+                var addReadzoneCommandDescription = xmlAddReadzoneResponse.getElementsByTagName("description")[0].childNodes[0].nodeValue;
+                //$scope.commandWizardData.commandCreationResponseStatus.description = createCommandDescription;
+                console.log("fail adding readzone");
+                console.log(addReadzoneCommandDescription);
+                showErrorDialog('Error adding readzone: ' + addReadzoneCommandDescription);
               }
 
 
             }).
             error(function (data, status, headers, config) {
-              console.log("error creating command in wizard");
+              console.log("error adding readzone");
 
-              showErrorDialog('Error creating command');
+              showErrorDialog('Error adding readzone');
 
 
               // called asynchronously if an error occurs
