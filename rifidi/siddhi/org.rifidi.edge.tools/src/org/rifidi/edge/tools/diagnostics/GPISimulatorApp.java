@@ -52,8 +52,11 @@ public class GPISimulatorApp extends AbstractRifidiApp {
 
 		StatementAwareUpdateListener stateUpdateListener = getSessionStateUpdateListener();
 
+		//FIXME SIDDHI
+		/*
 		addStatement("select * from GPIEvent", stateUpdateListener);
 		addStatement("select * from GPOEvent", stateUpdateListener);
+		*/
 	}
 	
 	/* (non-Javadoc)
@@ -103,7 +106,10 @@ public class GPISimulatorApp extends AbstractRifidiApp {
 	public void simGPIHigh(String readerID, Set<Integer> ports) {
 		for (Integer port : ports) {
 			GPIEvent gpi = new GPIEvent(readerID, port, true);
+			//FIXME SIDDHI
+			/*
 			getEPRuntime().sendEvent(gpi);
+			*/
 		}
 	}
 
@@ -113,7 +119,10 @@ public class GPISimulatorApp extends AbstractRifidiApp {
 	public void simGPILow(String readerID, Set<Integer> ports) {
 		for (Integer port : ports) {
 			GPIEvent gpi = new GPIEvent(readerID, port, false);
+			//FIXME SIDDHI
+			/*
 			getEPRuntime().sendEvent(gpi);
+			*/
 		}
 	}
 

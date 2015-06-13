@@ -128,6 +128,8 @@ public class TagGeneratorApp extends AbstractRifidiApp implements TagGenerator{
 		if (exposure == null) {
 			return null;
 		}
+		//FIXME SIDDHI
+		/*
 		ExposureRunner<?> runner = createExposureRunner(exposure, tags);
 		if (runner == null) {
 			return null;
@@ -135,6 +137,7 @@ public class TagGeneratorApp extends AbstractRifidiApp implements TagGenerator{
 		this.runners.put(runnerCount++, runner);
 		Thread t = new Thread(runner, "Tag Generation Runner: " + runnerCount);
 		t.start();
+		*/
 		return runnerCount;
 	}
 
@@ -196,10 +199,13 @@ public class TagGeneratorApp extends AbstractRifidiApp implements TagGenerator{
 	 * @param tags
 	 * @return
 	 */
+	//FIXME SIDDHI
+	/*
 	private ExposureRunner<?> createExposureRunner(Exposure exposure,
 			List<AbstractReadData<?>> tags) {
 		return exposure.createRunner(tags, this.getEPRuntime());
 	}
+	*/
 
 	/**
 	 * A helper method to turn a tag file into a list of TagReadData objects
