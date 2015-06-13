@@ -13,12 +13,17 @@
 package org.rifidi.edge.adapter.alien.gpio;
 
 import java.util.HashSet;
+import java.util.LinkedHashMap;
+import java.util.Map;
 import java.util.Set;
 
 import org.rifidi.edge.adapter.alien.gpio.messages.AlienGPIOMessage;
 import org.rifidi.edge.adapter.alien.gpio.messages.GPIOEvent;
 import org.rifidi.edge.notification.GPIEvent;
 import org.rifidi.edge.notification.GPOEvent;
+import org.wso2.siddhi.core.SiddhiManager;
+import org.wso2.siddhi.core.stream.input.InputHandler;
+
 
 /**
  * This class is a factory that creates a GPIEvent or a GPOEvent from an
@@ -31,6 +36,11 @@ public class GPIOEventFactory {
 
 	/** The ID of the reader this Factory creates events for */
 	public String readerID;
+	
+	//private final SiddhiManager manager;
+	//private InputHandler handlerGPI;
+	//private InputHandler handlerGPO;
+	//private Map<String, InputHandler> handlerMap = new LinkedHashMap<String, InputHandler>();
 
 	/**
 	 * Constructor
@@ -38,8 +48,22 @@ public class GPIOEventFactory {
 	 * @param readerID
 	 *            The ID of the reader
 	 */
-	public GPIOEventFactory(String readerID) {
+	public GPIOEventFactory(String readerID /*, final SiddhiManager manager*/) {
 		this.readerID = readerID;
+		//System.out.println("GPIOEventFactory.Setting manager: " + manager);
+		//this.manager = manager;
+		
+		//SIDDHI Ask matt
+		//if( manager.getInputHandler( GPIEvent.class.getName() ) == null ) {
+			
+			//manager.defineStream("define stream " + GPIEvent.class.getName() + " ( readerId string, port int, state boolean )");
+			//handlerMap.put(GPIEvent.class.getName(), manager.getInputHandler( GPIEvent.class.getName()) );
+		//}
+		//if(manager.getInputHandler("GPOEventStream")==null) {
+		//	manager.defineStream("define stream GPOEventStream ( readerId string, port int, state boolean )");
+		//}
+		//handlerGPI = manager.getInputHandler("GPIEventStream");
+		//handlerGPO = manager.getInputHandler("GPOEventStream");
 	}
 
 	/**
@@ -80,6 +104,14 @@ public class GPIOEventFactory {
 					GPIEvent event = new GPIEvent(readerID, i + 1,
 							(newDataBit != 0));
 					events.add(event);
+					/*
+					try {
+						//handlerGPI.send(new Object[] {event.getReaderID(), event.getPort(), event.getState()});
+						handlerMap.get(GPIEvent.class.getName()).send(new Object[] {event.getReaderID(), event.getPort(), event.getState()});
+					} catch (InterruptedException e) {
+						e.printStackTrace();
+					}
+					*/
 				}
 				// move the mask bit to the left.
 				mask = mask << 1;
@@ -98,6 +130,13 @@ public class GPIOEventFactory {
 					GPOEvent event = new GPOEvent(readerID, i + 1,
 							newDataBit == 1);
 					events.add(event);
+					/*
+					try {
+						handlerGPO.send(new Object[] {event.getReaderID(), event.getPort(), event.getState()});
+					} catch (InterruptedException e) {
+						e.printStackTrace();
+					}
+					*/
 				}
 				mask = mask << 1;
 			}

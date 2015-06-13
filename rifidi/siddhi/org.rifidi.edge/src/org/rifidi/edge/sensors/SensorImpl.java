@@ -27,6 +27,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import org.rifidi.edge.notification.ReadCycle;
 import org.rifidi.edge.notification.TagReadEvent;
 import org.rifidi.edge.services.EsperEventContainer;
+import org.rifidi.edge.util.RifidiEventInterface;
 
 /**
  * @author Jochen Mader - jochen@pramari.com
@@ -293,9 +294,10 @@ public class SensorImpl implements SensorUpdate, CompositeSensorUpdate {
 			tagQueue.drainTo(rcs);
 		}
 
-		Set<Object> events = new HashSet<Object>();
+		Set<RifidiEventInterface> events = new HashSet<RifidiEventInterface>();
 		synchronized (eventQueue) {
-			eventQueue.drainTo(events);
+			//FIXME SIDDHI
+			//eventQueue.drainTo(events);
 		}
 
 		long time = System.currentTimeMillis();
@@ -308,7 +310,10 @@ public class SensorImpl implements SensorUpdate, CompositeSensorUpdate {
 		ReadCycle cycle = new ReadCycle(tagReads, getName(), time);
 		EsperEventContainer eventContainer = new EsperEventContainer();
 		eventContainer.setReadCycle(cycle);
+		//FIXME SIDDHI
+		
 		eventContainer.setOtherEvents(events);
+		
 		return eventContainer;
 	}
 

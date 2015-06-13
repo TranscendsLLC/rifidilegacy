@@ -15,6 +15,8 @@ package org.rifidi.edge.notification;
 import java.io.Serializable;
 import java.text.SimpleDateFormat;
 
+import org.rifidi.edge.util.RifidiEventInterface;
+
 /**
  * This is an abstract class for Sensor Status Events (such as when a session is
  * connected or disconnected) to implement. These objects are submitted to
@@ -23,7 +25,9 @@ import java.text.SimpleDateFormat;
  * @author Kyle Neumeier - kyle@pramari.com
  * 
  */
-public abstract class SensorStatusEvent implements Serializable {
+public abstract class SensorStatusEvent 
+		implements RifidiEventInterface {
+	
 	/** the serial Version ID */
 	private static final long serialVersionUID = 1L;
 	/** The ID of the sensor */
@@ -62,6 +66,18 @@ public abstract class SensorStatusEvent implements Serializable {
 	 */
 	public Long getTimestamp() {
 		return timestamp;
+	}
+	
+	@Override
+	public Object[] getEventAttributes() {
+		// TODO Auto-generated method stub
+		return new Object[]{sensorID, timestamp};
+	}
+
+	@Override
+	public String getEventName() {
+		// TODO Auto-generated method stub
+		return this.getClass().getSimpleName();
 	}
 
 }

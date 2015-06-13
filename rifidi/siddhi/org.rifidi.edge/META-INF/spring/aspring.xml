@@ -20,6 +20,7 @@
 
 	<!-- Create Logical Reader management Service -->
 	<bean id="SensorManagement" class="org.rifidi.edge.sensors.SensorManagementServiceImpl">
+		<property name="siddhiManagementService" ref="siddhiManager"/>
 		<property name="reader" ref="readerSet" />
 		<property name="esperManager" ref="esperManager"/>
 	</bean>
@@ -54,8 +55,9 @@
 		</constructor-arg>
 	</bean>
 
-	<bean id="jmxService" class="org.rifidi.edge.configuration.JMXServiceImpl"
-		scope="singleton"/>
-	<bean id="esperManager"
-		class="org.rifidi.edge.services.EsperManagementServiceImpl" />
+	<bean id="jmxService" class="org.rifidi.edge.configuration.JMXServiceImpl" scope="singleton"/>
+	
+	<bean id="esperManager" class="org.rifidi.edge.services.EsperManagementServiceImpl" />
+		
+	<bean id="siddhiManager" class="org.rifidi.edge.services.SiddhiManagementServiceImpl" />
 </beans>

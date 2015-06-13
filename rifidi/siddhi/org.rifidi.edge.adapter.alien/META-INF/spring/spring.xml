@@ -35,5 +35,5 @@
 		class="org.rifidi.edge.adapter.alien.commands.AlienAutonomousModeStopCommandConfigurationFactory">
 		<property name="context" ref="bundleContext" />
 	</bean>
-		
+			
 </beans>

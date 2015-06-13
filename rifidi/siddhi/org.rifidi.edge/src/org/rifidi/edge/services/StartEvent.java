@@ -15,11 +15,14 @@
  */
 package org.rifidi.edge.services;
 
+import org.rifidi.edge.util.RifidiEventInterface;
+
 /**
  * @author Jochen Mader - jochen@pramari.com
  * 
  */
-public class StartEvent {
+public class StartEvent
+		implements RifidiEventInterface {
 	/** Name of the associated ec spec. */
 	private String name;
 	/** Trigger that created this event. */
@@ -62,5 +65,17 @@ public class StartEvent {
 	 */
 	public void setTrigger(String trigger) {
 		this.trigger = trigger;
+	}
+	
+	@Override
+	public Object[] getEventAttributes() {
+		// TODO Auto-generated method stub
+		return new Object[]{name, trigger};
+	}
+
+	@Override
+	public String getEventName() {
+		// TODO Auto-generated method stub
+		return this.getClass().getSimpleName();
 	}
 }

@@ -21,11 +21,6 @@ import java.util.concurrent.TimeUnit;
 import org.rifidi.edge.api.service.RifidiAppService;
 import org.rifidi.edge.notification.TagReadEvent;
 
-import com.espertech.esper.client.EPServiceProvider;
-import com.espertech.esper.client.EPStatement;
-import com.espertech.esper.client.EventBean;
-import com.espertech.esper.client.StatementAwareUpdateListener;
-
 /**
  * The implementation of the UniqueTagBatchIntervalService
  * 
@@ -72,6 +67,8 @@ public class UniqueTagBatchIntervalServiceImpl extends
 	 * org.rifidi.edge.api.service.RifidiAppService#createListener(
 	 * org.rifidi.edge.api.service.RifidiAppSubscriber)
 	 */
+	//FIXME SIDDHI
+	/*
 	@Override
 	protected StatementAwareUpdateListener createListener(
 			final UniqueTagBatchIntervalSubscriber subscriber) {
@@ -97,5 +94,6 @@ public class UniqueTagBatchIntervalServiceImpl extends
 			}
 		};
 	}
+	*/
 
 }

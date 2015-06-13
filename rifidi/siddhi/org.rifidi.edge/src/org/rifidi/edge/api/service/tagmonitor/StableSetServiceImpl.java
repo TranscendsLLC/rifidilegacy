@@ -21,11 +21,6 @@ import java.util.concurrent.TimeUnit;
 import org.rifidi.edge.api.service.RifidiAppService;
 import org.rifidi.edge.notification.TagReadEvent;
 
-import com.espertech.esper.client.EPServiceProvider;
-import com.espertech.esper.client.EPStatement;
-import com.espertech.esper.client.EventBean;
-import com.espertech.esper.client.StatementAwareUpdateListener;
-
 /**
  * @author kyle
  *
@@ -44,6 +39,9 @@ public class StableSetServiceImpl extends RifidiAppService<StableSetSubscriber> 
 	/* (non-Javadoc)
 	 * @see org.rifidi.edge.api.service.RifidiAppService#createListener(org.rifidi.edge.api.service.RifidiAppSubscriber)
 	 */
+	
+	//FIXME SIDDHI
+	/*
 	@Override
 	protected StatementAwareUpdateListener createListener(
 			final StableSetSubscriber subscriber) {
@@ -63,6 +61,7 @@ public class StableSetServiceImpl extends RifidiAppService<StableSetSubscriber> 
 			}
 		};
 	}
+	*/
 
 	/* (non-Javadoc)
 	 * @see org.rifidi.edge.api.service.tagmonitor.StableSetService#subscribe(org.rifidi.edge.api.service.tagmonitor.StableSetSubscriber, java.util.List, java.lang.Float, java.util.concurrent.TimeUnit, boolean)

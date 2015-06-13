@@ -36,14 +36,16 @@ import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceRegistration;
 import org.rifidi.edge.api.service.tagmonitor.ReadZone;
 import org.rifidi.edge.services.EsperManagementService;
+import org.rifidi.edge.services.SiddhiManagementService;
 import org.rifidi.edge.util.RifidiEdgeHelper;
 import org.springframework.osgi.context.BundleContextAware;
+import org.wso2.siddhi.core.SiddhiManager;
 
-import com.espertech.esper.client.EPAdministrator;
-import com.espertech.esper.client.EPOnDemandQueryResult;
-import com.espertech.esper.client.EPRuntime;
-import com.espertech.esper.client.EPStatement;
-import com.espertech.esper.client.StatementAwareUpdateListener;
+//import com.espertech.esper.client.EPAdministrator;
+//import com.espertech.esper.client.EPOnDemandQueryResult;
+//import com.espertech.esper.client.EPRuntime;
+//import com.espertech.esper.client.EPStatement;
+//import com.espertech.esper.client.StatementAwareUpdateListener;
 
 /**
  * This is a base class for all Rifidi Applications to extend.
@@ -55,11 +57,12 @@ public abstract class AbstractRifidiApp implements RifidiApp,
 		BundleContextAware {
 
 	/** All the esper statements that have been defined so far */
-	private final Set<EPStatement> statements = new CopyOnWriteArraySet<EPStatement>();
+	//FIXME SIDDHI
+	//private final Set<EPStatement> statements = new CopyOnWriteArraySet<EPStatement>();
 	/** Any additional events this app adds to the runtime. */
 	private final Set<String> additionalEvents = new CopyOnWriteArraySet<String>();
 	/** Esper service */
-	private EsperManagementService esperService;
+	//private EsperManagementService esperService;
 	/** The group this application is a part of */
 	private final String group;
 	/** The name of the application */
@@ -79,6 +82,7 @@ public abstract class AbstractRifidiApp implements RifidiApp,
 	private ServiceRegistration commandProviderService;
 	/** This is a map of ReadZones read in from the readzones directory */
 	public HashMap<String, ReadZone> readZones;
+	protected SiddhiManagementService siddhiManagementService;
 
 	/**
 	 * Constructor for a AbstractRifidiApp
@@ -133,12 +137,22 @@ public abstract class AbstractRifidiApp implements RifidiApp,
 	 * @see
 	 * org.rifidi.edge.api.RifidiApp#setEsperService(org.rifidi.edge.services.EsperManagementService)
 	 */
+	/*
 	public void setEsperService(EsperManagementService esperService) {
 		if (this.state == AppState.STARTED) {
 			throw new IllegalStateException(
 					"Cannot set esper while app is started");
 		}
+		
 		this.esperService = esperService;
+	}
+	*/
+	public void setSiddhiManagementService(final SiddhiManagementService manager) {
+		if (this.state == AppState.STARTED) {
+			throw new IllegalStateException(
+					"Cannot set esper while app is started");
+		}
+		this.siddhiManagementService = manager;
 	}
 
 	/*
@@ -156,6 +170,7 @@ public abstract class AbstractRifidiApp implements RifidiApp,
 		this.properties = properties;
 	}
 
+	//FIXME SIDDHI
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -184,8 +199,15 @@ public abstract class AbstractRifidiApp implements RifidiApp,
 	 * 
 	 * @return
 	 */
+	//FIXME SIDDHI
+	/*
 	protected EPAdministrator getEPAdministrator() {
 		return this.esperService.getProvider().getEPAdministrator();
+	}
+	*/
+	
+	public SiddhiManager getSiddhiManager() {
+		return this.siddhiManagementService.getManager();
 	}
 
 	/**
@@ -194,9 +216,12 @@ public abstract class AbstractRifidiApp implements RifidiApp,
 	 * 
 	 * @return
 	 */
+	//FIXME SIDDHI
+	/*
 	protected EPRuntime getEPRuntime() {
 		return this.esperService.getProvider().getEPRuntime();
 	}
+	*/
 
 	/*
 	 * (non-Javadoc)
@@ -225,10 +250,19 @@ public abstract class AbstractRifidiApp implements RifidiApp,
 	 */
 	@Override
 	public final void start() {
+		
+		
+		if (this.siddhiManagementService == null) {
+			throw new IllegalStateException("Application cannot be started "
+					+ "until siddhiManagementService has been injected");
+		}
+		//FIXME SIDDHI
+		/*
 		if (this.esperService == null) {
 			throw new IllegalStateException("Application cannot be started "
 					+ "until EsperManagementService has been injected");
 		}
+		*/
 		if (this.properties == null) {
 			throw new IllegalStateException("Application cannot be started "
 					+ "until properties have been injected");
@@ -266,6 +300,8 @@ public abstract class AbstractRifidiApp implements RifidiApp,
 	public final void stop() {
 		synchronized (this) {
 
+			//FIXME SIDDHI
+			/*
 			for (EPStatement statement : statements) {
 				try {
 					destroyStatement(statement.getName());
@@ -291,6 +327,7 @@ public abstract class AbstractRifidiApp implements RifidiApp,
 			} catch (Exception e) {
 
 			}
+			*/
 			this.state = AppState.STOPPED;
 		}
 	}
@@ -316,9 +353,14 @@ public abstract class AbstractRifidiApp implements RifidiApp,
 		} catch (InterruptedException e) {
 			logger.error(e.getMessage());
 		}
+		
+		//FIXME SIDDHI
+		/*
 		EPStatement statement = getEPAdministrator().createEPL(esperStatement);		
 		statements.add(statement);
 		return statement.getName();
+		*/
+		return "";
 
 	}
 
@@ -331,6 +373,8 @@ public abstract class AbstractRifidiApp implements RifidiApp,
 	 *            The listener to the statement
 	 * @return The name of the statement
 	 */
+	//FIXME SIDDHI
+	/*
 	protected final String addStatement(String esperStatement,
 			StatementAwareUpdateListener listener) {
 		try {
@@ -344,6 +388,7 @@ public abstract class AbstractRifidiApp implements RifidiApp,
 		statements.add(statement);
 		return statement.getName();
 	}
+	*/
 
 	/**
 	 * Adds a new event type to the esper configuration. The name of the event
@@ -353,10 +398,13 @@ public abstract class AbstractRifidiApp implements RifidiApp,
 	 * @param clazz
 	 *            The class of the event to add
 	 */
+	//FIXME SIDDHI
+	/*
 	protected final void addEventType(Class<?> clazz) {
 		String eventName = clazz.getSimpleName();
 		addEventType(eventName, clazz);
 	}
+	*/
 
 	/**
 	 * Adds a new event type to the esper configuration. The name of the event
@@ -366,10 +414,13 @@ public abstract class AbstractRifidiApp implements RifidiApp,
 	 * @param clazz
 	 *            The class of the event to add
 	 */
+	//FIXME SIDDHI
+	/*
 	protected final void addEventType(String eventName, Class<?> clazz) {
 		getEPAdministrator().getConfiguration().addEventType(eventName, clazz);
 		this.additionalEvents.add(eventName);
 	}
+	*/
 
 	/**
 	 * Add a new Map event type to the esper configuration. Events will be
@@ -378,18 +429,24 @@ public abstract class AbstractRifidiApp implements RifidiApp,
 	 * @param eventName
 	 * @param description
 	 */
+	//FIXME SIDDHI
+	/*
 	protected final void addEventType(String eventName,
 			Map<String, Object> description) {
 		getEPAdministrator().getConfiguration().addEventType(eventName,
 				description);
 		this.additionalEvents.add(eventName);
 	}
+	*/
 
 	/**
 	 * This method sends the given event to the Esper Runtime.
 	 * 
 	 * @param event
 	 */
+	
+	//FIXME SIDDHI
+	/*
 	protected final void sendEvent(Object event) {
 		getEPRuntime().sendEvent(event);
 	}
@@ -401,9 +458,12 @@ public abstract class AbstractRifidiApp implements RifidiApp,
 	 *            The query to run
 	 * @return The result of the query
 	 */
+	//FIXME SIDDHI
+	/*
 	protected final EPOnDemandQueryResult executeQuery(String esperQuery) {
 		return getEPRuntime().executeQuery(esperQuery);
 	}
+	*/
 
 	/**
 	 * Destroy a statement with a given name
@@ -411,6 +471,8 @@ public abstract class AbstractRifidiApp implements RifidiApp,
 	 * @param statementName
 	 *            The name of the statement to destroy.
 	 */
+	//FIXME SIDDHI
+	/*
 	protected final void destroyStatement(String statementName) {
 		EPStatement statement = getEPAdministrator()
 				.getStatement(statementName);
@@ -419,6 +481,7 @@ public abstract class AbstractRifidiApp implements RifidiApp,
 			statement.destroy();
 		}
 	}
+	*/
 
 	/**
 	 * Gets value of the property with the supplied name. If the value is null,

@@ -15,6 +15,7 @@ package org.rifidi.edge.api;
 import java.util.Properties;
 
 import org.rifidi.edge.services.EsperManagementService;
+import org.rifidi.edge.services.SiddhiManagementService;
 
 /**
  * This is the interface for a RifidiApp. A RifidiApp provides some base set of
@@ -58,7 +59,18 @@ public interface RifidiApp extends Comparable<RifidiApp>,
 	 * @param esperService
 	 *            the esperService to set
 	 */
+	//FIXME SIDDHI
+	/*
 	void setEsperService(EsperManagementService esperService);
+	*/
+	
+	/**
+	 * Used to set the siddhi service for this application
+	 * 
+	 * @param siddhiService
+	 *            the siddhiService to set
+	 */
+	void setSiddhiManagementService(SiddhiManagementService siddhiService);
 
 	/**
 	 * Used to set the Properties for this application Set the properties for

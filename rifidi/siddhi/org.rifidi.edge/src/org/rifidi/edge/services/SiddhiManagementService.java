@@ -10,46 +10,20 @@
  * USA. 
  * http://www.gnu.org/licenses/gpl-2.0.html
  *******************************************************************************/
-/**
- * 
- */
 package org.rifidi.edge.services;
 
-import org.rifidi.edge.util.RifidiEventInterface;
+import org.wso2.siddhi.core.SiddhiManager;
 
 /**
- * @author Jochen Mader - jochen@pramari.com
- *
+ * Service for handling Siddhi instances.
+ * 
+ * @author Matthew Dean
  */
-public class DestroyEvent
-		implements RifidiEventInterface {
-	/** Name of the associated ec spec. */
-	private String name;
-
+public interface SiddhiManagementService {
 	/**
-	 * @param name
-	 *            name of the associated ec spec
+	 * Get an esper service provider.
+	 * 
+	 * @return
 	 */
-	public DestroyEvent(String name) {
-		this.name = name;
-	}
-
-	/**
-	 * @return the name
-	 */
-	public String getName() {
-		return name;
-	}
-	
-	@Override
-	public Object[] getEventAttributes() {
-		// TODO Auto-generated method stub
-		return new Object[]{name};
-	}
-
-	@Override
-	public String getEventName() {
-		// TODO Auto-generated method stub
-		return this.getClass().getSimpleName();
-	}
+	public SiddhiManager getManager();
 }

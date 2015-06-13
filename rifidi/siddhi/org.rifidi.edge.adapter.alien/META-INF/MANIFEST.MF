@@ -9,7 +9,11 @@ Import-Package: org.apache.commons.codec,
  org.apache.commons.logging;version="1.0.4",
  org.osgi.framework;version="1.3.0",
  org.springframework.core;version="3.0.5.RELEASE",
- org.springframework.jms.core;version="3.0.5.RELEASE"
+ org.springframework.jms.core;version="3.0.5.RELEASE",
+ org.wso2.siddhi.core;version="2.1.0.wso2v1",
+ org.wso2.siddhi.core.stream.input;version="2.1.0.wso2v1",
+ org.wso2.siddhi.query.api.definition;version="2.1.0.wso2v1",
+ org.wso2.siddhi.query.compiler.exception;version="2.1.0.wso2v1"
 Export-Package: org.rifidi.edge.adapter.alien,
  org.rifidi.edge.adapter.alien.commandobject,
  org.rifidi.edge.adapter.alien.messages

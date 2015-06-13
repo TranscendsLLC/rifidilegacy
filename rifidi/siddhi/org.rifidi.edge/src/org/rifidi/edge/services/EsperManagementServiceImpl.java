@@ -27,10 +27,6 @@ import org.rifidi.edge.notification.SensorDisconnectedEvent;
 import org.rifidi.edge.notification.SensorStatusEvent;
 import org.rifidi.edge.notification.TagReadEvent;
 
-import com.espertech.esper.client.Configuration;
-import com.espertech.esper.client.EPServiceProvider;
-import com.espertech.esper.client.EPServiceProviderManager;
-
 /**
  * Service that configures and manages the esper provider.
  * 
@@ -41,13 +37,18 @@ public class EsperManagementServiceImpl implements EsperManagementService {
 	private static final Log logger = LogFactory
 			.getLog(EsperManagementServiceImpl.class);
 
+	//FIXME SIDDHI
+	/*
 	private final Configuration config;
+	*/
 
 	/**
 	 * Constructor.
 	 */
 	public EsperManagementServiceImpl() {
 		logger.info("EsperManagementServiceImpl created.");
+		//FIXME SIDDHI
+		/*
 		config = new Configuration();
 		config.addEventType("StopEvent", StopEvent.class);
 		config.addEventType("StartEvent", StartEvent.class);
@@ -64,6 +65,7 @@ public class EsperManagementServiceImpl implements EsperManagementService {
 		config.addEventType("SensorDisconnectedEvent", SensorDisconnectedEvent.class);
 		config.addEventType("SensorConnectedEvent", SensorConnectedEvent.class);
 		config.addEventType("RSSITagReadEvent", RSSITagReadEvent.class);
+		*/
 	}
 
 	/*
@@ -72,9 +74,12 @@ public class EsperManagementServiceImpl implements EsperManagementService {
 	 * @see
 	 * org.rifidi.edge.services.esper.EsperManagementService#getProvider()
 	 */
+	//FIXME SIDDHI
+	/*
 	@Override
 	public EPServiceProvider getProvider() {
 		return EPServiceProviderManager.getDefaultProvider(config);
 	}
+	*/
 
 }

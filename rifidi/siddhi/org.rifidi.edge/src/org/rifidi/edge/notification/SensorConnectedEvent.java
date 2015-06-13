@@ -12,7 +12,10 @@
  *******************************************************************************/
 package org.rifidi.edge.notification;
 
+import java.io.Serializable;
 import java.util.Date;
+
+import org.rifidi.edge.util.RifidiEventInterface;
 
 
 /**
@@ -21,7 +24,9 @@ import java.util.Date;
  * @author Kyle Neumeier - kyle@pramari.com
  * 
  */
-public class SensorConnectedEvent extends SensorStatusEvent {
+public class SensorConnectedEvent 
+		extends SensorStatusEvent
+		implements Serializable, RifidiEventInterface {
 
 	/** the serial Version ID */
 	private static final long serialVersionUID = 1L;
@@ -63,6 +68,20 @@ public class SensorConnectedEvent extends SensorStatusEvent {
 	@Override
 	public String toString() {
 		return toString;
+	}
+	
+	@Override
+	public Object[] getEventAttributes() {
+		// TODO Auto-generated method stub
+		System.out.println("TESTSIDDHI.SensorConnectedEvent.getEventAttributes()");
+		return new Object[]{getSensorID(), getTimestamp(), getSessionID()};
+	}
+
+	@Override
+	public String getEventName() {
+		// TODO Auto-generated method stub
+		System.out.println("TESTSIDDHI.SensorConnectedEvent.getEventName()");
+		return this.getClass().getSimpleName();
 	}
 
 }
