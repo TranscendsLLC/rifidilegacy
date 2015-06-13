@@ -73,7 +73,10 @@ public class TagMonitor extends AbstractRifidiApp {
 			}
 		};
 
+		//FIXME SIDDHI
+		/*
 		addStatement("select * from ReadCycle[select * from tags]", listener);
+		*/
 
 	}
 

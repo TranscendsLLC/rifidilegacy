@@ -24,7 +24,14 @@ Import-Package: gnu.io,
  org.springframework.jdbc.core.simple;version="3.0.5.RELEASE",
  org.springframework.jdbc.datasource;version="3.0.5.RELEASE",
  org.springframework.jms;version="3.0.5.RELEASE",
- org.springframework.jms.core;version="3.0.5.RELEASE"
+ org.springframework.jms.core;version="3.0.5.RELEASE",
+ org.wso2.siddhi.core;version="2.1.0.wso2v1",
+ org.wso2.siddhi.core.event;version="2.1.0.wso2v1",
+ org.wso2.siddhi.core.query.output.callback;version="2.1.0.wso2v1",
+ org.wso2.siddhi.core.stream.output;version="2.1.0.wso2v1",
+ org.wso2.siddhi.core.util;version="2.1.0.wso2v1",
+ org.wso2.siddhi.query.api.query;version="2.1.0.wso2v1",
+ org.wso2.siddhi.query.compiler.exception;version="2.1.0.wso2v1"
 Bundle-ClassPath: .,
  lib/RXTXcomm.jar
 Require-Bundle: org.rifidi.org.relique.jdbc;bundle-version="1.0.0",

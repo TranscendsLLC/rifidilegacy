@@ -22,6 +22,11 @@ import org.eclipse.osgi.framework.console.CommandProvider;
 import org.rifidi.edge.api.AbstractRifidiApp;
 import org.rifidi.edge.api.AppState;
 import org.rifidi.edge.notification.TagReadEvent;
+import org.wso2.siddhi.core.SiddhiManager;
+import org.wso2.siddhi.core.event.Event;
+import org.wso2.siddhi.core.query.output.callback.QueryCallback;
+import org.wso2.siddhi.core.stream.output.StreamCallback;
+import org.wso2.siddhi.core.util.EventPrinter;
 
 import com.espertech.esper.client.EPOnDemandQueryResult;
 import com.espertech.esper.client.EPServiceProvider;
@@ -93,14 +98,18 @@ public class TagApp extends AbstractRifidiApp {
 			return new ArrayList<TagReadEvent>();
 		}
 		List<TagReadEvent> recentTags = new LinkedList<TagReadEvent>();
+		//FIXME SIDDHI
+		/*
 		EPOnDemandQueryResult result = executeQuery("select * from recenttags where readerID=\""
 				+ readerID + "\"");
+				
 		if (result.getArray() != null) {
 			for (EventBean event : result.getArray()) {
 				TagReadEvent tag = (TagReadEvent) event.getUnderlying();
 				recentTags.add(tag);
 			}
 		}
+		*/
 		return recentTags;
 	}
 
@@ -114,7 +123,53 @@ public class TagApp extends AbstractRifidiApp {
 			logger.warn("TagApp not started. Use 'startapp <AppID>'");
 			return new ArrayList<TagReadEvent>();
 		}
+		System.out.println("Before getManager");
+		SiddhiManager siddhiManager = this.siddhiManagementService.getManager();
+		System.out.println("After getManager: " + siddhiManager);
+		String queryReference = null;
+		System.out.println("After the queryReference");
+		try {
+			//siddhiManager.defineStream("define stream ReadCycle ( epc string, reader string )");
+			queryReference = siddhiManager.addQuery( "from ReadCycle[ reader=='"+readerID+"' ] select epc, reader insert into TagEvent;"  );
+			
+		} catch(Exception e) {
+			System.out.println("Exception caught");
+			System.out.println(e.getMessage());
+			e.printStackTrace();
+		}
+		//System.out.println("After the queryReference");
+		try {
+			System.out.println("In the try");
+			System.out.flush();
+			siddhiManager.addCallback(queryReference, new QueryCallback() {
+				@Override
+				public void receive(long timeStamp, Event[] inEvents,
+						Event[] removeEvents) {
+					System.out.println("Receiving tag");
+					EventPrinter.print(timeStamp, inEvents, removeEvents);
+				}
+			});
+			
+			siddhiManager.addCallback("TagEvent", new StreamCallback() {
+	            @Override
+	            public void receive(Event[] events) {
+	                EventPrinter.print(events);
+	            }
+	        });
+			
+			siddhiManager.addCallback("ReadCycle", new StreamCallback() {
+	            @Override
+	            public void receive(Event[] events) {
+	                EventPrinter.print(events);
+	            }
+	        });
+		} catch (Exception e) {
+			System.out.println("Exception occured");
+			e.printStackTrace();
+		}
 		List<TagReadEvent> currentTags = new LinkedList<TagReadEvent>();
+		//FIXME SIDDHI
+		/*
 		EPOnDemandQueryResult result = executeQuery("select * from curtags where readerID=\""
 				+ readerID + "\"");
 		if (result.getArray() != null) {
@@ -123,6 +178,7 @@ public class TagApp extends AbstractRifidiApp {
 				currentTags.add(tag);
 			}
 		}
+		*/
 		return currentTags;
 	}
 	
@@ -132,6 +188,8 @@ public class TagApp extends AbstractRifidiApp {
 			return;
 		}
 
+		//FIXME SIDDHI
+		/*
 		addStatement("select tags from pattern" +
 				"[every tags=ReadCycle[select * from tags] " +
 				"until timer:interval("+seconds+" sec)]", 
@@ -161,6 +219,7 @@ public class TagApp extends AbstractRifidiApp {
 
 					}
 				});
+		*/
 
 	}
 
