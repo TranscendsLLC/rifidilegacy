@@ -401,6 +401,7 @@ public abstract class AbstractSensorSession extends SensorSession {
 			SensorConnectedEvent connectedEvent = new SensorConnectedEvent(this
 					.getSensor().getID(), System.currentTimeMillis(), this
 					.getID());
+			System.out.println("TESTSIDDHI.AbstractSensorSession.setStatus()");
 			this.getSensor().sendEvent(connectedEvent);
 		}
 		if (oldStatus == SessionStatus.PROCESSING

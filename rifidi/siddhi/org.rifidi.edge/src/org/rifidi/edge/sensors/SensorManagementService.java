@@ -155,7 +155,10 @@ public interface SensorManagementService {
 	 * @param sensorName
 	 * @throws NoSuchSensorException
 	 */
+	//FIXME SIDDHI
+	
 	void publishToEsper(String sensorName) throws NoSuchSensorException;
+	
 
 	/**
 	 * Dont publish the reads from a given sensor.
@@ -163,7 +166,10 @@ public interface SensorManagementService {
 	 * @param sensorName
 	 * @throws NoSuchSensorException
 	 */
+	//FIXME SIDDHI
+	
 	void unpublishFromEsper(String sensorName) throws NoSuchSensorException;
+	
 
 	/**
 	 * Get a serializable representation of the given sensor.

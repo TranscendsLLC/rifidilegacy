@@ -13,13 +13,6 @@ import org.restlet.Server;
 import org.restlet.data.Parameter;
 import org.restlet.data.Protocol;
 import org.restlet.util.Series;
-import org.vertx.java.core.Handler;
-import org.vertx.java.core.Vertx;
-import org.vertx.java.core.VertxFactory;
-import org.vertx.java.core.http.HttpServerRequest;
-import org.vertx.java.core.net.NetSocket;
-import org.vertx.java.core.streams.Pump;
-import org.vertx.java.platform.Verticle;
 
 /**
  * 

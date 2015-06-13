@@ -15,6 +15,8 @@
  */
 package org.rifidi.edge.services;
 
+import java.util.LinkedHashMap;
+import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArraySet;
 
@@ -22,8 +24,9 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.rifidi.edge.sensors.NotSubscribedException;
 import org.rifidi.edge.sensors.Sensor;
-
-import com.espertech.esper.client.EPRuntime;
+import org.rifidi.edge.util.RifidiEventInterface;
+import org.wso2.siddhi.core.SiddhiManager;
+import org.wso2.siddhi.core.stream.input.InputHandler;
 
 /**
  * Receive and handle ReadCycles from readers. Publish them to Esper.
@@ -37,16 +40,25 @@ public class EsperReceiver implements Runnable {
 	/** Set containing the sensors the receiver currently handles. */
 	private final Set<Sensor> sensors;
 	/** The esper runtime. */
-	private final EPRuntime runtime;
-
+	//private final EPRuntime runtime;
+	
+	private final SiddhiManager manager;
+	
+	private Map<String, InputHandler> handlerMap;
+	
 	/**
 	 * Constructor.
 	 * 
 	 * @param runtime
 	 */
-	public EsperReceiver(final EPRuntime runtime) {
+	//public EsperReceiver(final EPRuntime runtime, final SiddhiManager manager) {
+	public EsperReceiver(final SiddhiManager manager) {
 		sensors = new CopyOnWriteArraySet<Sensor>();
-		this.runtime = runtime;
+		//FIXME SIDDHI 
+		//this.runtime = runtime;
+		System.out.println("TESTSIDDHI.EsperReceiver.constructor: Setting manager: " + manager);
+		this.manager = manager;
+		this.handlerMap = new LinkedHashMap<String, InputHandler>();
 	}
 
 	/**
@@ -74,23 +86,49 @@ public class EsperReceiver implements Runnable {
 	 */
 	@Override
 	public void run() {
+		System.out.println("TESTSIDDHI.EsperReceiver.run.1()");
 		while (!Thread.currentThread().isInterrupted()) {
 			for (Sensor sensor : sensors) {
+				//FIXME SIDDHI
+				
 				try {
+					
 					EsperEventContainer container = sensor.receive(this);
-					runtime.sendEvent(container.getReadCycle());
-					for (Object event : container.getOtherEvents()) {
-						runtime.sendEvent(event);
+					
+					//FIXME SIDDHI
+					//runtime.sendEvent(container.getReadCycle());
+					
+					try {
+						
+						//System.out.println("TESTSIDDHI.EsperReceiver.before 'for'");
+						for (RifidiEventInterface event : container.getOtherEvents()) {
+							//runtime.sendEvent(event);
+							System.out.println("TESTSIDDHI.EsperReceiver.run2");
+							handlerMap.get(event.getEventName()).send( event.getEventAttributes() );
+						}
+						
+						
+						for (RifidiEventInterface rifidiEvent : container.getOtherEvents()) {
+							System.out.println("TESTSIDDHI.EsperReceiver.run3");
+							handlerMap.get(rifidiEvent.getEventName()).send( rifidiEvent.getEventAttributes() );
+						}
+						
+					} catch (InterruptedException e) {
+						e.printStackTrace();
 					}
+					
+					
 				} catch (NotSubscribedException e) {
 					throw new RuntimeException(e);
 				}
+				
 				// when a service becomes unavailable the proxy throws a runtime
 				// exception
 				catch (RuntimeException re) {
 					logger.debug("A sensor went away. " + re);
 					sensors.remove(sensor);
 				}
+				
 			}
 			try {
 				Thread.sleep(10);

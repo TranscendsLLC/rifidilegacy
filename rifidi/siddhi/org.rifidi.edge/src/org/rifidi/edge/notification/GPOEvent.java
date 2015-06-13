@@ -12,6 +12,8 @@
  *******************************************************************************/
 package org.rifidi.edge.notification;
 
+import org.rifidi.edge.util.RifidiEventInterface;
+
 /**
  * This class represents a GPO Event on a sensor. Sensors can use this class
  * when an Output line changed.
@@ -19,7 +21,8 @@ package org.rifidi.edge.notification;
  * @author Kyle Neumeier - kyle@pramari.com
  * 
  */
-public class GPOEvent {
+public class GPOEvent
+		implements RifidiEventInterface {
 
 	/** The serial version ID for this class */
 	private static final long serialVersionUID = 1L;
@@ -82,6 +85,18 @@ public class GPOEvent {
 	public String toString() {
 		return "GPOEvent: " + readerID + " port " + port + " is "
 				+ (state ? "High" : "Low");
+	}
+	
+	@Override
+	public Object[] getEventAttributes() {
+		// TODO Auto-generated method stub
+		return new Object[]{readerID, port, (state ? 1 : 0)};
+	}
+
+	@Override
+	public String getEventName() {
+		// TODO Auto-generated method stub
+		return this.getClass().getSimpleName();
 	}
 
 }

@@ -61,6 +61,12 @@
 			unbind-method="unbindCommandFactory" />
 	</osgi:set>
 
+ 
 	<osgi:service id="esperManagerService" ref="esperManager"
 		interface="org.rifidi.edge.services.EsperManagementService" />
+		
+		
+	<osgi:service id="siddhiManagementService" ref="siddhiManager"
+		interface="org.rifidi.edge.services.SiddhiManagementService" />
+		
 </beans>

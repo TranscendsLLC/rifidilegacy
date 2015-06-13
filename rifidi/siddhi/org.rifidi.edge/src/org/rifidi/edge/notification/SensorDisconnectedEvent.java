@@ -14,6 +14,8 @@ package org.rifidi.edge.notification;
 
 import java.util.Date;
 
+import org.rifidi.edge.util.RifidiEventInterface;
+
 
 /**
  * This class represents an event when a sensor becomes disconnected.
@@ -21,7 +23,9 @@ import java.util.Date;
  * @author Kyle Neumeier - kyle@pramari.com
  * 
  */
-public class SensorDisconnectedEvent extends SensorStatusEvent {
+public class SensorDisconnectedEvent 
+		extends SensorStatusEvent
+		implements RifidiEventInterface {
 
 	/** Serial Version UID */
 	private static final long serialVersionUID = 1L;
@@ -63,5 +67,17 @@ public class SensorDisconnectedEvent extends SensorStatusEvent {
 	@Override
 	public String toString() {
 		return toString;
+	}
+	
+	@Override
+	public Object[] getEventAttributes() {
+		// TODO Auto-generated method stub
+		return new Object[]{getSensorID(), getTimestamp(), getSessionID()};
+	}
+
+	@Override
+	public String getEventName() {
+		// TODO Auto-generated method stub
+		return this.getClass().getSimpleName();
 	}
 }

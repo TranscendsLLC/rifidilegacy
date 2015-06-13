@@ -177,7 +177,10 @@ public abstract class AbstractSensor<T extends SensorSession> extends
 		ReadCycle cycle = new ReadCycle(tagReads, getName(), time);
 		EsperEventContainer eventContainer = new EsperEventContainer();
 		eventContainer.setReadCycle(cycle);
+		//FIXME SIDDHI
+		/*
 		eventContainer.setOtherEvents(events);
+		*/
 		return eventContainer;
 
 	}
@@ -314,7 +317,10 @@ public abstract class AbstractSensor<T extends SensorSession> extends
 	 */
 	@Override
 	public void sendEvent(Object event) {
+		System.out.println("TESTSIDDHI.AbstractSensor<T extends SensorSession>.sendEvent()");
+		this.sendEvent(event);//added by Manuel, to test
 		for (Sensor receiver : receivers) {
+			System.out.println("TESTSIDDHI.AbstractSensor.receiver: " + receiver);
 			receiver.sendEvent(event);
 		}
 		for (LinkedBlockingQueue<Object> queue : eventSubscriberToQueueMap

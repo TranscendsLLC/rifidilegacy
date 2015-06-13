@@ -23,6 +23,7 @@ import java.util.concurrent.CopyOnWriteArraySet;
 import org.rifidi.edge.api.AppState;
 import org.rifidi.edge.api.RifidiApp;
 import org.rifidi.edge.services.EsperManagementService;
+import org.rifidi.edge.services.SiddhiManagementService;
 
 /**
  * The implementation of the AppManager
@@ -40,6 +41,7 @@ public class AppManagerImpl implements AppManager {
 	private volatile EsperManagementService esperService;
 	/** The number of services so far */
 	private int serviceCounter = 0;
+	private SiddhiManagementService siddhiManagementService;
 
 	/**
 	 * Constructor
@@ -140,7 +142,11 @@ public class AppManagerImpl implements AppManager {
 				queuedApps.add(appID);
 				return;
 			}
+			//FIXME SIDDHI
+			/*
 			app.setEsperService(esperService);
+			*/
+			app.setSiddhiManagementService(siddhiManagementService);
 			if (checkAutomaticStart && app.lazyStart()) {
 				return;
 			} else {
@@ -204,6 +210,14 @@ public class AppManagerImpl implements AppManager {
 			startApp(appID, true);
 		}
 		queuedApps.clear();
+	}
+	
+	public void setSiddhiManagementService(final SiddhiManagementService managementService) {
+		this.siddhiManagementService = managementService;
+	}
+
+	public SiddhiManagementService getSiddhiManagementService() {
+		return siddhiManagementService;
 	}
 
 }

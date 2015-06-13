@@ -22,8 +22,6 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import org.rifidi.edge.api.AbstractRifidiApp;
 
-import com.espertech.esper.client.StatementAwareUpdateListener;
-
 /**
  * This is a base class for Rifidi Application Services. These services capture
  * common esper patterns and allow subscribers to paramaterize them and
@@ -83,8 +81,11 @@ public abstract class RifidiAppService<T extends RifidiAppSubscriber> extends
 			for (String statement : esperFactory.createStatements()) {
 				statementNames.add(addStatement(statement));
 			}
+			//FIXME SIDDHI
+			/*
 			statementNames.add(addStatement(esperFactory.createQuery(),
 					createListener(subscriber)));
+					*/
 			subscriberMap.put(subscriber, statementNames);
 		}
 
@@ -104,7 +105,10 @@ public abstract class RifidiAppService<T extends RifidiAppSubscriber> extends
 			List<String> statements = this.subscriberMap.remove(subscriber);
 			if (statements != null) {
 				for (String name : statements) {
+					//FIXME SIDDHI
+					/*
 					destroyStatement(name);
+					*/
 				}
 			}
 		}
@@ -142,6 +146,9 @@ public abstract class RifidiAppService<T extends RifidiAppSubscriber> extends
 	 * @param subscriber
 	 *            The subscriber to notify
 	 */
+	//FIXME SIDDHI
+	/*
 	protected abstract StatementAwareUpdateListener createListener(T subscriber);
+	*/
 
 }

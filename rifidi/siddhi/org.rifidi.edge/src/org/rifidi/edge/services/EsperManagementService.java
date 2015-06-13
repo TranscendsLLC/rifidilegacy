@@ -12,8 +12,6 @@
  *******************************************************************************/
 package org.rifidi.edge.services;
 
-import com.espertech.esper.client.EPServiceProvider;
-
 /**
  * Service for handling Esper instances.
  * 
@@ -25,5 +23,8 @@ public interface EsperManagementService {
 	 * 
 	 * @return
 	 */
+	//FIXME SIDDHI
+	/*
 	EPServiceProvider getProvider();
+	*/
 }

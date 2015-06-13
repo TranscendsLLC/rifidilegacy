@@ -21,11 +21,6 @@ import org.rifidi.edge.api.service.RifidiAppEsperFactory;
 import org.rifidi.edge.api.service.RifidiAppService;
 import org.rifidi.edge.notification.TagReadEvent;
 
-import com.espertech.esper.client.EPServiceProvider;
-import com.espertech.esper.client.EPStatement;
-import com.espertech.esper.client.EventBean;
-import com.espertech.esper.client.StatementAwareUpdateListener;
-
 /**
  * This is an implementation of the ReadZoneMonitoringService. Subscibers can
  * use this class to be notified when tags arrive or depart from a read zone
@@ -111,6 +106,8 @@ public class ReadZoneMonitoringServiceImpl extends
 	 * @see org.rifidi.edge.api.service.RifidiAppService#createListener(
 	 * org.rifidi.edge.api.service.RifidiAppSubscriber)
 	 */
+	//FIXME SIDDHI
+	/*
 	@Override
 	protected StatementAwareUpdateListener createListener(
 			final ReadZoneSubscriber subscriber) {
@@ -138,6 +135,7 @@ public class ReadZoneMonitoringServiceImpl extends
 			}
 		};
 	}
+	*/
 
 	/*
 	 * (non-Javadoc)

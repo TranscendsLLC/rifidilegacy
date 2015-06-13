@@ -14,6 +14,8 @@ package org.rifidi.edge.notification;
 
 import java.io.Serializable;
 
+import org.rifidi.edge.util.RifidiEventInterface;
+
 /**
  * This class represents a GPI Event on a sensor. Sensors can use this class
  * when an Input line changed.
@@ -21,7 +23,7 @@ import java.io.Serializable;
  * @author Kyle Neumeier - kyle@pramari.com
  * 
  */
-public class GPIEvent implements Serializable {
+public class GPIEvent implements RifidiEventInterface {
 
 	/** The serial version ID for this class */
 	private static final long serialVersionUID = 1L;
@@ -84,6 +86,18 @@ public class GPIEvent implements Serializable {
 	public String toString() {
 		return "GPIEvent: " + readerID + " port " + port + " is "
 				+ (state ? "High" : "Low");
+	}
+
+	@Override
+	public Object[] getEventAttributes() {
+		// TODO Auto-generated method stub
+		return new Object[]{readerID, port, (state ? 1 : 0)};
+	}
+
+	@Override
+	public String getEventName() {
+		// TODO Auto-generated method stub
+		return this.getClass().getSimpleName();
 	}
 
 }

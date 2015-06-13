@@ -24,11 +24,6 @@ import org.rifidi.edge.api.service.EsperUtil;
 import org.rifidi.edge.api.service.RifidiAppService;
 import org.rifidi.edge.notification.RSSITagReadEvent;
 
-import com.espertech.esper.client.EPServiceProvider;
-import com.espertech.esper.client.EPStatement;
-import com.espertech.esper.client.EventBean;
-import com.espertech.esper.client.StatementAwareUpdateListener;
-
 /**
  * 
  * @author Matthew Dean matt@transcends.co
@@ -67,6 +62,9 @@ public class RSSIMonitoringServiceImpl extends
       this.subscribe(subscriber, new RSSIMonitorEsperFactory(new LinkedList<ReadZone>(readZones.values()), getCounter(), windowTime, timeUnit, countThreshold, minAvgRSSIThreshold, changeRSSIThreshold, useRegex));
    }
 
+
+   //FIXME SIDDHI
+   /*
    @Override
    protected StatementAwareUpdateListener createListener(
          final RSSIReadZoneSubscriber subscriber) {
@@ -106,6 +104,7 @@ public class RSSIMonitoringServiceImpl extends
          }
       };
    }
+   */
    
    /**
     * Removes duplicate values, just in case the esper statement returns multiple tags.  

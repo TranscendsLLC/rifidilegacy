@@ -20,10 +20,6 @@ import org.rifidi.edge.api.service.RifidiAppEsperFactory;
 import org.rifidi.edge.api.service.RifidiAppService;
 import org.rifidi.edge.notification.TagReadEvent;
 
-import com.espertech.esper.client.EPServiceProvider;
-import com.espertech.esper.client.EPStatement;
-import com.espertech.esper.client.EventBean;
-import com.espertech.esper.client.StatementAwareUpdateListener;
 
 /**
  * This is an implementation of the UniqueTagIntervalService
@@ -54,6 +50,8 @@ public class UniqueTagIntervalServiceImpl extends
 	 * org.rifidi.edge.api.service.RifidiAppService#createListener(
 	 * org.rifidi.edge.api.service.RifidiAppSubscriber)
 	 */
+	//FIXME SIDDHI
+	/*
 	@Override
 	protected StatementAwareUpdateListener createListener(
 			final UniqueTagIntervalSubscriber subscriber) {
@@ -72,6 +70,7 @@ public class UniqueTagIntervalServiceImpl extends
 			}
 		};
 	}
+	*/
 
 	/*
 	 * (non-Javadoc)

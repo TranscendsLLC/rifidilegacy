@@ -8,6 +8,7 @@
 	<bean id="appManager" class="org.rifidi.edge.api.service.appmanager.AppManagerImpl">
 		<property name="rifidiApps" ref="rifidiApps" />
 		<property name="esperService" ref="esperManager" />
+		<property name="siddhiManagementService" ref="siddhiManager" />
 	</bean>
 
 	<bean id="AppManagerCommands"

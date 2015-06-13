@@ -28,11 +28,15 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.rifidi.edge.services.EsperManagementService;
 import org.rifidi.edge.services.EsperReceiver;
+//import org.rifidi.edge.services.EsperManagementService;
+//import org.rifidi.edge.services.EsperReceiver;
+import org.rifidi.edge.services.SiddhiManagementService;
+import org.wso2.siddhi.core.SiddhiManager;
 
-import com.espertech.esper.client.EPRuntime;
+//import com.espertech.esper.client.EPRuntime;
 
 /**
- * Thread asfe implementation of the {@link SensorManagementService}
+ * Thread safe implementation of the {@link SensorManagementService}
  * 
  * @author Jochen Mader - jochen@pramari.com
  * 
@@ -54,11 +58,13 @@ public class SensorManagementServiceImpl implements SensorManagementService {
 	/** Reference to the esper service. */
 	private volatile EsperManagementService esperManager;
 	/** Esper runtime to publish the events to. */
-	private volatile EPRuntime esperRuntime;
+	//private volatile EPRuntime esperRuntime;
 	/** Thread for receiving tag reads. */
 	private Thread esperReceiverThread;
 	/** Runnable for the receiver thread. */
 	private EsperReceiver esperReceiver;
+	
+	private SiddhiManager manager;
 
 	/**
 	 * Constructor.
@@ -101,6 +107,7 @@ public class SensorManagementServiceImpl implements SensorManagementService {
 				child.addReceiver(sensor);
 			}
 			publishToEsper(sensorName);
+			
 		} finally {
 			sensorLock.unlock();
 		}
@@ -146,7 +153,9 @@ public class SensorManagementServiceImpl implements SensorManagementService {
 				}
 			}
 			sensors.remove(sensorName);
+			
 			unpublishFromEsper(sensorName);
+			
 		} finally {
 			sensorLock.unlock();
 		}
@@ -463,6 +472,7 @@ public class SensorManagementServiceImpl implements SensorManagementService {
 		try {
 			logger.info("Sensor bound:" + reader.getID());
 			physicalSensors.put(reader.getID(), reader);
+			
 			if (esperReceiver != null) {
 				try {
 					publishToEsper(reader.getName());
@@ -470,6 +480,7 @@ public class SensorManagementServiceImpl implements SensorManagementService {
 					logger.fatal(e);
 				}
 			}
+			
 		} finally {
 			sensorLock.unlock();
 		}
@@ -488,6 +499,8 @@ public class SensorManagementServiceImpl implements SensorManagementService {
 		sensorLock.lock();
 		try {
 			logger.info("Sensor unbound:" + reader.getID());
+			//FIXME SIDDHI
+			
 			if (esperReceiver != null) {
 				try {
 					unpublishFromEsper(reader.getName());
@@ -495,6 +508,7 @@ public class SensorManagementServiceImpl implements SensorManagementService {
 					logger.fatal(e);
 				}
 			}
+			
 			physicalSensors.remove(reader.getID());
 		} finally {
 			sensorLock.unlock();
@@ -514,6 +528,8 @@ public class SensorManagementServiceImpl implements SensorManagementService {
 				physicalSensors.put(reader.getID(), reader);
 				logger.debug("Sensor bound " + reader.getID());
 			}
+			//FIXME SIDDHI
+			
 			if (esperReceiver != null) {
 				for (Sensor sensor : physicalSensors.values()) {
 					try {
@@ -523,6 +539,7 @@ public class SensorManagementServiceImpl implements SensorManagementService {
 					}
 				}
 			}
+			
 		} finally {
 			sensorLock.unlock();
 		}
@@ -534,6 +551,8 @@ public class SensorManagementServiceImpl implements SensorManagementService {
 	 * @seeorg.rifidi.edge.core.sensors.management.SensorManagementService#
 	 * publishToEsper(java.lang.String)
 	 */
+	//FIXME SIDDHI
+	
 	@Override
 	public void publishToEsper(final String sensorName)
 			throws NoSuchSensorException {
@@ -556,6 +575,7 @@ public class SensorManagementServiceImpl implements SensorManagementService {
 			sensorLock.unlock();
 		}
 	}
+	
 
 	/*
 	 * (non-Javadoc)
@@ -563,6 +583,8 @@ public class SensorManagementServiceImpl implements SensorManagementService {
 	 * @seeorg.rifidi.edge.core.sensors.management.SensorManagementService#
 	 * unpublishFromEsper(java.lang.String)
 	 */
+	//FIXME SIDDHI
+	
 	@Override
 	public void unpublishFromEsper(final String sensorName)
 			throws NoSuchSensorException {
@@ -585,6 +607,7 @@ public class SensorManagementServiceImpl implements SensorManagementService {
 			sensorLock.unlock();
 		}
 	}
+	
 
 	/*
 	 * (non-Javadoc)
@@ -619,6 +642,7 @@ public class SensorManagementServiceImpl implements SensorManagementService {
 	 * @param esperManager
 	 *            the esperManager to set
 	 */
+	
 	public void setEsperManager(final EsperManagementService esperManager) {
 		sensorLock.lock();
 		try {
@@ -626,8 +650,10 @@ public class SensorManagementServiceImpl implements SensorManagementService {
 				logger.warn("Esper is set a second time.Should not happen!");
 			}
 			this.esperManager = esperManager;
-			this.esperRuntime = esperManager.getProvider().getEPRuntime();
-			esperReceiver = new EsperReceiver(esperRuntime);
+			//FIXME SIDDHI
+			//this.esperRuntime = esperManager.getProvider().getEPRuntime();
+			//esperReceiver = new EsperReceiver(esperRuntime, );
+			
 			for (Sensor sensor : physicalSensors.values()) {
 				try {
 					publishToEsper(sensor.getName());
@@ -654,9 +680,60 @@ public class SensorManagementServiceImpl implements SensorManagementService {
 			// }
 			//				
 			// });
+	
 		} finally {
 			sensorLock.unlock();
 		}
+	}
+	
+	
+	public void setSiddhiManagementService(final SiddhiManagementService managerService) {
+		//this.manager = manager.getManager();
+		
+		sensorLock.lock();
+		
+		try {
+			
+			//FIXME SIDDHI
+			
+			if (this.manager != null) {
+				logger.warn("Siddhi manager is set a second time. Should not happen!");
+			}
+			this.manager = managerService.getManager();
+			//this.esperRuntime = esperManager.getProvider().getEPRuntime();
+			esperReceiver = new EsperReceiver(this.manager);
+			for (Sensor sensor : physicalSensors.values()) {
+				try {
+					publishToEsper(sensor.getName());
+				} catch (NoSuchSensorException e) {
+					logger.fatal(e);
+				}
+			}
+			esperReceiverThread = new Thread(esperReceiver);
+			esperReceiverThread.start();
+			
+			
+			// EPStatement
+			// statement=esperManager.getProvider().getEPAdministrator().createEPL("select * from ReadCycle[select * from tags]");
+			// statement.addListener(new UpdateListener(){
+			//
+			// /* (non-Javadoc)
+			// * @see
+			// com.espertech.esper.client.UpdateListener#update(com.espertech.esper.client.EventBean[],
+			// com.espertech.esper.client.EventBean[])
+			// */
+			// @Override
+			// public void update(EventBean[] arg0, EventBean[] arg1) {
+			// for(EventBean event:arg0){
+			// System.out.println(event.getUnderlying());
+			// }
+			// }
+			//				
+			// });
+		} finally {
+			sensorLock.unlock();
+		}
+		
 	}
 
 }
