@@ -15,7 +15,7 @@ package org.rifidi.edge.tools.diagnostics;
 import java.util.List;
 import java.util.Properties;
 
-import com.espertech.esper.client.EPRuntime;
+import org.rifidi.edge.services.SiddhiManagementService;
 
 /**
  * An exposure defines how tags from the TagSet are put into esper as events.
@@ -111,7 +111,9 @@ public abstract class Exposure extends Properties {
 	 * @param runtime
 	 * @return
 	 */
+	//FIXME SIDDHI
 	public abstract ExposureRunner<?> createRunner(
-			List<AbstractReadData<?>> tags, EPRuntime runtime);
+			//List<AbstractReadData<?>> tags, EPRuntime runtime);
+			List<AbstractReadData<?>> tags, SiddhiManagementService siddhiManagementService);
 
 }

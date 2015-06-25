@@ -16,8 +16,7 @@ import java.util.Collection;
 import java.util.List;
 
 import org.rifidi.edge.notification.ReadCycle;
-
-import com.espertech.esper.client.EPRuntime;
+import org.rifidi.edge.services.SiddhiManagementService;
 
 /**
  * This class matches up an exposure with a tagset and runs them.
@@ -34,7 +33,8 @@ public abstract class ExposureRunner<T extends Exposure> implements Runnable {
 	/** The exposure to run */
 	protected final T exposure;
 	/** The esper runtime */
-	private final EPRuntime epRuntime;
+	//private final EPRuntime epRuntime;
+	private final SiddhiManagementService siddhiManagementService;
 	/** Turns true when the runner should stop */
 	private volatile boolean shouldStop = false;
 	/** The total number of tags seen so far */
@@ -50,9 +50,12 @@ public abstract class ExposureRunner<T extends Exposure> implements Runnable {
 	 * @param tags
 	 *            The list of tags that should be used
 	 */
-	public ExposureRunner(EPRuntime epRuntime, T exposure,
+	//FIXME SIDDHI
+	//public ExposureRunner(EPRuntime epRuntime, T exposure,
+	public ExposureRunner(SiddhiManagementService siddhiManagementService, T exposure,
 			List<AbstractReadData<?>> tags) {
-		this.epRuntime = epRuntime;
+		//this.epRuntime = epRuntime;
+		this.siddhiManagementService = siddhiManagementService;
 		this.exposure = exposure;
 		this.tagSet = new TagSet(tags);
 		this.tagData = tags;
@@ -119,7 +122,10 @@ public abstract class ExposureRunner<T extends Exposure> implements Runnable {
 	 */
 	protected void sendTags(Collection<ReadCycle> readCycles) {
 		for (ReadCycle cycle : readCycles) {
-			epRuntime.sendEvent(cycle);
+			//FIXME SIDDHI
+			System.out.println("ExposureRunner.sendTags(): Pending to send event");
+			//epRuntime.sendEvent(cycle);
+			//siddhiManagementService.sendEvent(event);
 		}
 	}
 

@@ -22,17 +22,12 @@ import org.eclipse.osgi.framework.console.CommandProvider;
 import org.rifidi.edge.api.AbstractRifidiApp;
 import org.rifidi.edge.api.AppState;
 import org.rifidi.edge.notification.TagReadEvent;
+import org.rifidi.edge.services.SiddhiManagementService;
 import org.wso2.siddhi.core.SiddhiManager;
 import org.wso2.siddhi.core.event.Event;
 import org.wso2.siddhi.core.query.output.callback.QueryCallback;
 import org.wso2.siddhi.core.stream.output.StreamCallback;
 import org.wso2.siddhi.core.util.EventPrinter;
-
-import com.espertech.esper.client.EPOnDemandQueryResult;
-import com.espertech.esper.client.EPServiceProvider;
-import com.espertech.esper.client.EPStatement;
-import com.espertech.esper.client.EventBean;
-import com.espertech.esper.client.StatementAwareUpdateListener;
 
 /**
  * This is an application that lets the user query recently seen tags and tags
@@ -124,13 +119,13 @@ public class TagApp extends AbstractRifidiApp {
 			return new ArrayList<TagReadEvent>();
 		}
 		System.out.println("Before getManager");
-		SiddhiManager siddhiManager = this.siddhiManagementService.getManager();
+		SiddhiManagementService siddhiManager = this.siddhiManagementService;
 		System.out.println("After getManager: " + siddhiManager);
 		String queryReference = null;
 		System.out.println("After the queryReference");
 		try {
 			//siddhiManager.defineStream("define stream ReadCycle ( epc string, reader string )");
-			queryReference = siddhiManager.addQuery( "from ReadCycle[ reader=='"+readerID+"' ] select epc, reader insert into TagEvent;"  );
+			queryReference = siddhiManager.getManager().addQuery( "from ReadCycle[ reader=='"+readerID+"' ] select epc, reader insert into TagEvent;"  );
 			
 		} catch(Exception e) {
 			System.out.println("Exception caught");
@@ -141,7 +136,7 @@ public class TagApp extends AbstractRifidiApp {
 		try {
 			System.out.println("In the try");
 			System.out.flush();
-			siddhiManager.addCallback(queryReference, new QueryCallback() {
+			siddhiManager.getManager().addCallback(queryReference, new QueryCallback() {
 				@Override
 				public void receive(long timeStamp, Event[] inEvents,
 						Event[] removeEvents) {
@@ -150,14 +145,14 @@ public class TagApp extends AbstractRifidiApp {
 				}
 			});
 			
-			siddhiManager.addCallback("TagEvent", new StreamCallback() {
+			siddhiManager.getManager().addCallback("TagEvent", new StreamCallback() {
 	            @Override
 	            public void receive(Event[] events) {
 	                EventPrinter.print(events);
 	            }
 	        });
 			
-			siddhiManager.addCallback("ReadCycle", new StreamCallback() {
+			siddhiManager.getManager().addCallback("ReadCycle", new StreamCallback() {
 	            @Override
 	            public void receive(Event[] events) {
 	                EventPrinter.print(events);

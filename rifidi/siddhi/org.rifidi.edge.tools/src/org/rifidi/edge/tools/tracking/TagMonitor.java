@@ -16,11 +16,6 @@ import org.rifidi.edge.api.AbstractRifidiApp;
 import org.rifidi.edge.api.resources.JMSResource;
 import org.rifidi.edge.notification.TagReadEvent;
 
-import com.espertech.esper.client.EPServiceProvider;
-import com.espertech.esper.client.EPStatement;
-import com.espertech.esper.client.EventBean;
-import com.espertech.esper.client.StatementAwareUpdateListener;
-
 /**
  * Sends tags out over jms with this format:
  * 
@@ -57,6 +52,9 @@ public class TagMonitor extends AbstractRifidiApp {
 	@Override
 	protected void _start() {
 		super._start();
+		
+		//FIXME SIDDHI
+		/*
 		StatementAwareUpdateListener listener = new StatementAwareUpdateListener() {
 
 			@Override
@@ -72,6 +70,7 @@ public class TagMonitor extends AbstractRifidiApp {
 
 			}
 		};
+		*/
 
 		//FIXME SIDDHI
 		/*

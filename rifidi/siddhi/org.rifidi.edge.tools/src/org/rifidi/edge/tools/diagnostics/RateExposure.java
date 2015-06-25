@@ -15,8 +15,7 @@ package org.rifidi.edge.tools.diagnostics;
 import java.util.List;
 import java.util.Properties;
 
-
-import com.espertech.esper.client.EPRuntime;
+import org.rifidi.edge.services.SiddhiManagementService;
 
 /**
  * A RateExposure allows you to specify how many tags per second you want to
@@ -47,10 +46,13 @@ public class RateExposure extends Exposure {
 	 * org.rifidi.edge.diagnostics.tags.generator.Exposure#createRunner(java.util
 	 * .List, com.espertech.esper.client.EPRuntime)
 	 */
+	//FIXME SIDDHI
 	@Override
 	public ExposureRunner<RateExposure> createRunner(List<AbstractReadData<?>> tags,
-			EPRuntime epRuntime) {
-		return new RateExposureRunner(epRuntime, this, tags);
+			//EPRuntime epRuntime) {
+			SiddhiManagementService siddhiManagementService) {
+		//return new RateExposureRunner(epRuntime, this, tags);
+		return new RateExposureRunner(siddhiManagementService, this, tags);
 	}
 
 }
