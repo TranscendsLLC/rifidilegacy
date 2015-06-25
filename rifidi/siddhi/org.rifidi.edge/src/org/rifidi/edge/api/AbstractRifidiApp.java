@@ -38,6 +38,7 @@ import org.rifidi.edge.api.service.tagmonitor.ReadZone;
 import org.rifidi.edge.services.EsperManagementService;
 import org.rifidi.edge.services.SiddhiManagementService;
 import org.rifidi.edge.util.RifidiEdgeHelper;
+import org.rifidi.edge.util.RifidiEventInterface;
 import org.springframework.osgi.context.BundleContextAware;
 import org.wso2.siddhi.core.SiddhiManager;
 
@@ -206,8 +207,9 @@ public abstract class AbstractRifidiApp implements RifidiApp,
 	}
 	*/
 	
-	public SiddhiManager getSiddhiManager() {
-		return this.siddhiManagementService.getManager();
+	public SiddhiManagementService getSiddhiManager() {
+		//return this.siddhiManagementService.getManager();
+		return this.siddhiManagementService;
 	}
 
 	/**
@@ -450,7 +452,19 @@ public abstract class AbstractRifidiApp implements RifidiApp,
 	protected final void sendEvent(Object event) {
 		getEPRuntime().sendEvent(event);
 	}
+	*/
+	
+	protected final void sendEvent(RifidiEventInterface event) 
+			throws InterruptedException {
+		
+		System.out.println("AbstractRifidiApp.sendEvent(): " + event);
+		
+		siddhiManagementService.sendEvent(event);
+		//getEPRuntime().sendEvent(event);
+	}
+	
 
+	/*
 	/**
 	 * Run an on-demand query.
 	 * 

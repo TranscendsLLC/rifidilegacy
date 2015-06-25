@@ -15,8 +15,8 @@ package org.rifidi.edge.tools.diagnostics;
 import java.util.List;
 import java.util.Properties;
 
+import org.rifidi.edge.services.SiddhiManagementService;
 
-import com.espertech.esper.client.EPRuntime;
 
 /**
  * A DelayExposure allows you to define the number of tags to send to esper
@@ -53,9 +53,12 @@ public class DelayExposure extends Exposure {
 	 * org.rifidi.edge.diagnostics.tags.generator.Exposure#createRunner(java.util
 	 * .List, com.espertech.esper.client.EPRuntime)
 	 */
+	//FIXME SIDDHI
 	@Override
 	public ExposureRunner<DelayExposure> createRunner(List<AbstractReadData<?>> tags,
-			EPRuntime epRuntime) {
-		return new DelayExposureRunner(epRuntime, this, tags);
+			//EPRuntime epRuntime) {
+			SiddhiManagementService siddhiManagementService) {
+		//return new DelayExposureRunner(epRuntime, this, tags);
+		return new DelayExposureRunner(siddhiManagementService, this, tags);
 	}
 }

@@ -14,8 +14,7 @@ package org.rifidi.edge.tools.diagnostics;
 
 import java.util.List;
 
-
-import com.espertech.esper.client.EPRuntime;
+import org.rifidi.edge.services.SiddhiManagementService;
 
 /**
  * 
@@ -29,9 +28,11 @@ public class DelayExposureRunner extends ExposureRunner<DelayExposure> {
 	 * @param exposure
 	 * @param tags
 	 */
-	public DelayExposureRunner(EPRuntime epRuntime, DelayExposure exposure,
+	//FIXME SIDDHI
+	//public DelayExposureRunner(EPRuntime epRuntime, DelayExposure exposure,
+	public DelayExposureRunner(SiddhiManagementService siddhiManagementService, DelayExposure exposure,
 			List<AbstractReadData<?>> tags) {
-		super(epRuntime, exposure, tags);
+		super(siddhiManagementService, exposure, tags);
 	}
 
 	/*

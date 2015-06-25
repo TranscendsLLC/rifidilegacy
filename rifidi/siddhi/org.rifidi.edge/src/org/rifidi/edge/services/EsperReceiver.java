@@ -42,9 +42,9 @@ public class EsperReceiver implements Runnable {
 	/** The esper runtime. */
 	//private final EPRuntime runtime;
 	
-	private final SiddhiManager manager;
+	private final SiddhiManagementService siddhiManagementService;
 	
-	private Map<String, InputHandler> handlerMap;
+	//private Map<String, InputHandler> handlerMap;
 	
 	/**
 	 * Constructor.
@@ -52,13 +52,13 @@ public class EsperReceiver implements Runnable {
 	 * @param runtime
 	 */
 	//public EsperReceiver(final EPRuntime runtime, final SiddhiManager manager) {
-	public EsperReceiver(final SiddhiManager manager) {
+	public EsperReceiver(final SiddhiManagementService siddhiManagementService) {
 		sensors = new CopyOnWriteArraySet<Sensor>();
 		//FIXME SIDDHI 
 		//this.runtime = runtime;
-		System.out.println("TESTSIDDHI.EsperReceiver.constructor: Setting manager: " + manager);
-		this.manager = manager;
-		this.handlerMap = new LinkedHashMap<String, InputHandler>();
+		System.out.println("TESTSIDDHI.EsperReceiver.constructor: Setting siddhiManagementService: " + siddhiManagementService);
+		this.siddhiManagementService = siddhiManagementService;
+		//this.handlerMap = new LinkedHashMap<String, InputHandler>();
 	}
 
 	/**
@@ -104,13 +104,13 @@ public class EsperReceiver implements Runnable {
 						for (RifidiEventInterface event : container.getOtherEvents()) {
 							//runtime.sendEvent(event);
 							System.out.println("TESTSIDDHI.EsperReceiver.run2");
-							handlerMap.get(event.getEventName()).send( event.getEventAttributes() );
+							siddhiManagementService.sendEvent(event);
 						}
 						
 						
 						for (RifidiEventInterface rifidiEvent : container.getOtherEvents()) {
 							System.out.println("TESTSIDDHI.EsperReceiver.run3");
-							handlerMap.get(rifidiEvent.getEventName()).send( rifidiEvent.getEventAttributes() );
+							siddhiManagementService.sendEvent(rifidiEvent);
 						}
 						
 					} catch (InterruptedException e) {

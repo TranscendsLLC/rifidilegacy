@@ -58,6 +58,9 @@ public class LLRPEventFactory {
 	 * @return the Rifidi Event or null if no relavent can be created
 	 */
 	public static Object createEvent(LLRPMessage message, String readerID) {
+		
+		System.out.println("LLRPEventFactory.createEvent(): ");
+		
 		// If we have A RO_ACCESS_REPORT, return a ReadCycle
 		if (message instanceof RO_ACCESS_REPORT) {
 			return createReadCycle((RO_ACCESS_REPORT) message, readerID);

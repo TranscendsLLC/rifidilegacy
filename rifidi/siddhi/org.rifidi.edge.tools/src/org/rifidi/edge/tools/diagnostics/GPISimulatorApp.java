@@ -21,10 +21,12 @@ import org.rifidi.edge.api.AbstractRifidiApp;
 import org.rifidi.edge.notification.GPIEvent;
 import org.rifidi.edge.notification.GPOEvent;
 
+/*
 import com.espertech.esper.client.EPServiceProvider;
 import com.espertech.esper.client.EPStatement;
 import com.espertech.esper.client.EventBean;
 import com.espertech.esper.client.StatementAwareUpdateListener;
+*/
 
 /**
  * 
@@ -50,7 +52,8 @@ public class GPISimulatorApp extends AbstractRifidiApp {
 	 */
 	protected void _start() {
 
-		StatementAwareUpdateListener stateUpdateListener = getSessionStateUpdateListener();
+		//FIXME SIDDHI
+		//StatementAwareUpdateListener stateUpdateListener = getSessionStateUpdateListener();
 
 		//FIXME SIDDHI
 		/*
@@ -68,6 +71,8 @@ public class GPISimulatorApp extends AbstractRifidiApp {
 		return Boolean.parseBoolean(lazyStart);
 	}
 
+	//FIXME SIDDHI
+	/*
 	public StatementAwareUpdateListener getSessionStateUpdateListener() {
 		return new StatementAwareUpdateListener() {
 
@@ -81,6 +86,8 @@ public class GPISimulatorApp extends AbstractRifidiApp {
 			 * com.espertech.esper.client.EPStatement,
 			 * com.espertech.esper.client.EPServiceProvider)
 			 */
+	
+	/*
 			@Override
 			public void update(EventBean[] arg0, EventBean[] arg1,
 					EPStatement arg2, EPServiceProvider arg3) {
@@ -99,6 +106,7 @@ public class GPISimulatorApp extends AbstractRifidiApp {
 			}
 		};
 	}
+	*/
 
 	/*
 	 * Set the given GPO ports high.
@@ -110,6 +118,11 @@ public class GPISimulatorApp extends AbstractRifidiApp {
 			/*
 			getEPRuntime().sendEvent(gpi);
 			*/
+			try {
+				getSiddhiManager().sendEvent(gpi);
+			} catch(InterruptedException iEx){
+				iEx.printStackTrace();
+			}
 		}
 	}
 
@@ -123,6 +136,11 @@ public class GPISimulatorApp extends AbstractRifidiApp {
 			/*
 			getEPRuntime().sendEvent(gpi);
 			*/
+			try {
+				getSiddhiManager().sendEvent(gpi);
+			} catch(InterruptedException iEx){
+				iEx.printStackTrace();
+			}	
 		}
 	}
 

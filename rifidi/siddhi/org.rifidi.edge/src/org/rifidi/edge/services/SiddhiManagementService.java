@@ -12,6 +12,7 @@
  *******************************************************************************/
 package org.rifidi.edge.services;
 
+import org.rifidi.edge.util.RifidiEventInterface;
 import org.wso2.siddhi.core.SiddhiManager;
 
 /**
@@ -26,4 +27,7 @@ public interface SiddhiManagementService {
 	 * @return
 	 */
 	public SiddhiManager getManager();
+	
+	public void sendEvent(RifidiEventInterface event)
+			throws InterruptedException;
 }

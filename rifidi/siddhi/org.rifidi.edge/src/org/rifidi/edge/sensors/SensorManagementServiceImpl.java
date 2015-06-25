@@ -64,7 +64,7 @@ public class SensorManagementServiceImpl implements SensorManagementService {
 	/** Runnable for the receiver thread. */
 	private EsperReceiver esperReceiver;
 	
-	private SiddhiManager manager;
+	private volatile SiddhiManagementService siddhiManagementService;
 
 	/**
 	 * Constructor.
@@ -687,7 +687,7 @@ public class SensorManagementServiceImpl implements SensorManagementService {
 	}
 	
 	
-	public void setSiddhiManagementService(final SiddhiManagementService managerService) {
+	public void setSiddhiManagementService(final SiddhiManagementService siddhiManagementService) {
 		//this.manager = manager.getManager();
 		
 		sensorLock.lock();
@@ -696,12 +696,13 @@ public class SensorManagementServiceImpl implements SensorManagementService {
 			
 			//FIXME SIDDHI
 			
-			if (this.manager != null) {
+			if (this.siddhiManagementService != null) {
 				logger.warn("Siddhi manager is set a second time. Should not happen!");
 			}
-			this.manager = managerService.getManager();
+			//this.manager = managerService.getManager();
+			this.siddhiManagementService = siddhiManagementService;
 			//this.esperRuntime = esperManager.getProvider().getEPRuntime();
-			esperReceiver = new EsperReceiver(this.manager);
+			esperReceiver = new EsperReceiver(siddhiManagementService);
 			for (Sensor sensor : physicalSensors.values()) {
 				try {
 					publishToEsper(sensor.getName());

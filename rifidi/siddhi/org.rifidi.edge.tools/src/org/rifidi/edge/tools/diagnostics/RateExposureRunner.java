@@ -14,8 +14,7 @@ package org.rifidi.edge.tools.diagnostics;
 
 import java.util.List;
 
-
-import com.espertech.esper.client.EPRuntime;
+import org.rifidi.edge.services.SiddhiManagementService;
 
 /**
  * @author Kyle Neumeier - kyle@pramari.com
@@ -31,9 +30,12 @@ public class RateExposureRunner extends ExposureRunner<RateExposure> {
 	 * @param exposure
 	 * @param tags
 	 */
-	public RateExposureRunner(EPRuntime epRuntime, RateExposure exposure,
-			List<AbstractReadData<?>> tags) {
-		super(epRuntime, exposure, tags);
+	//FIXME SIDDHI
+	//public RateExposureRunner(EPRuntime epRuntime, RateExposure exposure,
+	public RateExposureRunner(SiddhiManagementService siddhiManagementService, 
+			RateExposure exposure, List<AbstractReadData<?>> tags) {
+		//super(epRuntime, exposure, tags);
+		super(siddhiManagementService, exposure, tags);
 		int rate = exposure.getTagRate();
 		delayTime = Math.max(100, 1000 / rate);
 		int numDelaysPerSec = 1000 / (int) delayTime;

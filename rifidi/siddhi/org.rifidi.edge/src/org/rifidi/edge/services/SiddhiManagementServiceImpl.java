@@ -19,6 +19,7 @@ import org.rifidi.edge.notification.SensorConnectedEvent;
 import org.rifidi.edge.notification.SensorDisconnectedEvent;
 import org.rifidi.edge.notification.SensorStatusEvent;
 import org.rifidi.edge.notification.TagReadEvent;
+import org.rifidi.edge.util.RifidiEventInterface;
 import org.wso2.siddhi.core.SiddhiManager;
 import org.wso2.siddhi.core.stream.input.InputHandler;
 
@@ -66,8 +67,7 @@ public class SiddhiManagementServiceImpl implements SiddhiManagementService {
 		//DatacontainerEvent ???
 		//manager.defineStream("define stream " + DatacontainerEvent.class.getName() + " ( name string )");
 		//handlerMap.put(DatacontainerEvent.class.getName(), manager.getInputHandler( DatacontainerEvent.class.getName()) );
-				
-		
+						
 		//EPCGeneration1Event
 		//manager.defineStream("define stream " + EPCGeneration1Event.class.getName() + " ( memory int, length int )");
 		//handlerMap.put(EPCGeneration1Event.class.getName(), manager.getInputHandler( EPCGeneration1Event.class.getName()) );
@@ -79,8 +79,7 @@ public class SiddhiManagementServiceImpl implements SiddhiManagementService {
 		//ReadCycle
 		//manager.defineStream("define stream " + ReadCycle.class.getName() + " ( tags string, readerID string, eventTimestamp long )");
 		//handlerMap.put(ReadCycle.class.getName(), manager.getInputHandler( ReadCycle.class.getName()) );
-		
-		
+				
 		//SensorStatusEvent
 		String sensorStatusEventClassName = SensorStatusEvent.class.getSimpleName();
 		manager.defineStream("define stream " + sensorStatusEventClassName + " ( readerID string, timestamp long )");
@@ -103,10 +102,12 @@ public class SiddhiManagementServiceImpl implements SiddhiManagementService {
 	 * 
 	 * @see org.rifidi.edge.services.SiddhiManagementService#getManager()
 	 */
+	
 	@Override
 	public SiddhiManager getManager() {
 		return this.manager;
 	}
+	
 
 	public Map<String, InputHandler> getHandlerMap() {
 		return handlerMap;
@@ -119,6 +120,15 @@ public class SiddhiManagementServiceImpl implements SiddhiManagementService {
 	 */
 	public void addHandler(String key, InputHandler handler){
 		handlerMap.put(key, handler);
+	}
+	
+	public void sendEvent(RifidiEventInterface event)
+			throws InterruptedException {
+		
+		System.out.println("SiddhiManagementServiceImpl.sendEvent(): " + event);
+		
+		handlerMap.get(event.getEventName()).send( event.getEventAttributes() );
+		
 	}
 	
 	

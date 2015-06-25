@@ -1500,6 +1500,8 @@ public class LLRPReaderSession extends AbstractSensorSession implements
 		}
 		try {
 			Object event = LLRPEventFactory.createEvent(arg0, readerID);
+			System.out.println("LLRPReaderSession.messageReceived()");
+			
 			if (event != null) {
 				if (event instanceof ReadCycle) {
 					ReadCycle cycle = (ReadCycle) event;
