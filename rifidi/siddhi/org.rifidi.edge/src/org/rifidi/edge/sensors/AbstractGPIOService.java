@@ -17,7 +17,9 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.rifidi.edge.daos.ReaderDAO;
+import org.rifidi.edge.notification.GPIEvent;
 import org.rifidi.edge.sensors.sessions.AbstractSensorSession;
+import org.rifidi.edge.services.SiddhiManagementService;
 
 /**
  * This class is a service to be implemented by readers plugins which have GPIO
@@ -84,7 +86,7 @@ public abstract class AbstractGPIOService<T extends AbstractSensorSession> {
 	 *             If the ports cannot be flashed for some reason
 	 */
 	public abstract void flashGPO(String readerID, int flashTime,
-			Set<Integer> ports) throws CannotExecuteException;
+			SiddhiManagementService siddhiManagementService, Set<Integer> ports) throws CannotExecuteException;
 
 	/**
 	 * This method flashes External Output to high for a specified number of
@@ -99,13 +101,15 @@ public abstract class AbstractGPIOService<T extends AbstractSensorSession> {
 	 * @throws CannotExecuteException
 	 *             If the ports cannot be flashed for some reason
 	 */
-	public void flashGPO(String readerID, int flashTime, Integer... ports)
+	public void flashGPO(String readerID, int flashTime, SiddhiManagementService siddhiManagementService, Integer... ports)
 			throws CannotExecuteException {
+		
 		Set<Integer> set = new HashSet<Integer>();
 		for (Integer i : ports) {
 			set.add(i);
 		}
-		flashGPO(readerID, flashTime, set);
+		flashGPO(readerID, flashTime, siddhiManagementService, set);
+		
 	}
 
 	/**

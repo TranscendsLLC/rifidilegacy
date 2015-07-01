@@ -125,7 +125,7 @@ public class SiddhiManagementServiceImpl implements SiddhiManagementService {
 	public void sendEvent(RifidiEventInterface event)
 			throws InterruptedException {
 		
-		System.out.println("SiddhiManagementServiceImpl.sendEvent(): " + event);
+		System.out.println("#####SiddhiManagementServiceImpl.sendEvent(): " + event);
 		
 		handlerMap.get(event.getEventName()).send( event.getEventAttributes() );
 		
