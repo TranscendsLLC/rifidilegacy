@@ -21,6 +21,7 @@ import org.rifidi.edge.adapter.awid.awid2010.AwidSession;
 import org.rifidi.edge.api.SessionStatus;
 import org.rifidi.edge.sensors.AbstractGPIOService;
 import org.rifidi.edge.sensors.CannotExecuteException;
+import org.rifidi.edge.services.SiddhiManagementService;
 
 /**
  * This class is a service that lets applications access the GPIO functionality
@@ -40,7 +41,7 @@ public class AwidGPIOService extends AbstractGPIOService<AwidSession> {
 	 * java.lang.String, int, java.util.Set)
 	 */
 	@Override
-	public void flashGPO(String readerID, int flashTime, Set<Integer> ports)
+	public void flashGPO(String readerID, int flashTime, SiddhiManagementService siddhiManagementService, Set<Integer> ports)
 			throws CannotExecuteException {
 		getGPIOSession(readerID).flashOutput(getBitsForSet(ports),
 				new BitSet(), flashTime * 10, 0, 1);

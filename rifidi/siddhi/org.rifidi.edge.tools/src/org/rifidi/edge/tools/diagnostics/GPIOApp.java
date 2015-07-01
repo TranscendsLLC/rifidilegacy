@@ -75,7 +75,7 @@ public class GPIOApp extends AbstractRifidiApp{
 		bit.add(port);
 		for (AbstractGPIOService<?> service : this.gpioServiceList) {
 			if (service.isReaderAvailable(readerID)) {
-				service.flashGPO(readerID, seconds, bit);
+				service.flashGPO(readerID, seconds, getSiddhiManager(), bit);
 			}
 		}
 	}
