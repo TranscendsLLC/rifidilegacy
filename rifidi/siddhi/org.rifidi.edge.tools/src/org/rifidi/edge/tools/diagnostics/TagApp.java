@@ -21,6 +21,7 @@ import org.apache.commons.logging.LogFactory;
 import org.eclipse.osgi.framework.console.CommandProvider;
 import org.rifidi.edge.api.AbstractRifidiApp;
 import org.rifidi.edge.api.AppState;
+import org.rifidi.edge.notification.GPOEvent;
 import org.rifidi.edge.notification.TagReadEvent;
 import org.rifidi.edge.services.SiddhiManagementService;
 import org.wso2.siddhi.core.SiddhiManager;
@@ -125,7 +126,8 @@ public class TagApp extends AbstractRifidiApp {
 		System.out.println("After the queryReference");
 		try {
 			//siddhiManager.defineStream("define stream ReadCycle ( epc string, reader string )");
-			queryReference = siddhiManager.getManager().addQuery( "from ReadCycle[ reader=='"+readerID+"' ] select epc, reader insert into TagEvent;"  );
+			////queryReference = siddhiManager.getManager().addQuery( "from ReadCycle[ reader=='"+readerID+"' ] select epc, reader insert into TagEvent;"  );
+			queryReference = siddhiManager.getManager().addQuery( "from " + GPOEvent.class.getSimpleName() + "[ readerId=='"+readerID+"' ] select readerId, port, state insert into GPOEvent;"  );
 			
 		} catch(Exception e) {
 			System.out.println("Exception caught");

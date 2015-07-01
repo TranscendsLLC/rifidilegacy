@@ -26,8 +26,10 @@ import org.llrp.ltk.generated.parameters.GPOWriteData;
 import org.llrp.ltk.types.Bit;
 import org.llrp.ltk.types.UnsignedShort;
 import org.rifidi.edge.adapter.llrp.LLRPReaderSession;
+import org.rifidi.edge.notification.GPIEvent;
 import org.rifidi.edge.sensors.AbstractGPIOService;
 import org.rifidi.edge.sensors.CannotExecuteException;
+import org.rifidi.edge.services.SiddhiManagementService;
 
 /**
  * @author matt
@@ -43,13 +45,30 @@ public class LLRPGPIOService extends AbstractGPIOService<LLRPReaderSession> {
 	 * int, java.util.Set)
 	 */
 	@Override
-	public void flashGPO(String readerID, int flashTime, Set<Integer> ports)
+	public void flashGPO(String readerID, int flashTime, SiddhiManagementService siddhiManagementService, Set<Integer> ports)
 			throws CannotExecuteException {
+		
+		/*
 		LLRPReaderSession session = super.getSession(readerID);
 		LLRPGPOFlashThread flashrun = new LLRPGPOFlashThread(session,
 				flashTime, ports);
 		Thread flashthread = new Thread(flashrun);
 		flashthread.start();
+		*/
+		for (Integer port : ports) {
+			GPIEvent gpi = new GPIEvent(readerID, port, true);
+			//FIXME SIDDHI
+			/*
+			getEPRuntime().sendEvent(gpi);
+			*/
+			try {
+				siddhiManagementService.sendEvent(gpi);
+			} catch(InterruptedException iEx){
+				iEx.printStackTrace();
+			}
+		}
+		
+		
 	}
 
 	/*

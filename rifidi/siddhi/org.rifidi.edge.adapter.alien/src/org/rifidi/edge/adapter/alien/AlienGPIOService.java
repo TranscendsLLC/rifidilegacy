@@ -20,6 +20,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.rifidi.edge.sensors.AbstractGPIOService;
 import org.rifidi.edge.sensors.CannotExecuteException;
+import org.rifidi.edge.services.SiddhiManagementService;
 
 /**
  * This class is a service that lets applications access the GPIO functionality
@@ -62,7 +63,7 @@ public class AlienGPIOService extends
 	 * flashGPO(java.lang.String, int, java.util.Set)
 	 */
 	@Override
-	public void flashGPO(String readerID, int flashTime, Set<Integer> ports)
+	public void flashGPO(String readerID, int flashTime, SiddhiManagementService siddhiManagementService, Set<Integer> ports)
 			throws CannotExecuteException {
 		Alien9800ReaderSession session = getSession(readerID);
 		BitSet bits = new BitSet(8);
