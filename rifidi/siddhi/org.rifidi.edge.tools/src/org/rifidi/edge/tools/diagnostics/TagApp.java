@@ -127,7 +127,8 @@ public class TagApp extends AbstractRifidiApp {
 		try {
 			//siddhiManager.defineStream("define stream ReadCycle ( epc string, reader string )");
 			////queryReference = siddhiManager.getManager().addQuery( "from ReadCycle[ reader=='"+readerID+"' ] select epc, reader insert into TagEvent;"  );
-			queryReference = siddhiManager.getManager().addQuery( "from " + GPOEvent.class.getSimpleName() + "[ readerId=='"+readerID+"' ] select readerId, port, state insert into GPOEvent;"  );
+			//queryReference = siddhiManager.getManager().addQuery( "from " + GPOEvent.class.getSimpleName() + "[ readerId=='"+readerID+"' ] select readerId, port, state insert into GPOEvent;"  );
+			queryReference = siddhiManager.getManager().addQuery( "from " + GPOEvent.class.getSimpleName() + "select readerId, port, state insert into GPOEvent;"  );
 			
 		} catch(Exception e) {
 			System.out.println("Exception caught");
